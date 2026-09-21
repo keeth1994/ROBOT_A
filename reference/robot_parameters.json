@@ -1,0 +1,12 @@
+{
+  "effective_print_density_kg_m3": 650,
+  "metal_density_kg_m3": 7800,
+  "servo_mass_kg": 0.044,
+  "wheel_rotating_assembly_mass_kg": 0.12,
+  "electronics_and_battery_mass_kg": 0.2,
+  "servo_stall_torque_Nm": 0.27,
+  "servo_free_speed_deg_s": 230,
+  "brake_torque_Nm": 0.15,
+  "ground_friction": 0.8,
+  "notes": "All unmeasured assumptions. 120 g per rotating wheel is user starting estimate. Print density is an effective bulk estimate, not an infill calculation. Brake is ideal joint friction; no cam/contact validation."
+}

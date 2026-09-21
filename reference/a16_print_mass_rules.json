@@ -1,0 +1,202 @@
+[
+  {
+    "name": "A7 hus med plan P40 inngang",
+    "volume_m3": 4.839530458778754e-05,
+    "mass_kg": 0.05186392593383789
+  },
+  {
+    "name": "A7 servofeste - fire monteringshull",
+    "volume_m3": 1.2497559862640791e-05,
+    "mass_kg": 0.013241119384765625
+  },
+  {
+    "name": "A7 avstandsstotte",
+    "volume_m3": 1.4003335094111185e-06,
+    "mass_kg": 0.0016945297718048095
+  },
+  {
+    "name": "A7 fremre lagerbro",
+    "volume_m3": 1.1050426103519738e-05,
+    "mass_kg": 0.009807997703552247
+  },
+  {
+    "name": "A7 avtakbart fremre lagerlokk",
+    "volume_m3": 2.8791754192354444e-06,
+    "mass_kg": 0.0031446375846862795
+  },
+  {
+    "name": "A7 bakre lagerlokk",
+    "volume_m3": 3.9819686884249664e-07,
+    "mass_kg": 0.00047773122787475586
+  },
+  {
+    "name": "A7 dobbel gaffel - P40 utgang",
+    "volume_m3": 5.3097241693311466e-05,
+    "mass_kg": 0.05185905456542969
+  },
+  {
+    "name": "A7 avtakbart drivkinn med direkte nav",
+    "volume_m3": 3.158138270109225e-05,
+    "mass_kg": 0.027752159118652343
+  },
+  {
+    "name": "A7.2 Y180 hus med plan P40 inngang",
+    "volume_m3": 4.839530458778774e-05,
+    "mass_kg": 0.05201715087890625
+  },
+  {
+    "name": "A7.2 Y180 servofeste - fire monteringshull",
+    "volume_m3": 1.2497559862640717e-05,
+    "mass_kg": 0.012697151184082031
+  },
+  {
+    "name": "A7 hus med plan P40 inngang",
+    "volume_m3": 4.880256411340263e-05,
+    "mass_kg": 0.0506536865234375
+  },
+  {
+    "name": "A7 servofeste - fire monteringshull",
+    "volume_m3": 1.2904819388256277e-05,
+    "mass_kg": 0.013633065223693848
+  },
+  {
+    "name": "Lagerhus - to 37x7 seter, 29 mm senteravstand",
+    "volume_m3": 1.558869392298144e-05,
+    "mass_kg": 0.014376838684082032
+  },
+  {
+    "name": "Nedre lagerlokk M3",
+    "volume_m3": 3.283969632650633e-06,
+    "mass_kg": 0.0035292341709136964
+  },
+  {
+    "name": "Ovre lagerlokk og baereplate",
+    "volume_m3": 1.605366221559801e-05,
+    "mass_kg": 0.014313653945922851
+  },
+  {
+    "name": "Styreservo feste - bekreft hull mot fysisk servo",
+    "volume_m3": 3.530648246294418e-06,
+    "mass_kg": 0.003942779779434204
+  },
+  {
+    "name": "Bro for bremsestyring - 1 mm over tannhjul",
+    "volume_m3": 4.293899334724009e-06,
+    "mass_kg": 0.004232091426849365
+  },
+  {
+    "name": "Fremre kamstotte med lagerboring D8.2",
+    "volume_m3": 8.257138964958915e-06,
+    "mass_kg": 0.0069757761955261234
+  },
+  {
+    "name": "Bakre bremseservo feste - ma bekreftes",
+    "volume_m3": 9.694890995059233e-06,
+    "mass_kg": 0.009182384490966797
+  },
+  {
+    "name": "Beinfeste - fire M4 hull for senere pitch-ledd",
+    "volume_m3": 1.9507072597359054e-05,
+    "mass_kg": 0.013891901969909668
+  },
+  {
+    "name": "Adapterplate 90x90 og hul aksel D25 / D14.6",
+    "volume_m3": 3.048338864209097e-05,
+    "mass_kg": 0.02692079162597656
+  },
+  {
+    "name": "Aksial laasering D25 - delt klemring kreves",
+    "volume_m3": 8.639379797372298e-07,
+    "mass_kg": 0.0010242894887924194
+  },
+  {
+    "name": "Styrehjul 40T - innvendig D25",
+    "volume_m3": 5.975974881673874e-06,
+    "mass_kg": 0.005729398727416992
+  },
+  {
+    "name": "Forlenget bremsestang med kilespor og trykkskulder",
+    "volume_m3": 1.369933119767419e-05,
+    "mass_kg": 0.01085707950592041
+  },
+  {
+    "name": "Servohjul 40T - adapter til originalhorn",
+    "volume_m3": 8.998187014427393e-06,
+    "mass_kg": 0.00696290922164917
+  },
+  {
+    "name": "Originalhorn adapter - hull ma matches",
+    "volume_m3": 5.717698629533742e-07,
+    "mass_kg": 0.0006877719163894653
+  },
+  {
+    "name": "Kam R10 e2 med stottet aksel D8",
+    "volume_m3": 3.267256359733245e-06,
+    "mass_kg": 0.0028502192497253417
+  },
+  {
+    "name": "Trykkplate med to glideforinger",
+    "volume_m3": 2.694357532452984e-06,
+    "mass_kg": 0.002535728931427002
+  },
+  {
+    "name": "P40 adapter: M4 40x40, sentral D8, to styrehull D3.2",
+    "volume_m3": 2.3736042573655163e-05,
+    "mass_kg": 0.017641290664672852
+  },
+  {
+    "name": "Forlenget bremsestang med kilespor og trykkskulder",
+    "volume_m3": 1.3699399167898417e-05,
+    "mass_kg": 0.010857081413269043
+  },
+  {
+    "name": "A7.1 lukket akslingsgaffel med to foringsseter",
+    "volume_m3": 3.0436710782085897e-05,
+    "mass_kg": 0.02673546600341797
+  },
+  {
+    "name": "A14 second servo ribbed bridge",
+    "volume_m3": 1.6525135974645174e-05,
+    "mass_kg": 0.017154722213745116
+  },
+  {
+    "name": "136x136 ring - diagonal P40 interfaces",
+    "volume_m3": 0.0002219530768067641,
+    "mass_kg": 0.16754583740234374
+  },
+  {
+    "name": "M3 stack post",
+    "volume_m3": 3.74135410708646e-06,
+    "mass_kg": 0.0044312067031860355
+  },
+  {
+    "name": "Open electronics shelf",
+    "volume_m3": 1.9181222935972578e-05,
+    "mass_kg": 0.020776643753051757
+  },
+  {
+    "name": "Open electronics shelf",
+    "volume_m3": 1.9226618949816945e-05,
+    "mass_kg": 0.020817968368530275
+  },
+  {
+    "name": "Strap-retained battery cradle - removable M3",
+    "volume_m3": 1.2864244538121942e-05,
+    "mass_kg": 0.014823846817016602
+  },
+  {
+    "name": "Open IMU bridge",
+    "volume_m3": 9.719366377848968e-06,
+    "mass_kg": 0.011830642700195312
+  },
+  {
+    "name": "Strap saddle and M3 sensor face",
+    "volume_m3": 1.2521524783386806e-05,
+    "mass_kg": 0.0135050048828125
+  },
+  {
+    "name": "Camera strap shelf - prototype",
+    "volume_m3": 3.0720000000000097e-06,
+    "mass_kg": 0.0032535898685455322
+  }
+]

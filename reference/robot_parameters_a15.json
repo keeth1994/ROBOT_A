@@ -1,0 +1,15 @@
+{
+  "effective_print_density_kg_m3": 650,
+  "metal_density_kg_m3": 7800,
+  "servo_mass_kg": 0.044,
+  "wheel_rotating_assembly_mass_kg": 0.04,
+  "electronics_and_battery_mass_kg": 0.2,
+  "servo_stall_torque_Nm": 0.26833896966654,
+  "servo_free_speed_deg_s": 315.7894736842105,
+  "brake_torque_Nm": 0.15,
+  "ground_friction": 0.8,
+  "notes": "All unmeasured assumptions. A15: 40 g per rotating wheel assembly is the user-requested unmeasured estimate. Print density is an effective bulk estimate, not an infill calculation. Brake is ideal joint friction; no cam/contact validation. A8: 25x37x7 bearing uses SKF W61805-2RS1 reference mass 21.3 g; 8x16x5 bearing 5.9 g is a conservative solid-steel envelope estimate. Actual bearing selection unconfirmed. Digital servo v3.0 6V ratings used as optimistic instantaneous ceilings. A14: ideal synchronized dual hip servo, 2x stall torque, unchanged free speed; no thermal or supply sag model.",
+  "bearing_25_37_7_mass_kg": 0.0213,
+  "bearing_8_16_5_mass_kg": 0.0059,
+  "hip_servo_count": 2
+}

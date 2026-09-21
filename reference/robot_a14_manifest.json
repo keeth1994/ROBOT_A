@@ -1,0 +1,4712 @@
+{
+  "source": "Robot_A14_Dobbel_Pitch.f3d",
+  "cad_body_count": 605,
+  "servo_envelopes": 24,
+  "total_mass_assumed_kg": 4.971885417018724,
+  "joints": [
+    {
+      "name": "FL_hip_pitch",
+      "parent": "platform",
+      "origin_cad_m": [
+        0.15565863991822648,
+        0.12722361107568206,
+        0.045000000000000005
+      ],
+      "axis": [
+        0.7071067811865476,
+        -0.7071067811865476,
+        0.0
+      ],
+      "limits_rad": [
+        -0.7853981633974483,
+        0.7853981633974483
+      ],
+      "actuated": true
+    },
+    {
+      "name": "FL_yaw",
+      "parent": "FL_hip_pitch",
+      "origin_cad_m": [
+        0.21965180361560901,
+        0.20465180361560903,
+        0.0545
+      ],
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "FL_distal_pitch",
+      "parent": "FL_yaw",
+      "origin_cad_m": [
+        0.29707999615553604,
+        0.2686449673129916,
+        0.045000000000000005
+      ],
+      "axis": [
+        0.7071067811865476,
+        -0.7071067811865476,
+        0.0
+      ],
+      "limits_rad": [
+        0,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "FL_steering",
+      "parent": "FL_distal_pitch",
+      "origin_cad_m": [
+        0.285412734265958,
+        0.27041273426595797,
+        -0.106
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "FL_wheel_roll",
+      "parent": "FL_steering",
+      "origin_cad_m": [
+        0.285412734265958,
+        0.27041273426595797,
+        -0.1555
+      ],
+      "axis": [
+        -0.7071067811865476,
+        0.7071067811865476,
+        0.0
+      ],
+      "limits_rad": null,
+      "actuated": false
+    },
+    {
+      "name": "RL_hip_pitch",
+      "parent": "platform",
+      "origin_cad_m": [
+        -0.14222361107568207,
+        0.1406586399182265,
+        0.045000000000000005
+      ],
+      "axis": [
+        0.7071067811865476,
+        0.7071067811865475,
+        0.0
+      ],
+      "limits_rad": [
+        -0.7853981633974483,
+        0.7853981633974483
+      ],
+      "actuated": true
+    },
+    {
+      "name": "RL_yaw",
+      "parent": "RL_hip_pitch",
+      "origin_cad_m": [
+        -0.21965180361560901,
+        0.20465180361560903,
+        0.0545
+      ],
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "RL_distal_pitch",
+      "parent": "RL_yaw",
+      "origin_cad_m": [
+        -0.28364496731299155,
+        0.28207999615553603,
+        0.045000000000000005
+      ],
+      "axis": [
+        0.7071067811865476,
+        0.7071067811865475,
+        0.0
+      ],
+      "limits_rad": [
+        0,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "RL_steering",
+      "parent": "RL_distal_pitch",
+      "origin_cad_m": [
+        -0.2854127342659579,
+        0.27041273426595797,
+        -0.106
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "RL_wheel_roll",
+      "parent": "RL_steering",
+      "origin_cad_m": [
+        -0.2854127342659579,
+        0.27041273426595797,
+        -0.1555
+      ],
+      "axis": [
+        -0.7071067811865476,
+        -0.7071067811865475,
+        0.0
+      ],
+      "limits_rad": null,
+      "actuated": false
+    },
+    {
+      "name": "FR_hip_pitch",
+      "parent": "platform",
+      "origin_cad_m": [
+        0.14222361107568207,
+        -0.1406586399182265,
+        0.045000000000000005
+      ],
+      "axis": [
+        -0.7071067811865476,
+        -0.7071067811865476,
+        0.0
+      ],
+      "limits_rad": [
+        -0.7853981633974483,
+        0.7853981633974483
+      ],
+      "actuated": true
+    },
+    {
+      "name": "FR_yaw",
+      "parent": "FR_hip_pitch",
+      "origin_cad_m": [
+        0.21965180361560901,
+        -0.20465180361560903,
+        0.0545
+      ],
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "FR_distal_pitch",
+      "parent": "FR_yaw",
+      "origin_cad_m": [
+        0.2836449673129916,
+        -0.28207999615553603,
+        0.045000000000000005
+      ],
+      "axis": [
+        -0.7071067811865476,
+        -0.7071067811865476,
+        0.0
+      ],
+      "limits_rad": [
+        0,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "FR_steering",
+      "parent": "FR_distal_pitch",
+      "origin_cad_m": [
+        0.285412734265958,
+        -0.27041273426595797,
+        -0.106
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "FR_wheel_roll",
+      "parent": "FR_steering",
+      "origin_cad_m": [
+        0.285412734265958,
+        -0.27041273426595797,
+        -0.1555
+      ],
+      "axis": [
+        0.7071067811865476,
+        0.7071067811865476,
+        0.0
+      ],
+      "limits_rad": null,
+      "actuated": false
+    },
+    {
+      "name": "RR_hip_pitch",
+      "parent": "platform",
+      "origin_cad_m": [
+        -0.15565863991822645,
+        -0.12722361107568206,
+        0.045000000000000005
+      ],
+      "axis": [
+        -0.7071067811865476,
+        0.7071067811865475,
+        0.0
+      ],
+      "limits_rad": [
+        -0.7853981633974483,
+        0.7853981633974483
+      ],
+      "actuated": true
+    },
+    {
+      "name": "RR_yaw",
+      "parent": "RR_hip_pitch",
+      "origin_cad_m": [
+        -0.21965180361560901,
+        -0.20465180361560903,
+        0.0545
+      ],
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "RR_distal_pitch",
+      "parent": "RR_yaw",
+      "origin_cad_m": [
+        -0.29707999615553593,
+        -0.2686449673129916,
+        0.045000000000000005
+      ],
+      "axis": [
+        -0.7071067811865476,
+        0.7071067811865475,
+        0.0
+      ],
+      "limits_rad": [
+        0,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "RR_steering",
+      "parent": "RR_distal_pitch",
+      "origin_cad_m": [
+        -0.2854127342659579,
+        -0.27041273426595797,
+        -0.106
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "actuated": true
+    },
+    {
+      "name": "RR_wheel_roll",
+      "parent": "RR_steering",
+      "origin_cad_m": [
+        -0.2854127342659579,
+        -0.27041273426595797,
+        -0.1555
+      ],
+      "axis": [
+        0.7071067811865476,
+        -0.7071067811865475,
+        0.0
+      ],
+      "limits_rad": null,
+      "actuated": false
+    }
+  ],
+  "links": [
+    {
+      "link": "platform",
+      "parts": 133,
+      "mass_kg": 1.5235644527107521,
+      "com_cad_m": [
+        0.0062954607787335855,
+        0.0018480044810291437,
+        0.03842122818463779
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.018976129574818843,
+          0.00017395844323774015,
+          5.9709881751284814e-05
+        ],
+        [
+          0.00017395844323774015,
+          0.023412907954055637,
+          3.719990349915952e-05
+        ],
+        [
+          5.9709881751284814e-05,
+          3.719990349915952e-05,
+          0.04047757177069368
+        ]
+      ]
+    },
+    {
+      "link": "FL_hip_pitch",
+      "parts": 16,
+      "mass_kg": 0.1795499273685746,
+      "com_cad_m": [
+        0.20121483158133024,
+        0.18474493341102172,
+        0.046302729962424204
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0003010273267289898,
+          -0.00010230831431765785,
+          -8.974622011179208e-06
+        ],
+        [
+          -0.00010230831431765785,
+          0.0002777367989476239,
+          -9.318438650816934e-06
+        ],
+        [
+          -8.974622011179208e-06,
+          -9.318438650816934e-06,
+          0.00043767675302472294
+        ]
+      ]
+    },
+    {
+      "link": "FL_yaw",
+      "parts": 15,
+      "mass_kg": 0.17969417564719703,
+      "com_cad_m": [
+        0.2723419802927535,
+        0.255532370010091,
+        0.046023895188900536
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0002927807460087646,
+          -0.00010651628684951375,
+          1.528433956253267e-05
+        ],
+        [
+          -0.00010651628684951375,
+          0.0003006779139196469,
+          1.4977564210730283e-05
+        ],
+        [
+          1.528433956253267e-05,
+          1.4977564210730283e-05,
+          0.00044034430462952734
+        ]
+      ]
+    },
+    {
+      "link": "FL_distal_pitch",
+      "parts": 55,
+      "mass_kg": 0.2618039181650288,
+      "com_cad_m": [
+        0.2873701948014717,
+        0.28407921471196496,
+        -0.04372042310715342
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0007408912924720373,
+          1.3736407195059338e-05,
+          1.801209116697884e-05
+        ],
+        [
+          1.3736407195059338e-05,
+          0.0007209229206615196,
+          5.7584076096988794e-05
+        ],
+        [
+          1.801209116697884e-05,
+          5.7584076096988794e-05,
+          0.00032504675424357624
+        ]
+      ]
+    },
+    {
+      "link": "FL_steering",
+      "parts": 21,
+      "mass_kg": 0.11481172588308469,
+      "com_cad_m": [
+        0.2854202716291646,
+        0.2704020292438917,
+        -0.11495800197121586
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00018243614299422655,
+          6.939989266670791e-06,
+          3.294588320537842e-08
+        ],
+        [
+          6.939989266670791e-06,
+          0.00018243621881075577,
+          3.2488666757087233e-09
+        ],
+        [
+          3.294588320537842e-08,
+          3.2488666757087233e-09,
+          9.941406637437065e-05
+        ]
+      ]
+    },
+    {
+      "link": "FL_pinion",
+      "parts": 2,
+      "mass_kg": 0.006220471970297499,
+      "com_cad_m": [
+        0.31380307153050613,
+        0.29880307153050617,
+        -0.06876101465439004
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          9.057273358614083e-07,
+          -2.1809288292270433e-28,
+          1.1042192035824696e-18
+        ],
+        [
+          -2.1809288292270433e-28,
+          9.057273358614083e-07,
+          1.1042967961060861e-18
+        ],
+        [
+          1.1042192035824696e-18,
+          1.1042967961060861e-18,
+          1.7376372136812746e-06
+        ]
+      ]
+    },
+    {
+      "link": "RL_hip_pitch",
+      "parts": 16,
+      "mass_kg": 0.17954992736842712,
+      "com_cad_m": [
+        -0.19974493341058142,
+        0.1862148315823798,
+        0.046302729962425196
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0002777368027249424,
+          0.00010230831431819124,
+          9.318438650888072e-06
+        ],
+        [
+          0.00010230831431819124,
+          0.000301027324960018,
+          -8.974622010901828e-06
+        ],
+        [
+          9.318438650888072e-06,
+          -8.974622010901828e-06,
+          0.0004376767550331976
+        ]
+      ]
+    },
+    {
+      "link": "RL_yaw",
+      "parts": 15,
+      "mass_kg": 0.17969417564719656,
+      "com_cad_m": [
+        -0.2705323700107484,
+        0.2573419802934109,
+        0.04602389518935553
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00030067791550938473,
+          0.00010651628685384062,
+          -1.4977564210454926e-05
+        ],
+        [
+          0.00010651628685384062,
+          0.0002927807460111914,
+          1.528433955976598e-05
+        ],
+        [
+          -1.4977564210454926e-05,
+          1.528433955976598e-05,
+          0.00044034430622201173
+        ]
+      ]
+    },
+    {
+      "link": "RL_distal_pitch",
+      "parts": 55,
+      "mass_kg": 0.261803918165029,
+      "com_cad_m": [
+        -0.2990792147119366,
+        0.2723701948014587,
+        -0.04372042310715335
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0007209229206612017,
+          -1.3736407195054348e-05,
+          -5.758407609739721e-05
+        ],
+        [
+          -1.3736407195054348e-05,
+          0.0007408912924724658,
+          1.8012091167411575e-05
+        ],
+        [
+          -5.758407609739721e-05,
+          1.8012091167411575e-05,
+          0.00032504675424368704
+        ]
+      ]
+    },
+    {
+      "link": "RL_steering",
+      "parts": 21,
+      "mass_kg": 0.1148117700637311,
+      "com_cad_m": [
+        -0.2854020244475078,
+        0.2704202875019986,
+        -0.11495802552321409
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00018243607230100642,
+          -6.939989322080835e-06,
+          -3.262769888630712e-09
+        ],
+        [
+          -6.939989322080835e-06,
+          0.00018243599679497314,
+          3.289895360682271e-08
+        ],
+        [
+          -3.262769888630712e-09,
+          3.289895360682271e-08,
+          9.941407194971482e-05
+        ]
+      ]
+    },
+    {
+      "link": "RL_pinion",
+      "parts": 2,
+      "mass_kg": 0.006220471970297498,
+      "com_cad_m": [
+        -0.31380307153050613,
+        0.298803071530506,
+        -0.06876101465439001
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          9.057273358614082e-07,
+          2.1809286969388133e-28,
+          -1.1042192035824738e-18
+        ],
+        [
+          2.1809286969388133e-28,
+          9.057273358614082e-07,
+          1.10429679610609e-18
+        ],
+        [
+          -1.1042192035824738e-18,
+          1.10429679610609e-18,
+          1.7376372136812744e-06
+        ]
+      ]
+    },
+    {
+      "link": "FR_hip_pitch",
+      "parts": 16,
+      "mass_kg": 0.17954992736857456,
+      "com_cad_m": [
+        0.19974493341104463,
+        -0.18621483158135485,
+        0.046302729962424224
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00027773680274061573,
+          0.00010230831431781549,
+          -9.318438650779631e-06
+        ],
+        [
+          0.00010230831431781549,
+          0.00030102732495710933,
+          8.974622011141416e-06
+        ],
+        [
+          -9.318438650779631e-06,
+          8.974622011141416e-06,
+          0.0004376767550458344
+        ]
+      ]
+    },
+    {
+      "link": "FR_yaw",
+      "parts": 15,
+      "mass_kg": 0.17969417564719725,
+      "com_cad_m": [
+        0.27053237001074915,
+        -0.25734198029341115,
+        0.046023895188861345
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00030067791550955625,
+          0.00010651628685384118,
+          1.4977564210789706e-05
+        ],
+        [
+          0.00010651628685384118,
+          0.00029278074601136463,
+          -1.5284339562485217e-05
+        ],
+        [
+          1.4977564210789706e-05,
+          -1.5284339562485217e-05,
+          0.0004403443062220132
+        ]
+      ]
+    },
+    {
+      "link": "FR_distal_pitch",
+      "parts": 55,
+      "mass_kg": 0.26180391816502857,
+      "com_cad_m": [
+        0.2990792147119373,
+        -0.2723701948014592,
+        -0.04372042310715341
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0007209229206612115,
+          -1.3736407195054842e-05,
+          5.7584076097386296e-05
+        ],
+        [
+          -1.3736407195054842e-05,
+          0.0007408912924724577,
+          -1.801209116740117e-05
+        ],
+        [
+          5.7584076097386296e-05,
+          -1.801209116740117e-05,
+          0.0003250467542436859
+        ]
+      ]
+    },
+    {
+      "link": "FR_steering",
+      "parts": 21,
+      "mass_kg": 0.11481173514157833,
+      "com_cad_m": [
+        0.285402040105266,
+        -0.27042028750988506,
+        -0.11495801161968634
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00018243616019722881,
+          -6.93998944702807e-06,
+          3.2168674481406898e-09
+        ],
+        [
+          -6.93998944702807e-06,
+          0.00018243608450680833,
+          -3.289910362556386e-08
+        ],
+        [
+          3.2168674481406898e-09,
+          -3.289910362556386e-08,
+          9.941406720225432e-05
+        ]
+      ]
+    },
+    {
+      "link": "FR_pinion",
+      "parts": 2,
+      "mass_kg": 0.006220471970297499,
+      "com_cad_m": [
+        0.31380307153050613,
+        -0.29880307153050606,
+        -0.06876101465439004
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          9.057273358614083e-07,
+          2.1806223640069784e-28,
+          1.1042192035824734e-18
+        ],
+        [
+          2.1806223640069784e-28,
+          9.057273358614083e-07,
+          -1.1041416110588573e-18
+        ],
+        [
+          1.1042192035824734e-18,
+          -1.1041416110588573e-18,
+          1.7376372136812746e-06
+        ]
+      ]
+    },
+    {
+      "link": "RR_hip_pitch",
+      "parts": 16,
+      "mass_kg": 0.17954992736842734,
+      "com_cad_m": [
+        -0.20121483158235512,
+        -0.18474493341055856,
+        0.046302729962425175
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0003010273267318983,
+          -0.00010230831431803344,
+          8.97462201093955e-06
+        ],
+        [
+          -0.00010230831431803344,
+          0.00027773679893195043,
+          9.318438650925338e-06
+        ],
+        [
+          8.97462201093955e-06,
+          9.318438650925338e-06,
+          0.0004376767530120857
+        ]
+      ]
+    },
+    {
+      "link": "RR_yaw",
+      "parts": 15,
+      "mass_kg": 0.1796941756471973,
+      "com_cad_m": [
+        -0.27234198029275314,
+        -0.25553237001009077,
+        0.046023895189314566
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00029278074600861743,
+          -0.00010651628684951323,
+          -1.5284339559678425e-05
+        ],
+        [
+          -0.00010651628684951323,
+          0.0003006779139194994,
+          -1.497756421046945e-05
+        ],
+        [
+          -1.5284339559678425e-05,
+          -1.497756421046945e-05,
+          0.0004403443046295285
+        ]
+      ]
+    },
+    {
+      "link": "RR_distal_pitch",
+      "parts": 55,
+      "mass_kg": 0.26180391816502896,
+      "com_cad_m": [
+        -0.28737019480147163,
+        -0.28407921471196507,
+        -0.04372042310715334
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0007408912924720391,
+          1.373640719505981e-05,
+          -1.801209116697808e-05
+        ],
+        [
+          1.373640719505981e-05,
+          0.0007209229206615188,
+          -5.758407609698616e-05
+        ],
+        [
+          -1.801209116697808e-05,
+          -5.758407609698616e-05,
+          0.00032504675424357635
+        ]
+      ]
+    },
+    {
+      "link": "RR_steering",
+      "parts": 21,
+      "mass_kg": 0.11481176061548053,
+      "com_cad_m": [
+        -0.285420297361871,
+        -0.2704020292591489,
+        -0.11495801586516395
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00018243605518682046,
+          6.939989418578868e-06,
+          -3.28700616871566e-08
+        ],
+        [
+          6.939989418578868e-06,
+          0.00018243613059229567,
+          -3.248694284062511e-09
+        ],
+        [
+          -3.28700616871566e-08,
+          -3.248694284062511e-09,
+          9.941407050113849e-05
+        ]
+      ]
+    },
+    {
+      "link": "RR_pinion",
+      "parts": 2,
+      "mass_kg": 0.006220471970297495,
+      "com_cad_m": [
+        -0.313803071530506,
+        -0.29880307153050606,
+        -0.06876101465439002
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          9.057273358614078e-07,
+          -2.180775429971692e-28,
+          -1.1041416110588607e-18
+        ],
+        [
+          -2.180775429971692e-28,
+          9.057273358614078e-07,
+          -1.1042967961060932e-18
+        ],
+        [
+          -1.1041416110588607e-18,
+          -1.1042967961060932e-18,
+          1.7376372136812736e-06
+        ]
+      ]
+    },
+    {
+      "link": "FL_wheel_roll",
+      "parts": 9,
+      "mass_kg": 0.12,
+      "com_cad_m": [
+        0.2854127342676119,
+        0.2704127342668908,
+        -0.15549999999999994
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          8.033304431022878e-05,
+          2.604586094578787e-07,
+          2.6568953727073805e-21
+        ],
+        [
+          2.604586094578787e-07,
+          8.033304431022874e-05,
+          -2.6568953669720827e-21
+        ],
+        [
+          2.6568953727073805e-21,
+          -2.6568953669720827e-21,
+          7.809272255789505e-05
+        ]
+      ]
+    },
+    {
+      "link": "RL_wheel_roll",
+      "parts": 9,
+      "mass_kg": 0.12,
+      "com_cad_m": [
+        -0.2854127342676116,
+        0.2704127342668905,
+        -0.15549999999999975
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          8.033304431022868e-05,
+          -2.604586094578802e-07,
+          -1.7990033198256202e-20
+        ],
+        [
+          -2.604586094578802e-07,
+          8.033304431022878e-05,
+          -1.7990033196811818e-20
+        ],
+        [
+          -1.7990033198256202e-20,
+          -1.7990033196811818e-20,
+          7.809272255789502e-05
+        ]
+      ]
+    },
+    {
+      "link": "FR_wheel_roll",
+      "parts": 9,
+      "mass_kg": 0.12,
+      "com_cad_m": [
+        0.2854127342676115,
+        -0.27041273426689094,
+        -0.1555
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          8.033304431022875e-05,
+          -2.604586094578783e-07,
+          4.436842147020949e-21
+        ],
+        [
+          -2.604586094578783e-07,
+          8.033304431022875e-05,
+          4.436842139009021e-21
+        ],
+        [
+          4.436842147020949e-21,
+          4.436842139009021e-21,
+          7.809272255789502e-05
+        ]
+      ]
+    },
+    {
+      "link": "RR_wheel_roll",
+      "parts": 9,
+      "mass_kg": 0.12,
+      "com_cad_m": [
+        -0.2854127342676117,
+        -0.2704127342668913,
+        -0.15550000000000022
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          8.033304431022867e-05,
+          2.6045860945788243e-07,
+          -1.7371041537404946e-20
+        ],
+        [
+          2.6045860945788243e-07,
+          8.033304431022876e-05,
+          1.7371041528781176e-20
+        ],
+        [
+          -1.7371041537404946e-20,
+          1.7371041528781176e-20,
+          7.809272255789501e-05
+        ]
+      ]
+    }
+  ],
+  "assignments": [
+    {
+      "index": 0,
+      "component": "Plattform A9 P01 Attekantet underplate",
+      "body": "A9 underplate 4 mm - 310x280 - diagonale hjorner",
+      "link": "platform"
+    },
+    {
+      "index": 1,
+      "component": "Plattform A9 P02 Baereramme med fire vertikale P40 flater",
+      "body": "A9 ramme - 8 mm hjornvegger - fire M4 per bein",
+      "link": "platform"
+    },
+    {
+      "index": 2,
+      "component": "Plattform A9 P03 Avtakbart attekantet lokk",
+      "body": "A9 lokk 3 mm - ventilasjon og IMU",
+      "link": "platform"
+    },
+    {
+      "index": 3,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Batterivugge 70x40 fri - borrelaas og mykt underlag",
+      "link": "platform"
+    },
+    {
+      "index": 4,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "ESP32 avtakbar universalvugge",
+      "link": "platform"
+    },
+    {
+      "index": 5,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "PWM avtakbar universalvugge",
+      "link": "platform"
+    },
+    {
+      "index": 6,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Analog inngang avtakbar universalvugge",
+      "link": "platform"
+    },
+    {
+      "index": 7,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Stromforsyning avtakbar universalvugge",
+      "link": "platform"
+    },
+    {
+      "index": 8,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "FL kontaktfeste",
+      "link": "platform"
+    },
+    {
+      "index": 9,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Kabelstroppfeste",
+      "link": "platform"
+    },
+    {
+      "index": 10,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Kabelstroppfeste (1)",
+      "link": "platform"
+    },
+    {
+      "index": 11,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "RL kontaktfeste",
+      "link": "platform"
+    },
+    {
+      "index": 12,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Kabelstroppfeste (2)",
+      "link": "platform"
+    },
+    {
+      "index": 13,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Kabelstroppfeste (3)",
+      "link": "platform"
+    },
+    {
+      "index": 14,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "FR kontaktfeste",
+      "link": "platform"
+    },
+    {
+      "index": 15,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Kabelstroppfeste (4)",
+      "link": "platform"
+    },
+    {
+      "index": 16,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Kabelstroppfeste (5)",
+      "link": "platform"
+    },
+    {
+      "index": 17,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "RR kontaktfeste",
+      "link": "platform"
+    },
+    {
+      "index": 18,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Kabelstroppfeste (6)",
+      "link": "platform"
+    },
+    {
+      "index": 19,
+      "component": "Plattform P04 Elektronikkbrett og kabelstyring",
+      "body": "Kabelstroppfeste (7)",
+      "link": "platform"
+    },
+    {
+      "index": 20,
+      "component": "Plattform E01 RS 144-9405 LiPo 3.7V 1800mAh 53.5x35x10.4",
+      "body": "Batteri databladmaal - butikk oppgir annen lengde",
+      "link": "platform"
+    },
+    {
+      "index": 21,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "PCB 55x29",
+      "link": "platform"
+    },
+    {
+      "index": 22,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "ESP32 WROOM skjerm - forenklet",
+      "link": "platform"
+    },
+    {
+      "index": 23,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "19-pins tilkoblingsrad - malvolum",
+      "link": "platform"
+    },
+    {
+      "index": 24,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "19-pins tilkoblingsrad - malvolum (1)",
+      "link": "platform"
+    },
+    {
+      "index": 25,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "USB C tilgang mot senter",
+      "link": "platform"
+    },
+    {
+      "index": 26,
+      "component": "Plattform E03 RESERVERT PWM 16 kanaler - kortvariant ikke valgt",
+      "body": "70x35x18 reservert - IKKE produsentmaal",
+      "link": "platform"
+    },
+    {
+      "index": 27,
+      "component": "Plattform E04 RESERVERT ADC og FSR motstander",
+      "body": "65x35x18 reservert - sensorgrensesnitt",
+      "link": "platform"
+    },
+    {
+      "index": 28,
+      "component": "Plattform E05 RESERVERT regulator strom og spenningsmaaling",
+      "body": "70x45x28 reservert - elektrisk dimensjonering gjenstaar",
+      "link": "platform"
+    },
+    {
+      "index": 29,
+      "component": "Plattform E06 Fire beinporter med kontakt og vinkelinngang",
+      "body": "FL kontaktvolum - 4 servo + kontakt + vinkel",
+      "link": "platform"
+    },
+    {
+      "index": 30,
+      "component": "Plattform E06 Fire beinporter med kontakt og vinkelinngang",
+      "body": "RL kontaktvolum - 4 servo + kontakt + vinkel",
+      "link": "platform"
+    },
+    {
+      "index": 31,
+      "component": "Plattform E06 Fire beinporter med kontakt og vinkelinngang",
+      "body": "FR kontaktvolum - 4 servo + kontakt + vinkel",
+      "link": "platform"
+    },
+    {
+      "index": 32,
+      "component": "Plattform E06 Fire beinporter med kontakt og vinkelinngang",
+      "body": "RR kontaktvolum - 4 servo + kontakt + vinkel",
+      "link": "platform"
+    },
+    {
+      "index": 33,
+      "component": "Plattform P05 Sentral IMU-holder med utskiftbar sokkel",
+      "body": "mikroBUS sokkelholder - 2.54 mm pinnesteg",
+      "link": "platform"
+    },
+    {
+      "index": 34,
+      "component": "Plattform S01 MIKROE-4228 6DOF IMU 13 - accel og magnetometer",
+      "body": "PCB 28.6x25.4 - korttykkelse antatt 1.6",
+      "link": "platform"
+    },
+    {
+      "index": 35,
+      "component": "Plattform S01 MIKROE-4228 6DOF IMU 13 - accel og magnetometer",
+      "body": "MC6470 representasjon",
+      "link": "platform"
+    },
+    {
+      "index": 36,
+      "component": "Plattform S01 MIKROE-4228 6DOF IMU 13 - accel og magnetometer",
+      "body": "mikroBUS header - forenklet",
+      "link": "platform"
+    },
+    {
+      "index": 37,
+      "component": "Plattform S01 MIKROE-4228 6DOF IMU 13 - accel og magnetometer",
+      "body": "mikroBUS header - forenklet (1)",
+      "link": "platform"
+    },
+    {
+      "index": 38,
+      "component": "Plattform S05 M5Stack U082-X TimerCamera-X 48x24x15",
+      "body": "TimerCamera-X ytre maal - tilkoblinger forenklet",
+      "link": "platform"
+    },
+    {
+      "index": 39,
+      "component": "Plattform S05 M5Stack U082-X TimerCamera-X 48x24x15",
+      "body": "Kameralinse - senter foreloepig",
+      "link": "platform"
+    },
+    {
+      "index": 40,
+      "component": "Plattform P06 Kamera vugge med stroppspor og USB tilgang",
+      "body": "Kamerarygg og underhylle",
+      "link": "platform"
+    },
+    {
+      "index": 41,
+      "component": "Plattform P06 Kamera vugge med stroppspor og USB tilgang",
+      "body": "Sidefoering - 1 mm sideklaring",
+      "link": "platform"
+    },
+    {
+      "index": 42,
+      "component": "Plattform P06 Kamera vugge med stroppspor og USB tilgang",
+      "body": "Sidefoering - 1 mm sideklaring (1)",
+      "link": "platform"
+    },
+    {
+      "index": 43,
+      "component": "Plattform A9 IR Front GP2Y0A41SK0F",
+      "body": "Sharp hus 29.5 bredt - oerer 37 mm CC",
+      "link": "platform"
+    },
+    {
+      "index": 44,
+      "component": "Plattform A9 IR Front optikk",
+      "body": "Optisk vindu - sikt langs lokal Z",
+      "link": "platform"
+    },
+    {
+      "index": 45,
+      "component": "Plattform A9 IR Front optikk",
+      "body": "Optisk vindu - sikt langs lokal Z (1)",
+      "link": "platform"
+    },
+    {
+      "index": 46,
+      "component": "Plattform A9 IR Front avtakbart feste",
+      "body": "M3 feste med kabelutsparing",
+      "link": "platform"
+    },
+    {
+      "index": 47,
+      "component": "Plattform A9 IR Front avtakbart feste",
+      "body": "A9 sensoravstand 1.5 mm -18.5",
+      "link": "platform"
+    },
+    {
+      "index": 48,
+      "component": "Plattform A9 IR Front avtakbart feste",
+      "body": "A9 sensoravstand 1.5 mm 18.5",
+      "link": "platform"
+    },
+    {
+      "index": 49,
+      "component": "Plattform A9 IR Venstre GP2Y0A41SK0F",
+      "body": "Sharp hus 29.5 bredt - oerer 37 mm CC",
+      "link": "platform"
+    },
+    {
+      "index": 50,
+      "component": "Plattform A9 IR Venstre optikk",
+      "body": "Optisk vindu - sikt langs lokal Z",
+      "link": "platform"
+    },
+    {
+      "index": 51,
+      "component": "Plattform A9 IR Venstre optikk",
+      "body": "Optisk vindu - sikt langs lokal Z (1)",
+      "link": "platform"
+    },
+    {
+      "index": 52,
+      "component": "Plattform A9 IR Venstre avtakbart feste",
+      "body": "M3 feste med kabelutsparing",
+      "link": "platform"
+    },
+    {
+      "index": 53,
+      "component": "Plattform A9 IR Venstre avtakbart feste",
+      "body": "A9 sensoravstand 1.5 mm -18.5",
+      "link": "platform"
+    },
+    {
+      "index": 54,
+      "component": "Plattform A9 IR Venstre avtakbart feste",
+      "body": "A9 sensoravstand 1.5 mm 18.5",
+      "link": "platform"
+    },
+    {
+      "index": 55,
+      "component": "Plattform A9 IR Bak GP2Y0A41SK0F",
+      "body": "Sharp hus 29.5 bredt - oerer 37 mm CC",
+      "link": "platform"
+    },
+    {
+      "index": 56,
+      "component": "Plattform A9 IR Bak optikk",
+      "body": "Optisk vindu - sikt langs lokal Z",
+      "link": "platform"
+    },
+    {
+      "index": 57,
+      "component": "Plattform A9 IR Bak optikk",
+      "body": "Optisk vindu - sikt langs lokal Z (1)",
+      "link": "platform"
+    },
+    {
+      "index": 58,
+      "component": "Plattform A9 IR Bak avtakbart feste",
+      "body": "M3 feste med kabelutsparing",
+      "link": "platform"
+    },
+    {
+      "index": 59,
+      "component": "Plattform A9 IR Bak avtakbart feste",
+      "body": "A9 sensoravstand 1.5 mm -18.5",
+      "link": "platform"
+    },
+    {
+      "index": 60,
+      "component": "Plattform A9 IR Bak avtakbart feste",
+      "body": "A9 sensoravstand 1.5 mm 18.5",
+      "link": "platform"
+    },
+    {
+      "index": 61,
+      "component": "Plattform A9 IR Hoyre GP2Y0A41SK0F",
+      "body": "Sharp hus 29.5 bredt - oerer 37 mm CC",
+      "link": "platform"
+    },
+    {
+      "index": 62,
+      "component": "Plattform A9 IR Hoyre optikk",
+      "body": "Optisk vindu - sikt langs lokal Z",
+      "link": "platform"
+    },
+    {
+      "index": 63,
+      "component": "Plattform A9 IR Hoyre optikk",
+      "body": "Optisk vindu - sikt langs lokal Z (1)",
+      "link": "platform"
+    },
+    {
+      "index": 64,
+      "component": "Plattform A9 IR Hoyre avtakbart feste",
+      "body": "M3 feste med kabelutsparing",
+      "link": "platform"
+    },
+    {
+      "index": 65,
+      "component": "Plattform A9 IR Hoyre avtakbart feste",
+      "body": "A9 sensoravstand 1.5 mm -18.5",
+      "link": "platform"
+    },
+    {
+      "index": 66,
+      "component": "Plattform A9 IR Hoyre avtakbart feste",
+      "body": "A9 sensoravstand 1.5 mm 18.5",
+      "link": "platform"
+    },
+    {
+      "index": 67,
+      "component": "Plattform A9 Kamerafeste til frontvegg",
+      "body": "Kamerafeste M3 -12",
+      "link": "platform"
+    },
+    {
+      "index": 68,
+      "component": "Plattform A9 Kamerafeste til frontvegg",
+      "body": "Kamerafeste M3 12",
+      "link": "platform"
+    },
+    {
+      "index": 69,
+      "component": "Plattform A9 P07 Diagonal stoetfanger backing",
+      "body": "A9 backing - R25 under diagonal ramme",
+      "link": "platform"
+    },
+    {
+      "index": 70,
+      "component": "Plattform A9 S06 FSR02CE hel stripe",
+      "body": "622.3 mm aktiv lengde - R25 - ikke kuttet",
+      "link": "platform"
+    },
+    {
+      "index": 71,
+      "component": "Plattform A9 P08 Stoetfanger trykklag",
+      "body": "Elastisk trykklag - materiale ikke valgt",
+      "link": "platform"
+    },
+    {
+      "index": 72,
+      "component": "Plattform A9 P09 Stoetfanger ytterlist",
+      "body": "Ytre kontaktlist - prototype",
+      "link": "platform"
+    },
+    {
+      "index": 73,
+      "component": "Plattform A9 P10 Stoetfangeroppheng",
+      "body": "Oppheng front -40",
+      "link": "platform"
+    },
+    {
+      "index": 74,
+      "component": "Plattform A9 P10 Stoetfangeroppheng",
+      "body": "Oppheng front 40",
+      "link": "platform"
+    },
+    {
+      "index": 75,
+      "component": "Plattform A9 P10 Stoetfangeroppheng",
+      "body": "Oppheng side -1",
+      "link": "platform"
+    },
+    {
+      "index": 76,
+      "component": "Plattform A9 P10 Stoetfangeroppheng",
+      "body": "Oppheng side 1",
+      "link": "platform"
+    },
+    {
+      "index": 77,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "platform"
+    },
+    {
+      "index": 78,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "platform"
+    },
+    {
+      "index": 79,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "platform"
+    },
+    {
+      "index": 80,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "platform"
+    },
+    {
+      "index": 81,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "platform"
+    },
+    {
+      "index": 82,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "platform"
+    },
+    {
+      "index": 83,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "platform"
+    },
+    {
+      "index": 84,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "platform"
+    },
+    {
+      "index": 85,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 86,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "platform"
+    },
+    {
+      "index": 87,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "platform"
+    },
+    {
+      "index": 88,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 89,
+      "component": "FL 01 PITCH plattform F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 90,
+      "component": "FL 01 PITCH plattform F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 91,
+      "component": "FL 01 PITCH plattform F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 92,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 93,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 hus med plan P40 inngang",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 94,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 servofeste - fire monteringshull",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 95,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 96,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (1)",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 97,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (2)",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 98,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (3)",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 99,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lagerbro",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 100,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 101,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 102,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 103,
+      "component": "FL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lagerlokk",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 104,
+      "component": "FL 02 YAW F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 105,
+      "component": "FL 02 YAW F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 106,
+      "component": "FL 02 YAW F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 107,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 108,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 109,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 110,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 111,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 112,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 113,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 114,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 115,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 116,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 117,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 118,
+      "component": "FL 03 PITCH hjul F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 119,
+      "component": "FL 03 PITCH hjul F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 120,
+      "component": "FL 03 PITCH hjul F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 121,
+      "component": "FL 03 PITCH hjul F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 122,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Lagerhus - to 37x7 seter, 29 mm senteravstand",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 123,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Nedre lagerlokk M3",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 124,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Ovre lagerlokk og baereplate",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 125,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styreservo feste - bekreft hull mot fysisk servo",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 126,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Bro for bremsestyring - 1 mm over tannhjul",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 127,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styrepinne D4",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 128,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styrepinne D4 (1)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 129,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Fremre kamstotte med lagerboring D8.2",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 130,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Bakre bremseservo feste - ma bekreftes",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 131,
+      "component": "FL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Beinfeste - fire M4 hull for senere pitch-ledd",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 132,
+      "component": "FL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Adapterplate 90x90 og hul aksel D25 / D14.6",
+      "link": "FL_steering"
+    },
+    {
+      "index": 133,
+      "component": "FL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Aksial laasering D25 - delt klemring kreves",
+      "link": "FL_steering"
+    },
+    {
+      "index": 134,
+      "component": "FL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "61805 indre ring 49",
+      "link": "FL_steering"
+    },
+    {
+      "index": 135,
+      "component": "FL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "61805 indre ring 78",
+      "link": "FL_steering"
+    },
+    {
+      "index": 136,
+      "component": "FL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Styrehjul 40T - innvendig D25",
+      "link": "FL_steering"
+    },
+    {
+      "index": 137,
+      "component": "FL 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "Forlenget bremsestang med kilespor og trykkskulder",
+      "link": "FL_steering"
+    },
+    {
+      "index": 138,
+      "component": "FL 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "51101 nedre skive",
+      "link": "FL_steering"
+    },
+    {
+      "index": 139,
+      "component": "FL 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "Friksjonsbelegg 0.5 mm - materiale maa velges",
+      "link": "FL_steering"
+    },
+    {
+      "index": 140,
+      "component": "FL 04 BEVART 05 Styreservo tannhjul 40T",
+      "body": "Servohjul 40T - adapter til originalhorn",
+      "link": "FL_pinion"
+    },
+    {
+      "index": 141,
+      "component": "FL 04 BEVART 05 Styreservo tannhjul 40T",
+      "body": "Originalhorn adapter - hull ma matches",
+      "link": "FL_pinion"
+    },
+    {
+      "index": 142,
+      "component": "FL 04 BEVART 06 Parallax 900-00005 STYRING - malvolum",
+      "body": "Parallax standard servo - forenklet 40.5x20x36.1 hus",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 143,
+      "component": "FL 04 BEVART 07 Parallax 900-00005 BREMS - malvolum",
+      "body": "Parallax bremseservo horisontal - malvolum",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 144,
+      "component": "FL 04 BEVART 08 Bremsekam eksentrisitet 2 mm",
+      "body": "Kam R10 e2 med stottet aksel D8",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 145,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Trykkplate med to glideforinger",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 146,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "51101 ovre skive",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 147,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 148,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (1)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 149,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (2)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 150,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (3)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 151,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (4)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 152,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (5)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 153,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (6)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 154,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (7)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 155,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (8)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 156,
+      "component": "FL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (9)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 157,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "61805 ytre ring 49",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 158,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 159,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (1)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 160,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (2)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 161,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (3)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 162,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (4)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 163,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (5)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 164,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (6)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 165,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (7)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 166,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (8)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 167,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (9)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 168,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (10)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 169,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (11)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 170,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "61805 ytre ring 78",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 171,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (12)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 172,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (13)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 173,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (14)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 174,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (15)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 175,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (16)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 176,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (17)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 177,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (18)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 178,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (19)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 179,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (20)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 180,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (21)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 181,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (22)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 182,
+      "component": "FL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (23)",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 183,
+      "component": "FL 04 BEVART 20 M1 Adapter - original til P40 modulport",
+      "body": "P40 adapter: M4 40x40, sentral D8, to styrehull D3.2",
+      "link": "FL_distal_pitch"
+    },
+    {
+      "index": 184,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "platform"
+    },
+    {
+      "index": 185,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "platform"
+    },
+    {
+      "index": 186,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "platform"
+    },
+    {
+      "index": 187,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "platform"
+    },
+    {
+      "index": 188,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "platform"
+    },
+    {
+      "index": 189,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "platform"
+    },
+    {
+      "index": 190,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "platform"
+    },
+    {
+      "index": 191,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "platform"
+    },
+    {
+      "index": 192,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 193,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "platform"
+    },
+    {
+      "index": 194,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "platform"
+    },
+    {
+      "index": 195,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 196,
+      "component": "RL 01 PITCH plattform F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 197,
+      "component": "RL 01 PITCH plattform F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 198,
+      "component": "RL 01 PITCH plattform F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 199,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 200,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 hus med plan P40 inngang",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 201,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 servofeste - fire monteringshull",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 202,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 203,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (1)",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 204,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (2)",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 205,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (3)",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 206,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lagerbro",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 207,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 208,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 209,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 210,
+      "component": "RL 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lagerlokk",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 211,
+      "component": "RL 02 YAW F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 212,
+      "component": "RL 02 YAW F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 213,
+      "component": "RL 02 YAW F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 214,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 215,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 216,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 217,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 218,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 219,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 220,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 221,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 222,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 223,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 224,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 225,
+      "component": "RL 03 PITCH hjul F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 226,
+      "component": "RL 03 PITCH hjul F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 227,
+      "component": "RL 03 PITCH hjul F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 228,
+      "component": "RL 03 PITCH hjul F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 229,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Lagerhus - to 37x7 seter, 29 mm senteravstand",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 230,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Nedre lagerlokk M3",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 231,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Ovre lagerlokk og baereplate",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 232,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styreservo feste - bekreft hull mot fysisk servo",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 233,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Bro for bremsestyring - 1 mm over tannhjul",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 234,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styrepinne D4",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 235,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styrepinne D4 (1)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 236,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Fremre kamstotte med lagerboring D8.2",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 237,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Bakre bremseservo feste - ma bekreftes",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 238,
+      "component": "RL 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Beinfeste - fire M4 hull for senere pitch-ledd",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 239,
+      "component": "RL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Adapterplate 90x90 og hul aksel D25 / D14.6",
+      "link": "RL_steering"
+    },
+    {
+      "index": 240,
+      "component": "RL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Aksial laasering D25 - delt klemring kreves",
+      "link": "RL_steering"
+    },
+    {
+      "index": 241,
+      "component": "RL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "61805 indre ring 49",
+      "link": "RL_steering"
+    },
+    {
+      "index": 242,
+      "component": "RL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "61805 indre ring 78",
+      "link": "RL_steering"
+    },
+    {
+      "index": 243,
+      "component": "RL 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Styrehjul 40T - innvendig D25",
+      "link": "RL_steering"
+    },
+    {
+      "index": 244,
+      "component": "RL 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "Forlenget bremsestang med kilespor og trykkskulder",
+      "link": "RL_steering"
+    },
+    {
+      "index": 245,
+      "component": "RL 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "51101 nedre skive",
+      "link": "RL_steering"
+    },
+    {
+      "index": 246,
+      "component": "RL 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "Friksjonsbelegg 0.5 mm - materiale maa velges",
+      "link": "RL_steering"
+    },
+    {
+      "index": 247,
+      "component": "RL 04 BEVART 05 Styreservo tannhjul 40T",
+      "body": "Servohjul 40T - adapter til originalhorn",
+      "link": "RL_pinion"
+    },
+    {
+      "index": 248,
+      "component": "RL 04 BEVART 05 Styreservo tannhjul 40T",
+      "body": "Originalhorn adapter - hull ma matches",
+      "link": "RL_pinion"
+    },
+    {
+      "index": 249,
+      "component": "RL 04 BEVART 06 Parallax 900-00005 STYRING - malvolum",
+      "body": "Parallax standard servo - forenklet 40.5x20x36.1 hus",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 250,
+      "component": "RL 04 BEVART 07 Parallax 900-00005 BREMS - malvolum",
+      "body": "Parallax bremseservo horisontal - malvolum",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 251,
+      "component": "RL 04 BEVART 08 Bremsekam eksentrisitet 2 mm",
+      "body": "Kam R10 e2 med stottet aksel D8",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 252,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Trykkplate med to glideforinger",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 253,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "51101 ovre skive",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 254,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 255,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (1)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 256,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (2)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 257,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (3)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 258,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (4)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 259,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (5)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 260,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (6)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 261,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (7)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 262,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (8)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 263,
+      "component": "RL 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (9)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 264,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "61805 ytre ring 49",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 265,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 266,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (1)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 267,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (2)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 268,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (3)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 269,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (4)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 270,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (5)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 271,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (6)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 272,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (7)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 273,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (8)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 274,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (9)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 275,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (10)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 276,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (11)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 277,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "61805 ytre ring 78",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 278,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (12)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 279,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (13)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 280,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (14)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 281,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (15)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 282,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (16)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 283,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (17)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 284,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (18)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 285,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (19)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 286,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (20)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 287,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (21)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 288,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (22)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 289,
+      "component": "RL 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (23)",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 290,
+      "component": "RL 04 BEVART 20 M1 Adapter - original til P40 modulport",
+      "body": "P40 adapter: M4 40x40, sentral D8, to styrehull D3.2",
+      "link": "RL_distal_pitch"
+    },
+    {
+      "index": 291,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "platform"
+    },
+    {
+      "index": 292,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "platform"
+    },
+    {
+      "index": 293,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "platform"
+    },
+    {
+      "index": 294,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "platform"
+    },
+    {
+      "index": 295,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "platform"
+    },
+    {
+      "index": 296,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "platform"
+    },
+    {
+      "index": 297,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "platform"
+    },
+    {
+      "index": 298,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "platform"
+    },
+    {
+      "index": 299,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 300,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "platform"
+    },
+    {
+      "index": 301,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "platform"
+    },
+    {
+      "index": 302,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 303,
+      "component": "FR 01 PITCH plattform F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 304,
+      "component": "FR 01 PITCH plattform F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 305,
+      "component": "FR 01 PITCH plattform F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 306,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 307,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 hus med plan P40 inngang",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 308,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 servofeste - fire monteringshull",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 309,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 310,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (1)",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 311,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (2)",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 312,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (3)",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 313,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lagerbro",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 314,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 315,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 316,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 317,
+      "component": "FR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lagerlokk",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 318,
+      "component": "FR 02 YAW F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 319,
+      "component": "FR 02 YAW F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 320,
+      "component": "FR 02 YAW F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 321,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 322,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 323,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 324,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 325,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 326,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 327,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 328,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 329,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 330,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 331,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 332,
+      "component": "FR 03 PITCH hjul F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 333,
+      "component": "FR 03 PITCH hjul F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 334,
+      "component": "FR 03 PITCH hjul F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 335,
+      "component": "FR 03 PITCH hjul F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 336,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Lagerhus - to 37x7 seter, 29 mm senteravstand",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 337,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Nedre lagerlokk M3",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 338,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Ovre lagerlokk og baereplate",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 339,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styreservo feste - bekreft hull mot fysisk servo",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 340,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Bro for bremsestyring - 1 mm over tannhjul",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 341,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styrepinne D4",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 342,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styrepinne D4 (1)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 343,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Fremre kamstotte med lagerboring D8.2",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 344,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Bakre bremseservo feste - ma bekreftes",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 345,
+      "component": "FR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Beinfeste - fire M4 hull for senere pitch-ledd",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 346,
+      "component": "FR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Adapterplate 90x90 og hul aksel D25 / D14.6",
+      "link": "FR_steering"
+    },
+    {
+      "index": 347,
+      "component": "FR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Aksial laasering D25 - delt klemring kreves",
+      "link": "FR_steering"
+    },
+    {
+      "index": 348,
+      "component": "FR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "61805 indre ring 49",
+      "link": "FR_steering"
+    },
+    {
+      "index": 349,
+      "component": "FR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "61805 indre ring 78",
+      "link": "FR_steering"
+    },
+    {
+      "index": 350,
+      "component": "FR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Styrehjul 40T - innvendig D25",
+      "link": "FR_steering"
+    },
+    {
+      "index": 351,
+      "component": "FR 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "Forlenget bremsestang med kilespor og trykkskulder",
+      "link": "FR_steering"
+    },
+    {
+      "index": 352,
+      "component": "FR 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "51101 nedre skive",
+      "link": "FR_steering"
+    },
+    {
+      "index": 353,
+      "component": "FR 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "Friksjonsbelegg 0.5 mm - materiale maa velges",
+      "link": "FR_steering"
+    },
+    {
+      "index": 354,
+      "component": "FR 04 BEVART 05 Styreservo tannhjul 40T",
+      "body": "Servohjul 40T - adapter til originalhorn",
+      "link": "FR_pinion"
+    },
+    {
+      "index": 355,
+      "component": "FR 04 BEVART 05 Styreservo tannhjul 40T",
+      "body": "Originalhorn adapter - hull ma matches",
+      "link": "FR_pinion"
+    },
+    {
+      "index": 356,
+      "component": "FR 04 BEVART 06 Parallax 900-00005 STYRING - malvolum",
+      "body": "Parallax standard servo - forenklet 40.5x20x36.1 hus",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 357,
+      "component": "FR 04 BEVART 07 Parallax 900-00005 BREMS - malvolum",
+      "body": "Parallax bremseservo horisontal - malvolum",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 358,
+      "component": "FR 04 BEVART 08 Bremsekam eksentrisitet 2 mm",
+      "body": "Kam R10 e2 med stottet aksel D8",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 359,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Trykkplate med to glideforinger",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 360,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "51101 ovre skive",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 361,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 362,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (1)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 363,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (2)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 364,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (3)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 365,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (4)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 366,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (5)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 367,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (6)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 368,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (7)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 369,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (8)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 370,
+      "component": "FR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (9)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 371,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "61805 ytre ring 49",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 372,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 373,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (1)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 374,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (2)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 375,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (3)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 376,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (4)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 377,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (5)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 378,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (6)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 379,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (7)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 380,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (8)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 381,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (9)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 382,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (10)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 383,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (11)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 384,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "61805 ytre ring 78",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 385,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (12)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 386,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (13)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 387,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (14)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 388,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (15)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 389,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (16)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 390,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (17)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 391,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (18)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 392,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (19)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 393,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (20)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 394,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (21)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 395,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (22)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 396,
+      "component": "FR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (23)",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 397,
+      "component": "FR 04 BEVART 20 M1 Adapter - original til P40 modulport",
+      "body": "P40 adapter: M4 40x40, sentral D8, to styrehull D3.2",
+      "link": "FR_distal_pitch"
+    },
+    {
+      "index": 398,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "platform"
+    },
+    {
+      "index": 399,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "platform"
+    },
+    {
+      "index": 400,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "platform"
+    },
+    {
+      "index": 401,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "platform"
+    },
+    {
+      "index": 402,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "platform"
+    },
+    {
+      "index": 403,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "platform"
+    },
+    {
+      "index": 404,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "platform"
+    },
+    {
+      "index": 405,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "platform"
+    },
+    {
+      "index": 406,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 407,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "platform"
+    },
+    {
+      "index": 408,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "platform"
+    },
+    {
+      "index": 409,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 410,
+      "component": "RR 01 PITCH plattform F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 411,
+      "component": "RR 01 PITCH plattform F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 412,
+      "component": "RR 01 PITCH plattform F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 413,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 414,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 hus med plan P40 inngang",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 415,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 servofeste - fire monteringshull",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 416,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 417,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (1)",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 418,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (2)",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 419,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (3)",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 420,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lagerbro",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 421,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 422,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 423,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 424,
+      "component": "RR 02 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lagerlokk",
+      "link": "RR_hip_pitch"
+    },
+    {
+      "index": 425,
+      "component": "RR 02 YAW F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 426,
+      "component": "RR 02 YAW F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 427,
+      "component": "RR 02 YAW F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 428,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 429,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 430,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 431,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 432,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 433,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 434,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 435,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 436,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 437,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 438,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 439,
+      "component": "RR 03 PITCH hjul F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 440,
+      "component": "RR 03 PITCH hjul F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 441,
+      "component": "RR 03 PITCH hjul F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 442,
+      "component": "RR 03 PITCH hjul F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 443,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Lagerhus - to 37x7 seter, 29 mm senteravstand",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 444,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Nedre lagerlokk M3",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 445,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Ovre lagerlokk og baereplate",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 446,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styreservo feste - bekreft hull mot fysisk servo",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 447,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Bro for bremsestyring - 1 mm over tannhjul",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 448,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styrepinne D4",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 449,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Styrepinne D4 (1)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 450,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Fremre kamstotte med lagerboring D8.2",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 451,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Bakre bremseservo feste - ma bekreftes",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 452,
+      "component": "RR 04 BEVART 01 Lagerhus og feste til bein",
+      "body": "Beinfeste - fire M4 hull for senere pitch-ledd",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 453,
+      "component": "RR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Adapterplate 90x90 og hul aksel D25 / D14.6",
+      "link": "RR_steering"
+    },
+    {
+      "index": 454,
+      "component": "RR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Aksial laasering D25 - delt klemring kreves",
+      "link": "RR_steering"
+    },
+    {
+      "index": 455,
+      "component": "RR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "61805 indre ring 49",
+      "link": "RR_steering"
+    },
+    {
+      "index": 456,
+      "component": "RR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "61805 indre ring 78",
+      "link": "RR_steering"
+    },
+    {
+      "index": 457,
+      "component": "RR 04 BEVART 02 Roterende gaffel og hul styreaksel",
+      "body": "Styrehjul 40T - innvendig D25",
+      "link": "RR_steering"
+    },
+    {
+      "index": 458,
+      "component": "RR 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "Forlenget bremsestang med kilespor og trykkskulder",
+      "link": "RR_steering"
+    },
+    {
+      "index": 459,
+      "component": "RR 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "51101 nedre skive",
+      "link": "RR_steering"
+    },
+    {
+      "index": 460,
+      "component": "RR 04 BEVART 04 Bremsespindel D14 - forlenget og kilet",
+      "body": "Friksjonsbelegg 0.5 mm - materiale maa velges",
+      "link": "RR_steering"
+    },
+    {
+      "index": 461,
+      "component": "RR 04 BEVART 05 Styreservo tannhjul 40T",
+      "body": "Servohjul 40T - adapter til originalhorn",
+      "link": "RR_pinion"
+    },
+    {
+      "index": 462,
+      "component": "RR 04 BEVART 05 Styreservo tannhjul 40T",
+      "body": "Originalhorn adapter - hull ma matches",
+      "link": "RR_pinion"
+    },
+    {
+      "index": 463,
+      "component": "RR 04 BEVART 06 Parallax 900-00005 STYRING - malvolum",
+      "body": "Parallax standard servo - forenklet 40.5x20x36.1 hus",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 464,
+      "component": "RR 04 BEVART 07 Parallax 900-00005 BREMS - malvolum",
+      "body": "Parallax bremseservo horisontal - malvolum",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 465,
+      "component": "RR 04 BEVART 08 Bremsekam eksentrisitet 2 mm",
+      "body": "Kam R10 e2 med stottet aksel D8",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 466,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Trykkplate med to glideforinger",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 467,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "51101 ovre skive",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 468,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 469,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (1)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 470,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (2)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 471,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (3)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 472,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (4)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 473,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (5)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 474,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (6)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 475,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (7)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 476,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (8)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 477,
+      "component": "RR 04 BEVART 09 Styrt trykkplate",
+      "body": "Aksiallagerkule - forenklet (9)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 478,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "61805 ytre ring 49",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 479,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 480,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (1)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 481,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (2)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 482,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (3)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 483,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (4)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 484,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (5)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 485,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (6)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 486,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (7)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 487,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (8)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 488,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (9)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 489,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (10)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 490,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (11)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 491,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "61805 ytre ring 78",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 492,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (12)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 493,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (13)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 494,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (14)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 495,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (15)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 496,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (16)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 497,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (17)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 498,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (18)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 499,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (19)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 500,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (20)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 501,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (21)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 502,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (22)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 503,
+      "component": "RR 04 BEVART 10 Lager og skiver - forenklet",
+      "body": "Lagerkule (23)",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 504,
+      "component": "RR 04 BEVART 20 M1 Adapter - original til P40 modulport",
+      "body": "P40 adapter: M4 40x40, sentral D8, to styrehull D3.2",
+      "link": "RR_distal_pitch"
+    },
+    {
+      "index": 505,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lukket akslingsgaffel med to foringsseter",
+      "link": "FL_steering"
+    },
+    {
+      "index": 506,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 hjul D65 med to 608 lagerseter",
+      "link": "FL_wheel_roll"
+    },
+    {
+      "index": 507,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lagerlokk M3 - avtakbart, bare ytre lagerring",
+      "link": "FL_wheel_roll"
+    },
+    {
+      "index": 508,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lagerlokk M3 - avtakbart, bare ytre lagerring (1)",
+      "link": "FL_wheel_roll"
+    },
+    {
+      "index": 509,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 fast staelaksling D8 L57.6 - M4 endegjenger, maskinert del",
+      "link": "FL_steering"
+    },
+    {
+      "index": 510,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 indre metallavstandsr\u00f8r OD11 ID8.1 L16",
+      "link": "FL_steering"
+    },
+    {
+      "index": 511,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 metallforing i gaffel OD12 ID8.1 L8",
+      "link": "FL_steering"
+    },
+    {
+      "index": 512,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 metallforing i gaffel OD12 ID8.1 L8 (1)",
+      "link": "FL_steering"
+    },
+    {
+      "index": 513,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 ytre metallavstandsstykke OD11 ID8.1 L6",
+      "link": "FL_steering"
+    },
+    {
+      "index": 514,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 ytre metallavstandsstykke OD11 ID8.1 L6 (1)",
+      "link": "FL_steering"
+    },
+    {
+      "index": 515,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 endeskive OD16 ID4.4 tykkelse1.5",
+      "link": "FL_steering"
+    },
+    {
+      "index": 516,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 endeskive OD16 ID4.4 tykkelse1.5 (1)",
+      "link": "FL_steering"
+    },
+    {
+      "index": 517,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 M4x8 endeskrue - forenklet uten gjenger",
+      "link": "FL_steering"
+    },
+    {
+      "index": 518,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 M4x8 endeskrue - forenklet uten gjenger (1)",
+      "link": "FL_steering"
+    },
+    {
+      "index": 519,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 indre ring - fast paa aksling",
+      "link": "FL_steering"
+    },
+    {
+      "index": 520,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 ytre ring - roterer med hjul",
+      "link": "FL_wheel_roll"
+    },
+    {
+      "index": 521,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder",
+      "link": "FL_wheel_roll"
+    },
+    {
+      "index": 522,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (1)",
+      "link": "FL_wheel_roll"
+    },
+    {
+      "index": 523,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 indre ring - fast paa aksling (1)",
+      "link": "FL_steering"
+    },
+    {
+      "index": 524,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 ytre ring - roterer med hjul (1)",
+      "link": "FL_wheel_roll"
+    },
+    {
+      "index": 525,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (2)",
+      "link": "FL_wheel_roll"
+    },
+    {
+      "index": 526,
+      "component": "FL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (3)",
+      "link": "FL_wheel_roll"
+    },
+    {
+      "index": 527,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lukket akslingsgaffel med to foringsseter",
+      "link": "RL_steering"
+    },
+    {
+      "index": 528,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 hjul D65 med to 608 lagerseter",
+      "link": "RL_wheel_roll"
+    },
+    {
+      "index": 529,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lagerlokk M3 - avtakbart, bare ytre lagerring",
+      "link": "RL_wheel_roll"
+    },
+    {
+      "index": 530,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lagerlokk M3 - avtakbart, bare ytre lagerring (1)",
+      "link": "RL_wheel_roll"
+    },
+    {
+      "index": 531,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 fast staelaksling D8 L57.6 - M4 endegjenger, maskinert del",
+      "link": "RL_steering"
+    },
+    {
+      "index": 532,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 indre metallavstandsr\u00f8r OD11 ID8.1 L16",
+      "link": "RL_steering"
+    },
+    {
+      "index": 533,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 metallforing i gaffel OD12 ID8.1 L8",
+      "link": "RL_steering"
+    },
+    {
+      "index": 534,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 metallforing i gaffel OD12 ID8.1 L8 (1)",
+      "link": "RL_steering"
+    },
+    {
+      "index": 535,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 ytre metallavstandsstykke OD11 ID8.1 L6",
+      "link": "RL_steering"
+    },
+    {
+      "index": 536,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 ytre metallavstandsstykke OD11 ID8.1 L6 (1)",
+      "link": "RL_steering"
+    },
+    {
+      "index": 537,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 endeskive OD16 ID4.4 tykkelse1.5",
+      "link": "RL_steering"
+    },
+    {
+      "index": 538,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 endeskive OD16 ID4.4 tykkelse1.5 (1)",
+      "link": "RL_steering"
+    },
+    {
+      "index": 539,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 M4x8 endeskrue - forenklet uten gjenger",
+      "link": "RL_steering"
+    },
+    {
+      "index": 540,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 M4x8 endeskrue - forenklet uten gjenger (1)",
+      "link": "RL_steering"
+    },
+    {
+      "index": 541,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 indre ring - fast paa aksling",
+      "link": "RL_steering"
+    },
+    {
+      "index": 542,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 ytre ring - roterer med hjul",
+      "link": "RL_wheel_roll"
+    },
+    {
+      "index": 543,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder",
+      "link": "RL_wheel_roll"
+    },
+    {
+      "index": 544,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (1)",
+      "link": "RL_wheel_roll"
+    },
+    {
+      "index": 545,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 indre ring - fast paa aksling (1)",
+      "link": "RL_steering"
+    },
+    {
+      "index": 546,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 ytre ring - roterer med hjul (1)",
+      "link": "RL_wheel_roll"
+    },
+    {
+      "index": 547,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (2)",
+      "link": "RL_wheel_roll"
+    },
+    {
+      "index": 548,
+      "component": "RL 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (3)",
+      "link": "RL_wheel_roll"
+    },
+    {
+      "index": 549,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lukket akslingsgaffel med to foringsseter",
+      "link": "FR_steering"
+    },
+    {
+      "index": 550,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 hjul D65 med to 608 lagerseter",
+      "link": "FR_wheel_roll"
+    },
+    {
+      "index": 551,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lagerlokk M3 - avtakbart, bare ytre lagerring",
+      "link": "FR_wheel_roll"
+    },
+    {
+      "index": 552,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lagerlokk M3 - avtakbart, bare ytre lagerring (1)",
+      "link": "FR_wheel_roll"
+    },
+    {
+      "index": 553,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 fast staelaksling D8 L57.6 - M4 endegjenger, maskinert del",
+      "link": "FR_steering"
+    },
+    {
+      "index": 554,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 indre metallavstandsr\u00f8r OD11 ID8.1 L16",
+      "link": "FR_steering"
+    },
+    {
+      "index": 555,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 metallforing i gaffel OD12 ID8.1 L8",
+      "link": "FR_steering"
+    },
+    {
+      "index": 556,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 metallforing i gaffel OD12 ID8.1 L8 (1)",
+      "link": "FR_steering"
+    },
+    {
+      "index": 557,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 ytre metallavstandsstykke OD11 ID8.1 L6",
+      "link": "FR_steering"
+    },
+    {
+      "index": 558,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 ytre metallavstandsstykke OD11 ID8.1 L6 (1)",
+      "link": "FR_steering"
+    },
+    {
+      "index": 559,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 endeskive OD16 ID4.4 tykkelse1.5",
+      "link": "FR_steering"
+    },
+    {
+      "index": 560,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 endeskive OD16 ID4.4 tykkelse1.5 (1)",
+      "link": "FR_steering"
+    },
+    {
+      "index": 561,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 M4x8 endeskrue - forenklet uten gjenger",
+      "link": "FR_steering"
+    },
+    {
+      "index": 562,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 M4x8 endeskrue - forenklet uten gjenger (1)",
+      "link": "FR_steering"
+    },
+    {
+      "index": 563,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 indre ring - fast paa aksling",
+      "link": "FR_steering"
+    },
+    {
+      "index": 564,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 ytre ring - roterer med hjul",
+      "link": "FR_wheel_roll"
+    },
+    {
+      "index": 565,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder",
+      "link": "FR_wheel_roll"
+    },
+    {
+      "index": 566,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (1)",
+      "link": "FR_wheel_roll"
+    },
+    {
+      "index": 567,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 indre ring - fast paa aksling (1)",
+      "link": "FR_steering"
+    },
+    {
+      "index": 568,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 ytre ring - roterer med hjul (1)",
+      "link": "FR_wheel_roll"
+    },
+    {
+      "index": 569,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (2)",
+      "link": "FR_wheel_roll"
+    },
+    {
+      "index": 570,
+      "component": "FR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (3)",
+      "link": "FR_wheel_roll"
+    },
+    {
+      "index": 571,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lukket akslingsgaffel med to foringsseter",
+      "link": "RR_steering"
+    },
+    {
+      "index": 572,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 hjul D65 med to 608 lagerseter",
+      "link": "RR_wheel_roll"
+    },
+    {
+      "index": 573,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lagerlokk M3 - avtakbart, bare ytre lagerring",
+      "link": "RR_wheel_roll"
+    },
+    {
+      "index": 574,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 lagerlokk M3 - avtakbart, bare ytre lagerring (1)",
+      "link": "RR_wheel_roll"
+    },
+    {
+      "index": 575,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 fast staelaksling D8 L57.6 - M4 endegjenger, maskinert del",
+      "link": "RR_steering"
+    },
+    {
+      "index": 576,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 indre metallavstandsr\u00f8r OD11 ID8.1 L16",
+      "link": "RR_steering"
+    },
+    {
+      "index": 577,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 metallforing i gaffel OD12 ID8.1 L8",
+      "link": "RR_steering"
+    },
+    {
+      "index": 578,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 metallforing i gaffel OD12 ID8.1 L8 (1)",
+      "link": "RR_steering"
+    },
+    {
+      "index": 579,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 ytre metallavstandsstykke OD11 ID8.1 L6",
+      "link": "RR_steering"
+    },
+    {
+      "index": 580,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 ytre metallavstandsstykke OD11 ID8.1 L6 (1)",
+      "link": "RR_steering"
+    },
+    {
+      "index": 581,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 endeskive OD16 ID4.4 tykkelse1.5",
+      "link": "RR_steering"
+    },
+    {
+      "index": 582,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 endeskive OD16 ID4.4 tykkelse1.5 (1)",
+      "link": "RR_steering"
+    },
+    {
+      "index": 583,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 M4x8 endeskrue - forenklet uten gjenger",
+      "link": "RR_steering"
+    },
+    {
+      "index": 584,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "A7.1 M4x8 endeskrue - forenklet uten gjenger (1)",
+      "link": "RR_steering"
+    },
+    {
+      "index": 585,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 indre ring - fast paa aksling",
+      "link": "RR_steering"
+    },
+    {
+      "index": 586,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 ytre ring - roterer med hjul",
+      "link": "RR_wheel_roll"
+    },
+    {
+      "index": 587,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder",
+      "link": "RR_wheel_roll"
+    },
+    {
+      "index": 588,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (1)",
+      "link": "RR_wheel_roll"
+    },
+    {
+      "index": 589,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 indre ring - fast paa aksling (1)",
+      "link": "RR_steering"
+    },
+    {
+      "index": 590,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 8x22x7 ytre ring - roterer med hjul (1)",
+      "link": "RR_wheel_roll"
+    },
+    {
+      "index": 591,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (2)",
+      "link": "RR_wheel_roll"
+    },
+    {
+      "index": 592,
+      "component": "RR 05 A7.1 Hjulaksling - 608 lager og lukket gaffel",
+      "body": "608 tetning - geometrisk plassholder (3)",
+      "link": "RR_wheel_roll"
+    },
+    {
+      "index": 593,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "Parallax 900-00005 - second hip servo",
+      "link": "platform"
+    },
+    {
+      "index": 594,
+      "component": "FL 01 PITCH plattform F40 FAST",
+      "body": "A14 second servo ribbed bridge",
+      "link": "platform"
+    },
+    {
+      "index": 595,
+      "component": "FL 01 PITCH plattform F40 ROTOR",
+      "body": "A14 second OEM horn - verify hole pattern",
+      "link": "FL_hip_pitch"
+    },
+    {
+      "index": 596,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "Parallax 900-00005 - second hip servo",
+      "link": "platform"
+    },
+    {
+      "index": 597,
+      "component": "RL 01 PITCH plattform F40 FAST",
+      "body": "A14 second servo ribbed bridge",
+      "link": "platform"
+    },
+    {
+      "index": 598,
+      "component": "RL 01 PITCH plattform F40 ROTOR",
+      "body": "A14 second OEM horn - verify hole pattern",
+      "link": "RL_hip_pitch"
+    },
+    {
+      "index": 599,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "Parallax 900-00005 - second hip servo",
+      "link": "platform"
+    },
+    {
+      "index": 600,
+      "component": "FR 01 PITCH plattform F40 FAST",
+      "body": "A14 second servo ribbed bridge",
+      "link": "platform"
+    },
+    {
+      "index": 601,
+      "component": "FR 01 PITCH plattform F40 ROTOR",
+      "body": "A14 second OEM horn - verify hole pattern",
+      "link": "FR_hip_pitch"
+    },
+    {
+      "index": 602,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "Parallax 900-00005 - second hip servo",
+      "link": "platform"
+    },
+    {
+      "index": 603,
+      "component": "RR 01 PITCH plattform F40 FAST",
+      "body": "A14 second servo ribbed bridge",
+      "link": "platform"
+    },
+    {
+      "index": 604,
+      "component": "RR 01 PITCH plattform F40 ROTOR",
+      "body": "A14 second OEM horn - verify hole pattern",
+      "link": "RR_hip_pitch"
+    }
+  ],
+  "assumptions": {
+    "effective_print_density_kg_m3": 650,
+    "metal_density_kg_m3": 7800,
+    "servo_mass_kg": 0.044,
+    "wheel_rotating_assembly_mass_kg": 0.12,
+    "electronics_and_battery_mass_kg": 0.2,
+    "servo_stall_torque_Nm": 0.26833896966654,
+    "servo_free_speed_deg_s": 315.7894736842105,
+    "brake_torque_Nm": 0.15,
+    "ground_friction": 0.8,
+    "notes": "All unmeasured assumptions. 120 g per rotating wheel is user starting estimate. Print density is an effective bulk estimate, not an infill calculation. Brake is ideal joint friction; no cam/contact validation. A8: 25x37x7 bearing uses SKF W61805-2RS1 reference mass 21.3 g; 8x16x5 bearing 5.9 g is a conservative solid-steel envelope estimate. Actual bearing selection unconfirmed. Digital servo v3.0 6V ratings used as optimistic instantaneous ceilings. A14: ideal synchronized dual hip servo, 2x stall torque, unchanged free speed; no thermal or supply sag model.",
+    "bearing_25_37_7_mass_kg": 0.0213,
+    "bearing_8_16_5_mass_kg": 0.0059,
+    "hip_servo_count": 2
+  },
+  "limitations": [
+    "CAD visual meshes simplified with a 0.25 mm vertex grid; not manufacturing geometry",
+    "Bounding-box inertias; no calibrated mass properties",
+    "Capsule/box/cylinder collision proxies; not CAD interference validation",
+    "Ideal IMU and joint feedback, not evidence of sensors on real servos",
+    "Brake friction torque surrogate, no cam deformation, spring or pad model",
+    "Steering 40T/40T ideal joint equality; no backlash",
+    "No walking/skating policy yet"
+  ],
+  "source_base_sha256": "dc7da64cd8bac85341d2f7a8671fa6f4de5b068d50886be1ab985478387bab61",
+  "source_patch_sha256": "75c749f2ea6399aa329f2dcabbeec59d0a5467e3312212118b684ed0db3cdc4e",
+  "cad_com_validation_error_m": 9.004858352023766e-12
+}

@@ -1,0 +1,346 @@
+{
+  "units": "metres, radians; CAD uses cm internally",
+  "pose": "q=0 is the exported CAD pose",
+  "new_hinges": [
+    {
+      "name": "FL_hip_pitch",
+      "origin_world_m": [
+        0.19242819253992696,
+        0.16399316369738254,
+        0.07
+      ],
+      "axis_world": [
+        0.7071067811865476,
+        -0.7071067811865476,
+        0.0
+      ],
+      "limits_from_export_pose_rad": [
+        -0.7853981633974483,
+        0.7853981633974483
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "FL 01 PITCH plattform F40 FAST",
+      "child_cad_component": "FL 01 PITCH plattform F40 ROTOR"
+    },
+    {
+      "name": "FL_yaw",
+      "origin_world_m": [
+        0.2564213562373095,
+        0.2414213562373095,
+        0.0795
+      ],
+      "axis_world": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "limits_from_export_pose_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "FL 02 YAW F40 FAST",
+      "child_cad_component": "FL 02 YAW F40 ROTOR"
+    },
+    {
+      "name": "FL_distal_pitch",
+      "origin_world_m": [
+        0.3338495487772365,
+        0.30541451993469204,
+        0.07
+      ],
+      "axis_world": [
+        0.7071067811865476,
+        -0.7071067811865476,
+        0.0
+      ],
+      "limits_from_export_pose_rad": [
+        0,
+        1.5707963267948966
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "FL 03 PITCH hjul F40 FAST",
+      "child_cad_component": "FL 03 PITCH hjul F40 ROTOR"
+    },
+    {
+      "name": "RL_hip_pitch",
+      "origin_world_m": [
+        -0.17899316369738255,
+        0.17742819253992698,
+        0.07
+      ],
+      "axis_world": [
+        0.7071067811865476,
+        0.7071067811865475,
+        0.0
+      ],
+      "limits_from_export_pose_rad": [
+        -0.7853981633974483,
+        0.7853981633974483
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "RL 01 PITCH plattform F40 FAST",
+      "child_cad_component": "RL 01 PITCH plattform F40 ROTOR"
+    },
+    {
+      "name": "RL_yaw",
+      "origin_world_m": [
+        -0.2564213562373095,
+        0.2414213562373095,
+        0.0795
+      ],
+      "axis_world": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "limits_from_export_pose_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "RL 02 YAW F40 FAST",
+      "child_cad_component": "RL 02 YAW F40 ROTOR"
+    },
+    {
+      "name": "RL_distal_pitch",
+      "origin_world_m": [
+        -0.320414519934692,
+        0.3188495487772365,
+        0.07
+      ],
+      "axis_world": [
+        0.7071067811865476,
+        0.7071067811865475,
+        0.0
+      ],
+      "limits_from_export_pose_rad": [
+        0,
+        1.5707963267948966
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "RL 03 PITCH hjul F40 FAST",
+      "child_cad_component": "RL 03 PITCH hjul F40 ROTOR"
+    },
+    {
+      "name": "FR_hip_pitch",
+      "origin_world_m": [
+        0.17899316369738255,
+        -0.17742819253992698,
+        0.07
+      ],
+      "axis_world": [
+        -0.7071067811865476,
+        -0.7071067811865476,
+        0.0
+      ],
+      "limits_from_export_pose_rad": [
+        -0.7853981633974483,
+        0.7853981633974483
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "FR 01 PITCH plattform F40 FAST",
+      "child_cad_component": "FR 01 PITCH plattform F40 ROTOR"
+    },
+    {
+      "name": "FR_yaw",
+      "origin_world_m": [
+        0.2564213562373095,
+        -0.2414213562373095,
+        0.0795
+      ],
+      "axis_world": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "limits_from_export_pose_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "FR 02 YAW F40 FAST",
+      "child_cad_component": "FR 02 YAW F40 ROTOR"
+    },
+    {
+      "name": "FR_distal_pitch",
+      "origin_world_m": [
+        0.32041451993469205,
+        -0.3188495487772365,
+        0.07
+      ],
+      "axis_world": [
+        -0.7071067811865476,
+        -0.7071067811865476,
+        0.0
+      ],
+      "limits_from_export_pose_rad": [
+        0,
+        1.5707963267948966
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "FR 03 PITCH hjul F40 FAST",
+      "child_cad_component": "FR 03 PITCH hjul F40 ROTOR"
+    },
+    {
+      "name": "RR_hip_pitch",
+      "origin_world_m": [
+        -0.19242819253992693,
+        -0.16399316369738254,
+        0.07
+      ],
+      "axis_world": [
+        -0.7071067811865476,
+        0.7071067811865475,
+        0.0
+      ],
+      "limits_from_export_pose_rad": [
+        -0.7853981633974483,
+        0.7853981633974483
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "RR 01 PITCH plattform F40 FAST",
+      "child_cad_component": "RR 01 PITCH plattform F40 ROTOR"
+    },
+    {
+      "name": "RR_yaw",
+      "origin_world_m": [
+        -0.2564213562373095,
+        -0.2414213562373095,
+        0.0795
+      ],
+      "axis_world": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "limits_from_export_pose_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "RR 02 YAW F40 FAST",
+      "child_cad_component": "RR 02 YAW F40 ROTOR"
+    },
+    {
+      "name": "RR_distal_pitch",
+      "origin_world_m": [
+        -0.3338495487772364,
+        -0.30541451993469204,
+        0.07
+      ],
+      "axis_world": [
+        -0.7071067811865476,
+        0.7071067811865475,
+        0.0
+      ],
+      "limits_from_export_pose_rad": [
+        0,
+        1.5707963267948966
+      ],
+      "external_transmission_ratio": 1,
+      "effort_limit_Nm": null,
+      "velocity_limit_rad_s": null,
+      "parent_cad_component": "RR 03 PITCH hjul F40 FAST",
+      "child_cad_component": "RR 03 PITCH hjul F40 ROTOR"
+    }
+  ],
+  "existing_wheel_module": "Geometry retained; steering, braking and wheel-roll joints still require simulator definition.",
+  "mass_inertia": "Not calibrated. CAD plastic appearance is not a measured PLA mass model.",
+  "assets": [
+    "Robot_A8_Lett_PM45.step"
+  ],
+  "status": "Kinematic handoff only, not a runnable physics model.",
+  "rigid_mates": [
+    {
+      "parent": "platform rigid group",
+      "child": "FL 01 PITCH plattform F40 FAST"
+    },
+    {
+      "parent": "FL 01 PITCH plattform F40 ROTOR",
+      "child": "FL 02 YAW F40 FAST"
+    },
+    {
+      "parent": "FL 02 YAW F40 ROTOR",
+      "child": "FL 03 PITCH hjul F40 FAST"
+    },
+    {
+      "parent": "FL 03 PITCH hjul F40 ROTOR",
+      "child": "FL wheel module fixed frame",
+      "status": "Wheel housing/steering/roll body grouping remains to be defined."
+    },
+    {
+      "parent": "platform rigid group",
+      "child": "RL 01 PITCH plattform F40 FAST"
+    },
+    {
+      "parent": "RL 01 PITCH plattform F40 ROTOR",
+      "child": "RL 02 YAW F40 FAST"
+    },
+    {
+      "parent": "RL 02 YAW F40 ROTOR",
+      "child": "RL 03 PITCH hjul F40 FAST"
+    },
+    {
+      "parent": "RL 03 PITCH hjul F40 ROTOR",
+      "child": "RL wheel module fixed frame",
+      "status": "Wheel housing/steering/roll body grouping remains to be defined."
+    },
+    {
+      "parent": "platform rigid group",
+      "child": "FR 01 PITCH plattform F40 FAST"
+    },
+    {
+      "parent": "FR 01 PITCH plattform F40 ROTOR",
+      "child": "FR 02 YAW F40 FAST"
+    },
+    {
+      "parent": "FR 02 YAW F40 ROTOR",
+      "child": "FR 03 PITCH hjul F40 FAST"
+    },
+    {
+      "parent": "FR 03 PITCH hjul F40 ROTOR",
+      "child": "FR wheel module fixed frame",
+      "status": "Wheel housing/steering/roll body grouping remains to be defined."
+    },
+    {
+      "parent": "platform rigid group",
+      "child": "RR 01 PITCH plattform F40 FAST"
+    },
+    {
+      "parent": "RR 01 PITCH plattform F40 ROTOR",
+      "child": "RR 02 YAW F40 FAST"
+    },
+    {
+      "parent": "RR 02 YAW F40 ROTOR",
+      "child": "RR 03 PITCH hjul F40 FAST"
+    },
+    {
+      "parent": "RR 03 PITCH hjul F40 ROTOR",
+      "child": "RR wheel module fixed frame",
+      "status": "Wheel housing/steering/roll body grouping remains to be defined."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+<mujoco model="Robot A - servo bench - assumed parameters">
+  <compiler angle="radian"/>
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast"/>
+  <visual>
+    <global offwidth="1280" offheight="800"/>
+    <headlight ambient="0.45 0.45 0.45" diffuse="0.8 0.8 0.8"/>
+    <rgba haze="0.12 0.16 0.21 1"/>
+  </visual>
+  <asset>
+    <texture name="floor_tex" type="2d" builtin="checker" rgb1="0.17 0.21 0.26" rgb2="0.23 0.28 0.33" width="512" height="512"/>
+    <material name="floor_mat" texture="floor_tex" texrepeat="6 6" reflectance="0.12"/>
+  </asset>
+  <worldbody>
+    <light pos="0 -1 2" dir="0 0 -1"/>
+    <geom name="floor" type="plane" size="1 1 0.1" material="floor_mat"/>
+    <geom type="box" pos="0 0.065 0.025" size="0.12 0.09 0.025" rgba="0.35 0.4 0.46 1"/>
+    <geom type="box" pos="0 0.095 0.205" size="0.025 0.02 0.18" rgba="0.42 0.47 0.53 1"/>
+    <geom name="servo_case" type="box" pos="0 0.042 0.38" size="0.022 0.03 0.032" rgba="0.12 0.13 0.15 1"/>
+    <geom type="sphere" pos="0 0 0.38" size="0.017" rgba="0.8 0.82 0.85 1"/>
+    <body name="arm" pos="0 0 0.38">
+      <joint name="servo" type="hinge" axis="0 1 0" range="-0.7853981634 0.7853981634" damping="0.003" armature="0.00002"/>
+      <geom name="arm_geom" type="capsule" fromto="0 0 0 0 0 -0.15" size="0.008" mass="0.04" rgba="1 0.48 0.12 1"/>
+      <body name="payload" pos="0 0 -0.15">
+        <geom name="payload_geom" type="sphere" size="0.018" mass="0.05" rgba="1 0.65 0.2 1"/>
+      </body>
+    </body>
+    <body name="target" mocap="true" pos="0 -0.04 0.38">
+      <geom type="capsule" fromto="0 0 0 0 0 -0.15" size="0.004" rgba="0.15 0.7 1 0.55" contype="0" conaffinity="0"/>
+      <geom type="sphere" pos="0 0 -0.15" size="0.012" rgba="0.15 0.7 1 0.45" contype="0" conaffinity="0"/>
+    </body>
+  </worldbody>
+  <actuator><motor name="servo_torque" joint="servo" gear="1"/></actuator>
+</mujoco>
