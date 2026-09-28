@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="A17 - flat to 10 degree ramp - 1.26 Nm">
+  <compiler angle="radian" meshdir="robot_meshes_a17" inertiafromgeom="false" autolimits="true" />
+  <option timestep=".002" integrator="implicitfast" cone="elliptic" iterations="50" />
+  <visual>
+    <global offwidth="1280" offheight="900" />
+    <headlight ambient=".4 .4 .4" diffuse=".7 .7 .7" />
+  </visual>
+  <statistic center="0 0 .15" extent=".9" />
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".15 .18 .22" rgb2=".23 .27 .3" />
+    <material name="floor_mat" texture="grid" texrepeat="15 15" texuniform="true" />
+    <mesh name="platform_White" file="platform_White.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="platform_Green" file="platform_Green.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="platform_Yellow" file="platform_Yellow.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="platform_Black" file="platform_Black.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="platform_Gray" file="platform_Gray.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FL_yaw_White" file="FL_yaw_White.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FL_yaw_Yellow" file="FL_yaw_Yellow.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FL_yaw_Black" file="FL_yaw_Black.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FL_yaw_Gray" file="FL_yaw_Gray.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FL_pitch_White" file="FL_pitch_White.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FL_pitch_Yellow" file="FL_pitch_Yellow.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FL_pitch_Black" file="FL_pitch_Black.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RL_yaw_White" file="RL_yaw_White.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RL_yaw_Yellow" file="RL_yaw_Yellow.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RL_yaw_Black" file="RL_yaw_Black.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RL_yaw_Gray" file="RL_yaw_Gray.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RL_pitch_White" file="RL_pitch_White.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RL_pitch_Yellow" file="RL_pitch_Yellow.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RL_pitch_Black" file="RL_pitch_Black.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FR_yaw_White" file="FR_yaw_White.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FR_yaw_Yellow" file="FR_yaw_Yellow.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FR_yaw_Black" file="FR_yaw_Black.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FR_yaw_Gray" file="FR_yaw_Gray.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FR_pitch_White" file="FR_pitch_White.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FR_pitch_Yellow" file="FR_pitch_Yellow.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="FR_pitch_Black" file="FR_pitch_Black.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RR_yaw_White" file="RR_yaw_White.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RR_yaw_Yellow" file="RR_yaw_Yellow.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RR_yaw_Black" file="RR_yaw_Black.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RR_yaw_Gray" file="RR_yaw_Gray.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RR_pitch_White" file="RR_pitch_White.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RR_pitch_Yellow" file="RR_pitch_Yellow.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="RR_pitch_Black" file="RR_pitch_Black.obj" inertia="shell" maxhullvert="32" />
+    <mesh name="ramp_wedge" vertex="0.65 -1.5 -0.1 0.65 -1.5 0 0.65 1.5 -0.1 0.65 1.5 0 6.65 -1.5 -0.1 6.65 -1.5 1.0579618842507899 6.65 1.5 -0.1 6.65 1.5 1.0579618842507899" />
+  </asset>
+  <worldbody>
+    <light pos="0 -1 2" dir="0 0 -1" />
+    <geom name="floor" type="plane" size="20 20 .1" material="floor_mat" contype="1" conaffinity="2" friction=".8 .002 .0001" />
+    <body name="platform" pos="0 0 .114">
+      <freejoint name="floating_base" />
+      <site name="imu" pos="0 0 .09" size=".003" group="4" />
+      <body name="FL_yaw" pos="0.0764411255 0.0764411255 0.0545">
+        <joint name="FL_yaw" type="hinge" axis="0 0 1" range="-1.57079633 1.57079633" damping=".012" armature=".000005" />
+        <body name="FL_pitch" pos="0.0774281925 0.0639931637 -0.0095">
+          <joint name="FL_pitch" type="hinge" axis="0.707106781 -0.707106781 0" range="0 1.57079633" damping=".012" armature=".000005" />
+          <inertial mass="0.131206572" pos="-0.00595589217 0.00595588932 -0.051345835" fullinertia="0.000362158563 0.000362158555 0.000197800444 2.48118124e-05 -1.56438993e-05 1.5643884e-05" />
+          <geom name="visual_FL_pitch_White" type="mesh" mesh="FL_pitch_White" rgba="0.78 0.8 0.83 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="visual_FL_pitch_Yellow" type="mesh" mesh="FL_pitch_Yellow" rgba="0.88 0.57 0.1 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="visual_FL_pitch_Black" type="mesh" mesh="FL_pitch_Black" rgba="0.065 0.075 0.09 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="FL_shank_contact" type="capsule" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" fromto="0 0 -0.047 -0.00671751442 0.00671751442 -0.138" size=".012" />
+          <geom name="FL_foot_contact" type="cylinder" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="-0.00671751442 0.00671751442 -0.1535" size=".015 .0045" />
+          <site name="FL_foot" pos="-0.00671751442 0.00671751442 -0.158" size=".003" group="4" />
+        </body>
+        <inertial mass="0.235695785" pos="0.0495866798 0.0484265804 -0.00880650436" fullinertia="0.000400733281 0.000407514882 0.000585452045 -0.000137889561 1.72683121e-05 1.71237115e-05" />
+        <geom name="visual_FL_yaw_White" type="mesh" mesh="FL_yaw_White" rgba="0.78 0.8 0.83 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_FL_yaw_Yellow" type="mesh" mesh="FL_yaw_Yellow" rgba="0.88 0.57 0.1 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_FL_yaw_Black" type="mesh" mesh="FL_yaw_Black" rgba="0.065 0.075 0.09 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_FL_yaw_Gray" type="mesh" mesh="FL_yaw_Gray" rgba="0.42 0.47 0.53 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="FL_upper_contact" type="capsule" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" fromto="0 0 0 0.0774281925 0.0639931637 -0.0095" size=".025" />
+      </body>
+      <body name="RL_yaw" pos="-0.0764411255 0.0764411255 0.0545">
+        <joint name="RL_yaw" type="hinge" axis="0 0 1" range="-1.57079633 1.57079633" damping=".012" armature=".000005" />
+        <body name="RL_pitch" pos="-0.0639931637 0.0774281925 -0.0095">
+          <joint name="RL_pitch" type="hinge" axis="0.707106781 0.707106781 0" range="0 1.57079633" damping=".012" armature=".000005" />
+          <inertial mass="0.131206579" pos="-0.00595591429 -0.00595591767 -0.0513458357" fullinertia="0.000362158566 0.000362158573 0.00019780046 -2.48118174e-05 -1.5644018e-05 -1.56440361e-05" />
+          <geom name="visual_RL_pitch_White" type="mesh" mesh="RL_pitch_White" rgba="0.78 0.8 0.83 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="visual_RL_pitch_Yellow" type="mesh" mesh="RL_pitch_Yellow" rgba="0.88 0.57 0.1 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="visual_RL_pitch_Black" type="mesh" mesh="RL_pitch_Black" rgba="0.065 0.075 0.09 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="RL_shank_contact" type="capsule" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" fromto="0 0 -0.047 -0.00671751442 -0.00671751442 -0.138" size=".012" />
+          <geom name="RL_foot_contact" type="cylinder" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="-0.00671751442 -0.00671751442 -0.1535" size=".015 .0045" />
+          <site name="RL_foot" pos="-0.00671751442 -0.00671751442 -0.158" size=".003" group="4" />
+        </body>
+        <inertial mass="0.235695785" pos="-0.0484265804 0.0495866798 -0.00880650436" fullinertia="0.000407514882 0.000400733281 0.000585452045 0.000137889561 -1.71237115e-05 1.72683121e-05" />
+        <geom name="visual_RL_yaw_White" type="mesh" mesh="RL_yaw_White" rgba="0.78 0.8 0.83 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_RL_yaw_Yellow" type="mesh" mesh="RL_yaw_Yellow" rgba="0.88 0.57 0.1 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_RL_yaw_Black" type="mesh" mesh="RL_yaw_Black" rgba="0.065 0.075 0.09 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_RL_yaw_Gray" type="mesh" mesh="RL_yaw_Gray" rgba="0.42 0.47 0.53 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="RL_upper_contact" type="capsule" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" fromto="0 0 0 -0.0639931637 0.0774281925 -0.0095" size=".025" />
+      </body>
+      <body name="FR_yaw" pos="0.0764411255 -0.0764411255 0.0545">
+        <joint name="FR_yaw" type="hinge" axis="0 0 1" range="-1.57079633 1.57079633" damping=".012" armature=".000005" />
+        <body name="FR_pitch" pos="0.0639931637 -0.0774281925 -0.0095">
+          <joint name="FR_pitch" type="hinge" axis="-0.707106781 -0.707106781 0" range="0 1.57079633" damping=".012" armature=".000005" />
+          <inertial mass="0.131206576" pos="0.00595587448 0.00595589257 -0.0513458412" fullinertia="0.00036215862 0.000362158625 0.000197800445 -2.4811811e-05 1.56438047e-05 1.56439019e-05" />
+          <geom name="visual_FR_pitch_White" type="mesh" mesh="FR_pitch_White" rgba="0.78 0.8 0.83 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="visual_FR_pitch_Yellow" type="mesh" mesh="FR_pitch_Yellow" rgba="0.88 0.57 0.1 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="visual_FR_pitch_Black" type="mesh" mesh="FR_pitch_Black" rgba="0.065 0.075 0.09 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="FR_shank_contact" type="capsule" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" fromto="0 0 -0.047 0.00671751442 0.00671751442 -0.138" size=".012" />
+          <geom name="FR_foot_contact" type="cylinder" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="0.00671751442 0.00671751442 -0.1535" size=".015 .0045" />
+          <site name="FR_foot" pos="0.00671751442 0.00671751442 -0.158" size=".003" group="4" />
+        </body>
+        <inertial mass="0.235695785" pos="0.0484265804 -0.0495866798 -0.00880650436" fullinertia="0.000407514882 0.000400733281 0.000585452045 0.000137889561 1.71237115e-05 -1.72683121e-05" />
+        <geom name="visual_FR_yaw_White" type="mesh" mesh="FR_yaw_White" rgba="0.78 0.8 0.83 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_FR_yaw_Yellow" type="mesh" mesh="FR_yaw_Yellow" rgba="0.88 0.57 0.1 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_FR_yaw_Black" type="mesh" mesh="FR_yaw_Black" rgba="0.065 0.075 0.09 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_FR_yaw_Gray" type="mesh" mesh="FR_yaw_Gray" rgba="0.42 0.47 0.53 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="FR_upper_contact" type="capsule" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" fromto="0 0 0 0.0639931637 -0.0774281925 -0.0095" size=".025" />
+      </body>
+      <body name="RR_yaw" pos="-0.0764411255 -0.0764411255 0.0545">
+        <joint name="RR_yaw" type="hinge" axis="0 0 1" range="-1.57079633 1.57079633" damping=".012" armature=".000005" />
+        <body name="RR_pitch" pos="-0.0774281925 -0.0639931637 -0.0095">
+          <joint name="RR_pitch" type="hinge" axis="-0.707106781 0.707106781 0" range="0 1.57079633" damping=".012" armature=".000005" />
+          <inertial mass="0.131206577" pos="0.00595593255 -0.00595591444 -0.0513458414" fullinertia="0.000362158635 0.000362158631 0.000197800461 2.4811819e-05 1.56441167e-05 -1.56440194e-05" />
+          <geom name="visual_RR_pitch_White" type="mesh" mesh="RR_pitch_White" rgba="0.78 0.8 0.83 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="visual_RR_pitch_Yellow" type="mesh" mesh="RR_pitch_Yellow" rgba="0.88 0.57 0.1 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="visual_RR_pitch_Black" type="mesh" mesh="RR_pitch_Black" rgba="0.065 0.075 0.09 1" contype="0" conaffinity="0" group="1" mass="0" />
+          <geom name="RR_shank_contact" type="capsule" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" fromto="0 0 -0.047 0.00671751442 -0.00671751442 -0.138" size=".012" />
+          <geom name="RR_foot_contact" type="cylinder" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="0.00671751442 -0.00671751442 -0.1535" size=".015 .0045" />
+          <site name="RR_foot" pos="0.00671751442 -0.00671751442 -0.158" size=".003" group="4" />
+        </body>
+        <inertial mass="0.235695785" pos="-0.0495866798 -0.0484265804 -0.00880650436" fullinertia="0.000400733281 0.000407514882 0.000585452045 -0.000137889561 -1.72683121e-05 -1.71237115e-05" />
+        <geom name="visual_RR_yaw_White" type="mesh" mesh="RR_yaw_White" rgba="0.78 0.8 0.83 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_RR_yaw_Yellow" type="mesh" mesh="RR_yaw_Yellow" rgba="0.88 0.57 0.1 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_RR_yaw_Black" type="mesh" mesh="RR_yaw_Black" rgba="0.065 0.075 0.09 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="visual_RR_yaw_Gray" type="mesh" mesh="RR_yaw_Gray" rgba="0.42 0.47 0.53 1" contype="0" conaffinity="0" group="1" mass="0" />
+        <geom name="RR_upper_contact" type="capsule" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" fromto="0 0 0 -0.0774281925 -0.0639931637 -0.0095" size=".025" />
+      </body>
+      <inertial mass="1.09882888" pos="-2.04439108e-05 -0.00138846579 0.043609218" fullinertia="0.00459269714 0.00463127091 0.00796359074 5.25406911e-07 7.52587091e-08 3.26556667e-05" />
+      <geom name="visual_platform_White" type="mesh" mesh="platform_White" rgba="0.78 0.8 0.83 1" contype="0" conaffinity="0" group="1" mass="0" />
+      <geom name="visual_platform_Green" type="mesh" mesh="platform_Green" rgba="0.12 0.55 0.32 1" contype="0" conaffinity="0" group="1" mass="0" />
+      <geom name="visual_platform_Yellow" type="mesh" mesh="platform_Yellow" rgba="0.88 0.57 0.1 1" contype="0" conaffinity="0" group="1" mass="0" />
+      <geom name="visual_platform_Black" type="mesh" mesh="platform_Black" rgba="0.065 0.075 0.09 1" contype="0" conaffinity="0" group="1" mass="0" />
+      <geom name="visual_platform_Gray" type="mesh" mesh="platform_Gray" rgba="0.42 0.47 0.53 1" contype="0" conaffinity="0" group="1" mass="0" />
+      <geom name="centre_contact" type="box" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="0 0 .042" size=".061 .061 .045" />
+      <geom name="battery_contact" type="box" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="0 0 -.0115" size=".038 .022 .0075" />
+      <geom name="FL_yaw_fixed" type="cylinder" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="0.0764411255 0.0764411255 0.0445" size=".028 .033" />
+      <geom name="RL_yaw_fixed" type="cylinder" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="-0.0764411255 0.0764411255 0.0445" size=".028 .033" />
+      <geom name="FR_yaw_fixed" type="cylinder" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="0.0764411255 -0.0764411255 0.0445" size=".028 .033" />
+      <geom name="RR_yaw_fixed" type="cylinder" contype="2" conaffinity="3" group="3" rgba=".1 .8 .6 .35" mass="0" friction=".8 .002 .0001" solref=".006 1" pos="-0.0764411255 -0.0764411255 0.0445" size=".028 .033" />
+    </body>
+    <geom name="ramp" type="mesh" mesh="ramp_wedge" mass="0" rgba=".52 .48 .30 1" contype="1" conaffinity="2" friction=".8 .002 .0001" solref=".006 1" />
+  </worldbody>
+  <actuator>
+    <motor name="FL_yaw" joint="FL_yaw" gear="1" ctrlrange="-1.26 1.26" />
+    <motor name="FL_pitch" joint="FL_pitch" gear="1" ctrlrange="-1.26 1.26" />
+    <motor name="RL_yaw" joint="RL_yaw" gear="1" ctrlrange="-1.26 1.26" />
+    <motor name="RL_pitch" joint="RL_pitch" gear="1" ctrlrange="-1.26 1.26" />
+    <motor name="FR_yaw" joint="FR_yaw" gear="1" ctrlrange="-1.26 1.26" />
+    <motor name="FR_pitch" joint="FR_pitch" gear="1" ctrlrange="-1.26 1.26" />
+    <motor name="RR_yaw" joint="RR_yaw" gear="1" ctrlrange="-1.26 1.26" />
+    <motor name="RR_pitch" joint="RR_pitch" gear="1" ctrlrange="-1.26 1.26" />
+  </actuator>
+  <sensor>
+    <gyro site="imu" name="gyro" />
+    <accelerometer site="imu" name="accel" />
+  </sensor>
+</mujoco>

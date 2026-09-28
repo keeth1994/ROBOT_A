@@ -1,0 +1,1329 @@
+{
+  "source": "Robot_A17_Yaw_Pitch.f3d",
+  "cad_body_count": 151,
+  "servo_envelopes": 8,
+  "total_mass_assumed_kg": 2.566438331313368,
+  "joints": [
+    {
+      "name": "FL_yaw",
+      "parent": "platform",
+      "origin_cad_m": [
+        0.07644112549695428,
+        0.07644112549695428,
+        0.0545
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ]
+    },
+    {
+      "name": "FL_pitch",
+      "parent": "FL_yaw",
+      "origin_cad_m": [
+        0.15386931803688123,
+        0.14043428919433681,
+        0.045
+      ],
+      "axis": [
+        0.7071067811865476,
+        -0.7071067811865476,
+        0
+      ],
+      "limits_rad": [
+        0,
+        1.5707963267948966
+      ]
+    },
+    {
+      "name": "RL_yaw",
+      "parent": "platform",
+      "origin_cad_m": [
+        -0.07644112549695427,
+        0.07644112549695428,
+        0.0545
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ]
+    },
+    {
+      "name": "RL_pitch",
+      "parent": "RL_yaw",
+      "origin_cad_m": [
+        -0.14043428919433681,
+        0.15386931803688123,
+        0.045
+      ],
+      "axis": [
+        0.7071067811865476,
+        0.7071067811865475,
+        0
+      ],
+      "limits_rad": [
+        0,
+        1.5707963267948966
+      ]
+    },
+    {
+      "name": "FR_yaw",
+      "parent": "platform",
+      "origin_cad_m": [
+        0.07644112549695428,
+        -0.07644112549695428,
+        0.0545
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ]
+    },
+    {
+      "name": "FR_pitch",
+      "parent": "FR_yaw",
+      "origin_cad_m": [
+        0.14043428919433681,
+        -0.15386931803688123,
+        0.045
+      ],
+      "axis": [
+        -0.7071067811865476,
+        -0.7071067811865476,
+        0
+      ],
+      "limits_rad": [
+        0,
+        1.5707963267948966
+      ]
+    },
+    {
+      "name": "RR_yaw",
+      "parent": "platform",
+      "origin_cad_m": [
+        -0.07644112549695427,
+        -0.07644112549695428,
+        0.0545
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "limits_rad": [
+        -1.5707963267948966,
+        1.5707963267948966
+      ]
+    },
+    {
+      "name": "RR_pitch",
+      "parent": "RR_yaw",
+      "origin_cad_m": [
+        -0.15386931803688123,
+        -0.14043428919433681,
+        0.045
+      ],
+      "axis": [
+        -0.7071067811865476,
+        0.7071067811865475,
+        0
+      ],
+      "limits_rad": [
+        0,
+        1.5707963267948966
+      ]
+    }
+  ],
+  "links": [
+    {
+      "link": "platform",
+      "parts": 71,
+      "mass_kg": 1.0988288848876953,
+      "com_cad_m": [
+        -2.0443910772780457e-05,
+        -0.0013884657894654285,
+        0.04360921800388937
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.004592697139749385,
+          5.254069105698405e-07,
+          7.525870911698031e-08
+        ],
+        [
+          5.254069105698405e-07,
+          0.004631270910679893,
+          3.2655666666329276e-05
+        ],
+        [
+          7.525870911698031e-08,
+          3.2655666666329276e-05,
+          0.007963590737905568
+        ]
+      ]
+    },
+    {
+      "link": "FL_yaw",
+      "parts": 15,
+      "mass_kg": 0.23569578547051265,
+      "com_cad_m": [
+        0.12602780527613372,
+        0.12486770588506388,
+        0.04569349564330589
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00040073328128261565,
+          -0.00013788956068593416,
+          1.7268312119658726e-05
+        ],
+        [
+          -0.00013788956068593416,
+          0.00040751488208533944,
+          1.7123711489501787e-05
+        ],
+        [
+          1.7268312119658726e-05,
+          1.7123711489501787e-05,
+          0.0005854520451855555
+        ]
+      ]
+    },
+    {
+      "link": "FL_pitch",
+      "parts": 5,
+      "mass_kg": 0.13120657248531123,
+      "com_cad_m": [
+        0.14791342586775394,
+        0.14639017851815142,
+        -0.006345835046530669
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00036215856327164066,
+          2.481181240826443e-05,
+          -1.5643899293082593e-05
+        ],
+        [
+          2.481181240826443e-05,
+          0.00036215855543795416,
+          1.564388400599908e-05
+        ],
+        [
+          -1.5643899293082593e-05,
+          1.564388400599908e-05,
+          0.0001978004439780834
+        ]
+      ]
+    },
+    {
+      "link": "RL_yaw",
+      "parts": 15,
+      "mass_kg": 0.23569578547051265,
+      "com_cad_m": [
+        -0.12486770588587864,
+        0.1260278052769485,
+        0.045693495643784776
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0004075148820962501,
+          0.00013788956069403505,
+          -1.7123711488778936e-05
+        ],
+        [
+          0.00013788956069403505,
+          0.0004007332812876189,
+          1.726831211544242e-05
+        ],
+        [
+          -1.7123711488778936e-05,
+          1.726831211544242e-05,
+          0.0005854520452017584
+        ]
+      ]
+    },
+    {
+      "link": "RL_pitch",
+      "parts": 5,
+      "mass_kg": 0.13120657859375365,
+      "com_cad_m": [
+        -0.14639020348727966,
+        0.14791340037087522,
+        -0.006345835704635779
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0003621585657287473,
+          -2.4811817447706954e-05,
+          -1.5644018025972033e-05
+        ],
+        [
+          -2.4811817447706954e-05,
+          0.00036215857345766754,
+          -1.5644036147145994e-05
+        ],
+        [
+          -1.5644018025972033e-05,
+          -1.5644036147145994e-05,
+          0.00019780045999437642
+        ]
+      ]
+    },
+    {
+      "link": "FR_yaw",
+      "parts": 15,
+      "mass_kg": 0.23569578547051265,
+      "com_cad_m": [
+        0.1248677058858791,
+        -0.12602780527694876,
+        0.04569349564325821
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0004075148820964052,
+          0.0001378895606940357,
+          1.712371148956156e-05
+        ],
+        [
+          0.0001378895606940357,
+          0.0004007332812877754,
+          -1.726831211955496e-05
+        ],
+        [
+          1.712371148956156e-05,
+          -1.726831211955496e-05,
+          0.0005854520452017592
+        ]
+      ]
+    },
+    {
+      "link": "FR_pitch",
+      "parts": 5,
+      "mass_kg": 0.13120657641724215,
+      "com_cad_m": [
+        0.14639016367248733,
+        -0.14791342546787145,
+        -0.006345841176275329
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.0003621586201729596,
+          -2.48118109624754e-05,
+          1.5643804739651902e-05
+        ],
+        [
+          -2.48118109624754e-05,
+          0.0003621586249605987,
+          1.5643901930728344e-05
+        ],
+        [
+          1.5643804739651902e-05,
+          1.5643901930728344e-05,
+          0.0001978004449084135
+        ]
+      ]
+    },
+    {
+      "link": "RR_yaw",
+      "parts": 15,
+      "mass_kg": 0.23569578547051265,
+      "com_cad_m": [
+        -0.12602780527613372,
+        -0.12486770588506405,
+        0.045693495643734906
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00040073328128248354,
+          -0.00013788956068593503,
+          -1.7268312115402115e-05
+        ],
+        [
+          -0.00013788956068593503,
+          0.0004075148820852082,
+          -1.7123711488893916e-05
+        ],
+        [
+          -1.7268312115402115e-05,
+          -1.7123711488893916e-05,
+          0.0005854520451855593
+        ]
+      ]
+    },
+    {
+      "link": "RR_pitch",
+      "parts": 5,
+      "mass_kg": 0.1312065770473153,
+      "com_cad_m": [
+        -0.14791338548627633,
+        -0.146390203629593,
+        -0.00634584141627862
+      ],
+      "inertia_approx_kg_m2": [
+        [
+          0.00036215863533107026,
+          2.4811818950255887e-05,
+          1.5644116732755208e-05
+        ],
+        [
+          2.4811818950255887e-05,
+          0.0003621586305493778,
+          -1.5644019408935974e-05
+        ],
+        [
+          1.5644116732755208e-05,
+          -1.5644019408935974e-05,
+          0.0001978004614964059
+        ]
+      ]
+    }
+  ],
+  "assignments": [
+    {
+      "index": 0,
+      "component": "Plattform A17 P01 compact structural ring",
+      "body": "136x136 ring - diagonal P40 interfaces",
+      "link": "platform"
+    },
+    {
+      "index": 1,
+      "component": "Plattform A17 P02 stack posts",
+      "body": "M3 stack post",
+      "link": "platform"
+    },
+    {
+      "index": 2,
+      "component": "Plattform A17 P02 stack posts",
+      "body": "M3 stack post (1)",
+      "link": "platform"
+    },
+    {
+      "index": 3,
+      "component": "Plattform A17 P02 stack posts",
+      "body": "M3 stack post (2)",
+      "link": "platform"
+    },
+    {
+      "index": 4,
+      "component": "Plattform A17 P02 stack posts",
+      "body": "M3 stack post (3)",
+      "link": "platform"
+    },
+    {
+      "index": 5,
+      "component": "Plattform A17 P03 removable shelf 4",
+      "body": "Open electronics shelf",
+      "link": "platform"
+    },
+    {
+      "index": 6,
+      "component": "Plattform A17 P03 removable shelf 40",
+      "body": "Open electronics shelf",
+      "link": "platform"
+    },
+    {
+      "index": 7,
+      "component": "Plattform A17 P03 removable shelf 62",
+      "body": "Open electronics shelf",
+      "link": "platform"
+    },
+    {
+      "index": 8,
+      "component": "Plattform A17 P04 underslung battery cradle",
+      "body": "Strap-retained battery cradle - removable M3",
+      "link": "platform"
+    },
+    {
+      "index": 9,
+      "component": "Plattform E01 RS 144-9405 LiPo 3.7V 1800mAh 53.5x35x10.4",
+      "body": "Batteri databladmaal - butikk oppgir annen lengde",
+      "link": "platform"
+    },
+    {
+      "index": 10,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "PCB 55x29",
+      "link": "platform"
+    },
+    {
+      "index": 11,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "ESP32 WROOM skjerm - forenklet",
+      "link": "platform"
+    },
+    {
+      "index": 12,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "19-pins tilkoblingsrad - malvolum",
+      "link": "platform"
+    },
+    {
+      "index": 13,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "19-pins tilkoblingsrad - malvolum (1)",
+      "link": "platform"
+    },
+    {
+      "index": 14,
+      "component": "Plattform E02 SEEIT ESP32-DEV-38P 55x29x17",
+      "body": "USB C tilgang mot senter",
+      "link": "platform"
+    },
+    {
+      "index": 15,
+      "component": "Plattform E03 RESERVERT PWM 16 kanaler - kortvariant ikke valgt",
+      "body": "70x35x18 reservert - IKKE produsentmaal",
+      "link": "platform"
+    },
+    {
+      "index": 16,
+      "component": "Plattform E04 RESERVERT ADC og FSR motstander",
+      "body": "65x35x18 reservert - sensorgrensesnitt",
+      "link": "platform"
+    },
+    {
+      "index": 17,
+      "component": "Plattform E05 RESERVERT regulator strom og spenningsmaaling",
+      "body": "70x45x28 reservert - elektrisk dimensjonering gjenstaar",
+      "link": "platform"
+    },
+    {
+      "index": 18,
+      "component": "Plattform S01 MIKROE-4228 6DOF IMU 13 - accel og magnetometer",
+      "body": "PCB 28.6x25.4 - korttykkelse antatt 1.6",
+      "link": "platform"
+    },
+    {
+      "index": 19,
+      "component": "Plattform S01 MIKROE-4228 6DOF IMU 13 - accel og magnetometer",
+      "body": "MC6470 representasjon",
+      "link": "platform"
+    },
+    {
+      "index": 20,
+      "component": "Plattform S01 MIKROE-4228 6DOF IMU 13 - accel og magnetometer",
+      "body": "mikroBUS header - forenklet",
+      "link": "platform"
+    },
+    {
+      "index": 21,
+      "component": "Plattform S01 MIKROE-4228 6DOF IMU 13 - accel og magnetometer",
+      "body": "mikroBUS header - forenklet (1)",
+      "link": "platform"
+    },
+    {
+      "index": 22,
+      "component": "Plattform A17 P05 IMU support",
+      "body": "Open IMU bridge",
+      "link": "platform"
+    },
+    {
+      "index": 23,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "platform"
+    },
+    {
+      "index": 24,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte",
+      "link": "platform"
+    },
+    {
+      "index": 25,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (1)",
+      "link": "platform"
+    },
+    {
+      "index": 26,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (2)",
+      "link": "platform"
+    },
+    {
+      "index": 27,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (3)",
+      "link": "platform"
+    },
+    {
+      "index": 28,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lagerbro",
+      "link": "platform"
+    },
+    {
+      "index": 29,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 30,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "platform"
+    },
+    {
+      "index": 31,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "platform"
+    },
+    {
+      "index": 32,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 33,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 hus med plan P40 inngang",
+      "link": "platform"
+    },
+    {
+      "index": 34,
+      "component": "FL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 servofeste - fire monteringshull",
+      "link": "platform"
+    },
+    {
+      "index": 35,
+      "component": "FL 01 YAW F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 36,
+      "component": "FL 01 YAW F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 37,
+      "component": "FL 01 YAW F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 38,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 39,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 40,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 41,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 42,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 43,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 44,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 45,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 46,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 47,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 48,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 49,
+      "component": "FL 02 PITCH fot F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "FL_yaw"
+    },
+    {
+      "index": 50,
+      "component": "FL 02 PITCH fot F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FL_pitch"
+    },
+    {
+      "index": 51,
+      "component": "FL 02 PITCH fot F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FL_pitch"
+    },
+    {
+      "index": 52,
+      "component": "FL 02 PITCH fot F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FL_pitch"
+    },
+    {
+      "index": 53,
+      "component": "FL 03 A17 enkel fot",
+      "body": "A17 hollow shank - P40 - 3mm walls",
+      "link": "FL_pitch"
+    },
+    {
+      "index": 54,
+      "component": "FL 04 A17 gummisaale placeholder",
+      "body": "A17 3mm rubber foot pad - material placeholder",
+      "link": "FL_pitch"
+    },
+    {
+      "index": 55,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "platform"
+    },
+    {
+      "index": 56,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte",
+      "link": "platform"
+    },
+    {
+      "index": 57,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (1)",
+      "link": "platform"
+    },
+    {
+      "index": 58,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (2)",
+      "link": "platform"
+    },
+    {
+      "index": 59,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (3)",
+      "link": "platform"
+    },
+    {
+      "index": 60,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lagerbro",
+      "link": "platform"
+    },
+    {
+      "index": 61,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 62,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "platform"
+    },
+    {
+      "index": 63,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "platform"
+    },
+    {
+      "index": 64,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 65,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 hus med plan P40 inngang",
+      "link": "platform"
+    },
+    {
+      "index": 66,
+      "component": "RL 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 servofeste - fire monteringshull",
+      "link": "platform"
+    },
+    {
+      "index": 67,
+      "component": "RL 01 YAW F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 68,
+      "component": "RL 01 YAW F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 69,
+      "component": "RL 01 YAW F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 70,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 71,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 72,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 73,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 74,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 75,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 76,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 77,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 78,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 79,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 80,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 81,
+      "component": "RL 02 PITCH fot F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "RL_yaw"
+    },
+    {
+      "index": 82,
+      "component": "RL 02 PITCH fot F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RL_pitch"
+    },
+    {
+      "index": 83,
+      "component": "RL 02 PITCH fot F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RL_pitch"
+    },
+    {
+      "index": 84,
+      "component": "RL 02 PITCH fot F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RL_pitch"
+    },
+    {
+      "index": 85,
+      "component": "RL 03 A17 enkel fot",
+      "body": "A17 hollow shank - P40 - 3mm walls",
+      "link": "RL_pitch"
+    },
+    {
+      "index": 86,
+      "component": "RL 04 A17 gummisaale placeholder",
+      "body": "A17 3mm rubber foot pad - material placeholder",
+      "link": "RL_pitch"
+    },
+    {
+      "index": 87,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "platform"
+    },
+    {
+      "index": 88,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte",
+      "link": "platform"
+    },
+    {
+      "index": 89,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (1)",
+      "link": "platform"
+    },
+    {
+      "index": 90,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (2)",
+      "link": "platform"
+    },
+    {
+      "index": 91,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (3)",
+      "link": "platform"
+    },
+    {
+      "index": 92,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lagerbro",
+      "link": "platform"
+    },
+    {
+      "index": 93,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 94,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "platform"
+    },
+    {
+      "index": 95,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "platform"
+    },
+    {
+      "index": 96,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 97,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 hus med plan P40 inngang",
+      "link": "platform"
+    },
+    {
+      "index": 98,
+      "component": "FR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 servofeste - fire monteringshull",
+      "link": "platform"
+    },
+    {
+      "index": 99,
+      "component": "FR 01 YAW F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 100,
+      "component": "FR 01 YAW F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 101,
+      "component": "FR 01 YAW F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 102,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 103,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 104,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 105,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 106,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 107,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 108,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 109,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 110,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 111,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 112,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 113,
+      "component": "FR 02 PITCH fot F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "FR_yaw"
+    },
+    {
+      "index": 114,
+      "component": "FR 02 PITCH fot F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "FR_pitch"
+    },
+    {
+      "index": 115,
+      "component": "FR 02 PITCH fot F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "FR_pitch"
+    },
+    {
+      "index": 116,
+      "component": "FR 02 PITCH fot F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "FR_pitch"
+    },
+    {
+      "index": 117,
+      "component": "FR 03 A17 enkel fot",
+      "body": "A17 hollow shank - P40 - 3mm walls",
+      "link": "FR_pitch"
+    },
+    {
+      "index": 118,
+      "component": "FR 04 A17 gummisaale placeholder",
+      "body": "A17 3mm rubber foot pad - material placeholder",
+      "link": "FR_pitch"
+    },
+    {
+      "index": 119,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "platform"
+    },
+    {
+      "index": 120,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte",
+      "link": "platform"
+    },
+    {
+      "index": 121,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (1)",
+      "link": "platform"
+    },
+    {
+      "index": 122,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (2)",
+      "link": "platform"
+    },
+    {
+      "index": 123,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avstandsstotte (3)",
+      "link": "platform"
+    },
+    {
+      "index": 124,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lagerbro",
+      "link": "platform"
+    },
+    {
+      "index": 125,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 126,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "platform"
+    },
+    {
+      "index": 127,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "platform"
+    },
+    {
+      "index": 128,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7 bakre lagerlokk",
+      "link": "platform"
+    },
+    {
+      "index": 129,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 hus med plan P40 inngang",
+      "link": "platform"
+    },
+    {
+      "index": 130,
+      "component": "RR 01 YAW F40 FAST - A7.2 180deg",
+      "body": "A7.2 Y180 servofeste - fire monteringshull",
+      "link": "platform"
+    },
+    {
+      "index": 131,
+      "component": "RR 01 YAW F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 132,
+      "component": "RR 01 YAW F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 133,
+      "component": "RR 01 YAW F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 134,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "Parallax 900-00005 - coaxial direct drive",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 135,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 hus med plan P40 inngang",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 136,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 servofeste - fire monteringshull",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 137,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 138,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (1)",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 139,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (2)",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 140,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 avstandsstotte (3)",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 141,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 fremre lagerbro",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 142,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 avtakbart fremre lagerlokk",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 143,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 fremre lager 25x37x7",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 144,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 bakre lager 8x16x5",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 145,
+      "component": "RR 02 PITCH fot F40 FAST",
+      "body": "A7 bakre lagerlokk",
+      "link": "RR_yaw"
+    },
+    {
+      "index": 146,
+      "component": "RR 02 PITCH fot F40 ROTOR",
+      "body": "A7 dobbel gaffel - P40 utgang",
+      "link": "RR_pitch"
+    },
+    {
+      "index": 147,
+      "component": "RR 02 PITCH fot F40 ROTOR",
+      "body": "A7 avtakbart drivkinn med direkte nav",
+      "link": "RR_pitch"
+    },
+    {
+      "index": 148,
+      "component": "RR 02 PITCH fot F40 ROTOR",
+      "body": "A7 OEM horn - plassholder hullmaal ma bekreftes",
+      "link": "RR_pitch"
+    },
+    {
+      "index": 149,
+      "component": "RR 03 A17 enkel fot",
+      "body": "A17 hollow shank - P40 - 3mm walls",
+      "link": "RR_pitch"
+    },
+    {
+      "index": 150,
+      "component": "RR 04 A17 gummisaale placeholder",
+      "body": "A17 3mm rubber foot pad - material placeholder",
+      "link": "RR_pitch"
+    }
+  ],
+  "assumptions": {
+    "effective_print_density_kg_m3": 650,
+    "metal_density_kg_m3": 7800,
+    "servo_mass_kg": 0.044,
+    "wheel_rotating_assembly_mass_kg": 0.04,
+    "electronics_and_battery_mass_kg": 0.2,
+    "servo_stall_torque_Nm": 0.26833896966654,
+    "servo_free_speed_deg_s": 315.7894736842105,
+    "brake_torque_Nm": 0.15,
+    "ground_friction": 0.8,
+    "notes": "A17: 8 single servos; old parts use matched A16 slicer mass. New hollow feet use conservative solid PLA density. Electronics/battery 200g unmeasured. Inertias approximate. Servo torque and speed optimistic instantaneous ceilings; no thermal or supply sag model.",
+    "bearing_25_37_7_mass_kg": 0.0213,
+    "bearing_8_16_5_mass_kg": 0.0059,
+    "hip_servo_count": 0,
+    "print_profile": "P2S 0.4 mm, 0.20 layer, 4 walls, 25% gyroid"
+  },
+  "limitations": [
+    "CAD visuals; simplified collision proxies",
+    "Bounding-box approximate inertia",
+    "No physical load, servo travel or battery validation",
+    "Open-loop gait is not reinforcement learning"
+  ],
+  "controller": "run_robot_a17.py; diagonal stepping plus ideal IMU heading correction",
+  "validation_results": "results/a17_walk.json"
+}
