@@ -1,0 +1,151 @@
+{
+  "total_mass_kg": 1.0757124710662795,
+  "mass_by_kind_kg": {
+    "PLA": 0.277793423524432,
+    "battery": 0.18,
+    "electronics": 0.09,
+    "imu": 0.003,
+    "servo": 0.3519999999999999,
+    "bearing": 0.04,
+    "hardware": 0.03522559771682994,
+    "rubber": 0.01769344982501763,
+    "unmodeled_horns_fasteners_wiring_straps": 0.08
+  },
+  "links": [
+    {
+      "link": "platform",
+      "mass_kg": 0.6889617971942987
+    },
+    {
+      "link": "FL_driver",
+      "mass_kg": 0.00418894278643658
+    },
+    {
+      "link": "FL_yaw",
+      "mass_kg": 0.018934517995871303
+    },
+    {
+      "link": "FL_pitch",
+      "mass_kg": 0.07356494391115788
+    },
+    {
+      "link": "RL_driver",
+      "mass_kg": 0.004188942786436582
+    },
+    {
+      "link": "RL_yaw",
+      "mass_kg": 0.018934517995871307
+    },
+    {
+      "link": "RL_pitch",
+      "mass_kg": 0.07356845543240771
+    },
+    {
+      "link": "FR_driver",
+      "mass_kg": 0.004188942786436581
+    },
+    {
+      "link": "FR_yaw",
+      "mass_kg": 0.01893451799587128
+    },
+    {
+      "link": "FR_pitch",
+      "mass_kg": 0.07356345426954819
+    },
+    {
+      "link": "RR_driver",
+      "mass_kg": 0.004188942786436582
+    },
+    {
+      "link": "RR_yaw",
+      "mass_kg": 0.01893451799587128
+    },
+    {
+      "link": "RR_pitch",
+      "mass_kg": 0.07355997712963552
+    }
+  ],
+  "servo": {
+    "legs": {
+      "FL": {
+        "yaw_center_mm": [
+          52.0,
+          52.0,
+          0
+        ],
+        "neutral_yaw_deg": 45,
+        "pitch_local_mm": [
+          38,
+          0,
+          27
+        ]
+      },
+      "RL": {
+        "yaw_center_mm": [
+          -52.0,
+          52.0,
+          0
+        ],
+        "neutral_yaw_deg": 135,
+        "pitch_local_mm": [
+          38,
+          0,
+          27
+        ]
+      },
+      "FR": {
+        "yaw_center_mm": [
+          52.0,
+          -52.0,
+          0
+        ],
+        "neutral_yaw_deg": -45,
+        "pitch_local_mm": [
+          38,
+          0,
+          27
+        ]
+      },
+      "RR": {
+        "yaw_center_mm": [
+          -52.0,
+          -52.0,
+          0
+        ],
+        "neutral_yaw_deg": -135,
+        "pitch_local_mm": [
+          38,
+          0,
+          27
+        ]
+      }
+    },
+    "yaw_requested_range_deg": [
+      -135,
+      135
+    ],
+    "pitch_requested_range_deg": [
+      -45,
+      45
+    ],
+    "clearance_status": "See B3 clearance audit; requested travel is not clearance certified",
+    "pitch_servo_moves_with_foot": true,
+    "gear_ratio_speed": 1.5,
+    "gear_efficiency_assumed": 0.85,
+    "servo_stall_Nm": 0.26833896966654,
+    "servo_free_speed_deg_s": 315.7894736842,
+    "servo_mass_kg": 0.044
+  },
+  "limitations": [
+    "Solid PLA mass, not slicer verified",
+    "Bounding-box approximate inertia",
+    "Battery/electronics are packaging reservations with mass allowances",
+    "Rigid ramp, no flexible panel model",
+    "Friction 0.8 assumed, not measured",
+    "Gear efficiency 85% assumed, no backlash or thermal model",
+    "No native CAD joints; MuJoCo kinematic tree supplied separately",
+    "Collision proxies approximate CAD; mounting details omitted",
+    "Yaw restricted to +/-45 degrees; combined pitch/yaw CAD clearance not certified",
+    "Pitch motor mass moves with the rocker, opposite to B1"
+  ]
+}

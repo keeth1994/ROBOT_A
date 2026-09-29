@@ -1,9 +1,4 @@
 .venv/
 __pycache__/
+*.pyc
 logs/
-results/
-reference/A10_mesh_patch.json
-reference/A14_mesh_patch.json
-reference/a16_cad_meshes.json.gz
-reference/a7_1_cad_meshes.json.gz
-reference/a7_cad_meshes.json.gz

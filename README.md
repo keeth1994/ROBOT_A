@@ -1,35 +1,32 @@
-# ROBOT_A · MuJoCo
+# Robot B3 - Y-fork rocker quadruped
 
-**Robot A7.2 er overført fra Fusion til en bevegelig MuJoCo-modell.**
+Original Parallax servos, top-facing yaw outputs, Y-forks, and pitch servos moving with the rocker legs. Only B3 is retained in this repository.
 
-I VS Code: **Ctrl+Shift+B** starter **Start robot A7.2**.
+## Start
 
-```powershell
-.\.venv\Scripts\python.exe run_robot.py
-```
+In VS Code, press **Ctrl+Shift+B** for the flat / 10-degree uphill / crest / 10-degree downhill test, or run `./start.ps1` in PowerShell. The viewer stays open after 100 simulated seconds.
 
-Du får en 3D-visning og et kontrollpanel. Begynn i **Visning – uten fysikk**, velg bein og prøv leddvinklene. Bytt til **Fysikk – begrenset servo** for tyngdekraft, gulvkontakt, brems og servobegrensninger.
-
-Les [brukerveiledningen for A7.2](ROBOT_A7_2.md) for kontroller, modellantakelser og gjenværende arbeid. Modellen bruker foreløpige masser og motorverdier, og har ingen ferdig gå-/skøytepolicy.
-
-## Kontroller modellen
+## Setup and reproduce
 
 ```powershell
-.\.venv\Scripts\python.exe run_robot.py --check
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe build_robot_b3.py
+.\.venv\Scripts\python.exe test_b3_course.py --flat --seconds 25
+.\.venv\Scripts\python.exe test_b3_course.py --seconds 100
+.\.venv\Scripts\python.exe record_b3_course.py --seconds 100
 ```
 
-Resultater lagres i `results/robot_check.json`. Modell: `models/robot_a7_2.xml`. Innstillinger: `reference/robot_parameters.json`. Etter endring av innstillinger bygges modellen med `build_robot.py`.
+The builder uses only B3 reference files and `mesh_utils.py`. No previous version is required. `requirements-lock.txt` captures the existing environment.
 
-## Tidligere servotestbenk
+## Contents
 
-```powershell
-.\.venv\Scripts\python.exe run_sim.py
-```
+- `cad/`: Fusion and STEP snapshots, previews and CAD clearance audit.
+- `models/`: B3 flat/course models and visual meshes.
+- `reference/`: B3 geometry, kinematics, gait, course and mass assumptions.
+- `results/`: current flat/course measurements and replay.
+- `DESIGN_B3_SIM.md`: test setup, results and limitations.
 
-Den separate testen av en servoarm er bevart. [Tidligere dokumentasjon](SERVO_TESTBENK.md) beskriver denne testbenken; henvisninger der til planlagt robotimport er historikk.
+## Current result
 
-## Miljø
-
-Lokal Python 3.12 og MuJoCo 3.13.0 i `.venv`. Installer med `requirements-lock.txt` ved behov. Ikke kopier `.venv` mellom maskiner.
-
-[MuJoCo Python-dokumentasjon](https://mujoco.readthedocs.io/en/stable/python.html)
+Flat walking: 0.782 m in 25 s. Course traversal: 2.315 m in 100 s, no falls. **Not a clean 300 mm corridor pass:** tread overhang reaches 78 mm. Steering uses ideal simulated pose; collision geometry and mass are approximate. Full 270-degree CAD yaw is not achieved. These results do not certify hardware performance.
