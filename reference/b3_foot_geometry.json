@@ -1,0 +1,43 @@
+{
+  "revision": "short_flat_round_outer_feet",
+  "centers_x_mm": [
+    32,
+    40
+  ],
+  "center_z_mm": -21,
+  "inner_radius_mm": 5,
+  "plastic_radius_mm": 10,
+  "tread_radius_mm": 12,
+  "crossbar_z_mm": -28,
+  "strut_endpoints_mm": [
+    [
+      25,
+      -26
+    ],
+    [
+      54,
+      -24
+    ]
+  ],
+  "rail_y_ranges_mm": [
+    [
+      -19.5,
+      -16.5
+    ],
+    [
+      30.5,
+      33.5
+    ]
+  ],
+  "tread_y_ranges_mm": [
+    [
+      -21,
+      -15
+    ],
+    [
+      29,
+      35
+    ]
+  ],
+  "outer_radius_extra_mm": 10
+}

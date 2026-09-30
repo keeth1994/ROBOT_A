@@ -1,44 +1,33 @@
-# B3 walking and ramp test
+# B3 simulation: narrow feet and supplied sensors
 
-The simulation uses the exported B3 CAD bodies, including the pitch servo moving with the rocker. Only B3 is retained in this repository. Earlier working files were archived outside it.
+## Model
 
-## Run
+Native Fusion and STEP exports, CAD-derived visual meshes, approximate inertias and contact shapes are rebuilt from the same B3 geometry. Runner length is 42 mm, flat sole 8 mm, inward tread radius 12 mm, outward tread radius 22 mm, PLA thickness 3 mm and radial section 5 mm. Pitch axle is 60 mm above the neutral sole. Inward reach is deliberately shorter (18 mm versus 24 mm outward).
 
-In Visual Studio Code, **Ctrl+Shift+B** starts **Start B3 - flat uphill downhill - original servos**, now the default build task. The simulation stops advancing after 100 simulated seconds but leaves the viewer open for inspection. Close and relaunch to restart. Another task, **Start B3 - flat walking**, runs the 25-second flat test.
+Estimated total mass: 1.1094 kg. Solid PLA: 284.2 g. Sensor mass additions and the retained electronics/fastener allowances are itemized in `reference/robot_b3_manifest.json`. These are not measured or sliced masses.
 
-From the project terminal:
+Original Parallax 900-00005 servos remain: pitch stall limit 0.26834 Nm, yaw output 0.15206 Nm after 1.5 speed-increasing gears and assumed 85% efficiency. Torque decreases with motoring speed; no thermal, battery-sag or backlash model. Pitch and yaw are limited to +/-45 degrees. Full requested 270-degree yaw is not clearance-certified.
 
-```powershell
-.\.venv\Scripts\python.exe run_robot_b3.py --ramp --seconds 100
-.\.venv\Scripts\python.exe test_b3_course.py --seconds 100
-.\.venv\Scripts\python.exe test_b3_course.py --flat --seconds 25
-```
+## Course and controller
 
-Recorded replay: `results/b3_flat_up_down.mp4`, 2x playback of 100 seconds of physics.
+The photo-inspired ramp has a 300 mm width and five 600 mm horizontal sections. Its provisional height profile is 0 -> 160 -> 0 -> 200 -> 200 -> 0 mm: first climb, first descent into a valley, second climb, raised flat platform, final descent. Thin 6 mm rigid panels have black surfaces, exposed wood-coloured edges and simplified supports. The first slopes are about +/-14.9 degrees and the second climb/descent +/-18.4 degrees. The checkerboard floor remains for visual tracking. Dimensions are assumptions pending measurements; flex and grip are not calibrated.
 
-## Course
+An independently positioned open zigzag corridor has a provisional 400 mm clear width, 180 mm wall height and 12 mm wall thickness. The settings file exposes both obstacles' positions, rotations and dimensions. There is no ceiling because the photograph shows open walls. The existing controller is unchanged and cannot be assumed to navigate from the ramp into this corridor.
 
-Flat approach to x=0.40 m; 0.60 m horizontal uphill run at 10 degrees; a 0.30 m crest; 0.60 m horizontal downhill run at 10 degrees; flat exit beginning at x=1.90 m. Crest height is 105.8 mm. All raised sections are 300 mm wide. Transitions are continuous in height. The ramp is rigid; the real flexible panel is not simulated.
+The programmed gait acts through torque/speed-limited motors, without teleportation, base forces or terrain-specific choreography. Ideal simulated heading and lateral feedback remain. After reducing the feet, yaw sweep direction was changed to +0.45 rad; no other gait gains were changed. An earlier unchanged-gait comparison is retained separately and is not the current run.
 
-## Results
+## Previous-geometry tests (not rerun)
 
-| Test | Result |
-|---|---|
-| Flat, 25 s including 2 s settling | 0.782 m forward; 25 mm lateral drift; maximum tilt 0.39 degrees |
-| Course, 100 s including settling | 2.315 m forward; uphill, crest and downhill all contacted; reaches flat exit |
-| Stability | No falls, no non-foot terrain contact, no MuJoCo warnings |
-| Corridor | FAIL: tread vertices overhang a side by up to 78.3 mm, sampled every 20 ms |
-| Off-ramp floor support | No detected foot contact with the floor beside the raised sections |
+The programmed-gait tests below have not been rerun for the short-sole/rounded-toe revision; new RL experiments on that geometry are documented in `RL_B3.md` and `RL_CURRICULUM.md`. On the preceding foot geometry, the 100 s run advanced 0.499 m, contacted first_climb, floor, and did not complete the ramp. Detected fall: False; warnings: 0; maximum tilt 16.06 degrees. Those previous-geometry results remain in `results/b3_course_test.json` and the replay. The pass criterion requires contact with all five ramp surfaces, clearance of the ramp exit, no fall, no non-foot contact and no ramp-width violation. It assesses the ramp only, not successful corridor navigation. Geometry and sensor validation do not prove traversal capability.
 
-This is a traversal demonstration, not a clean 300 mm corridor pass. Width, joint interference and hardware feasibility still need work. The initial gait without lateral correction drifted away from the course; the selected controller adds ideal lateral position feedback. This is a hand-coded gait with feedback, not reinforcement learning.
+## Sensors
 
-## Model assumptions
+Three Sharp GP2Y0A41SK0F rays provide left, right and downward-forward range observations. Outside 4-30 cm is unknown. MC6470 accelerometer and magnetometer channels are present, with no invented gyro. The TimerCamera-X is represented by a forward RGB camera. `b3_sensors.py` logs observations and captures a camera view. `test_b3_sensors.py` checks wall distances, ground-ray orientation, invalid ranges and channel presence. These tests passed on the previous foot geometry; analogue noise, surface reflectivity, magnetic interference and perception software remain unmodelled. The gait does not yet use these readings. See `SENSORS_B3.md`.
 
-- Eight original Parallax 900-00005 motors. Maximum pitch torque 0.26834 Nm. Yaw output maximum 0.15206 Nm after the 1.5 speed-increasing gears and assumed 85% efficiency. No 1.26 Nm motor upgrade.
-- Torque falls linearly with motoring speed, using the inherited 315.79 degrees/second no-load servo speed. Peak values are not continuous thermal ratings; supply sag and overheating are not modelled.
-- Estimated mass 1.0757 kg: solid PLA 277.8 g, servos 352 g, battery reservation 180 g, electronics 90 g, IMU 3 g, bearings 40 g, modelled hardware 35.2 g, rubber 17.7 g, miscellaneous allowance 80 g. Battery and electronics are not finalized. This is not measured or slicer-verified mass.
-- Pitch +/-45 degrees; yaw restricted to +/-45 degrees. Current target yaw amplitude is 25.8 degrees and pitch lift amplitude 37.2 degrees. Combined CAD poses are not certified collision-free.
-- Visual geometry comes from B3. Collision geometry uses simplified open rocker segments, rods, motor boxes and platform proxies. Small mounting features are omitted; adjacent link contacts are filtered by MuJoCo. Dynamics cannot certify exact CAD clearances.
-- Friction 0.8 assumed, approximate box inertias, ideal heading/lateral pose feedback, no injected base forces or teleporting.
+## CAD checks
 
-Machine-readable metrics: `results/b3_flat_test.json`, `results/b3_course_test.json`. Model and mass manifest: `reference/robot_b3_manifest.json`. Controller parameters: `reference/b3_gait.json`.
+The audit has 59 recorded overlap cases; inspect `cad/B3_clearance_audit.json` for scope and locations. Own pitch is sampled at 5-degree intervals, FL neutral-pitch yaw at 15 degrees, sensor-vs-leg poses at yaw/pitch -45/0/+45 for all four legs, and stationary sensor packaging is checked. Combined continuous poses, neighbouring moving legs, wiring and strength are not certified. Sensor brackets and other small mounting details contribute mass but are not fully represented by MuJoCo contact geometry.
+
+## Files
+
+`cad/` holds native exports and previews. `models/` holds flat and course XML plus visual meshes. `reference/` holds geometry, sensor and gait configuration. `results/` holds previous-geometry metrics, replay, sensor log and camera view.

@@ -1,0 +1,144 @@
+{
+  "flat": {
+    "course_geometry": null,
+    "controller": "physics-driven programmed gait with ideal pose feedback",
+    "parameters": {
+      "period": 1.0,
+      "duty": 0.6,
+      "yaw_amplitude": -0.45,
+      "pitch_lift": 0.65,
+      "pitch_stance": 0.0,
+      "kp": 1.6,
+      "kd": 0.04,
+      "heading_gain": 0.8,
+      "pattern": "trot",
+      "lateral_gain": 5.0
+    },
+    "duration_s": 25.0,
+    "course": false,
+    "mass_kg": 1.1092656485599999,
+    "start_xyz": [
+      -2.480523298781143e-07,
+      -1.1679932098545613e-07,
+      0.03297728220755629
+    ],
+    "final_xyz": [
+      -0.36802412130400836,
+      0.16274437510657064,
+      0.033246264709659364
+    ],
+    "forward_m": -0.36802387325167846,
+    "max_x_m": 0.003622721152609073,
+    "max_tilt_deg": 0.390392131809894,
+    "fallen": false,
+    "tread_contacts": [
+      "floor"
+    ],
+    "first_tread_contact_s": {
+      "floor": 2.0000000000000013
+    },
+    "left_ramp_width": false,
+    "max_tread_overhang_m": 0.0,
+    "offside_floor_contact_fraction": 0.0,
+    "nonfoot_contact_fraction": 0.0,
+    "stall_saturation_fraction": 0.009412225023910965,
+    "max_contact_penetration_m": 0.0007729578115898382,
+    "warnings": 0,
+    "course_passed": false,
+    "flat_passed": false,
+    "torque_limits_Nm": [
+      0.15205874947770598,
+      0.26833896966654,
+      0.15205874947770598,
+      0.26833896966654,
+      0.15205874947770598,
+      0.26833896966654,
+      0.15205874947770598,
+      0.26833896966654
+    ],
+    "limitations": [
+      "Approximate contact proxies and box inertias",
+      "Rigid 300 mm ramp; flexible real panel is not modelled",
+      "Assumed friction 0.8 and gear efficiency 0.85",
+      "Peak servo model, no thermal limits or voltage sag",
+      "Heading and optional lateral feedback use ideal simulated pose",
+      "No proof of full CAD clearance at combined joint poses"
+    ]
+  },
+  "course": {
+    "course_geometry": {
+      "width_m": 0.3,
+      "approach_end_x": 0.4,
+      "uphill_end_x": 1.0,
+      "crest_end_x": 1.3,
+      "downhill_end_x": 1.4832443735993672,
+      "slope_deg": 10,
+      "downhill_deg": 30,
+      "height_m": 0.10579618842507899,
+      "success_base_x": 1.6332443735993671
+    },
+    "controller": "physics-driven programmed gait with ideal pose feedback",
+    "parameters": {
+      "period": 1.0,
+      "duty": 0.6,
+      "yaw_amplitude": -0.45,
+      "pitch_lift": 0.65,
+      "pitch_stance": 0.0,
+      "kp": 1.6,
+      "kd": 0.04,
+      "heading_gain": 0.8,
+      "pattern": "trot",
+      "lateral_gain": 5.0
+    },
+    "duration_s": 100.0,
+    "course": true,
+    "mass_kg": 1.1092656485599999,
+    "start_xyz": [
+      -2.480523298781143e-07,
+      -1.1679932098545613e-07,
+      0.03297728220755629
+    ],
+    "final_xyz": [
+      0.9234739516498867,
+      0.37442672619012446,
+      0.03323930243923527
+    ],
+    "forward_m": 0.9234741997022166,
+    "max_x_m": 0.9234739516498867,
+    "max_tilt_deg": 0.43051946997822577,
+    "fallen": false,
+    "tread_contacts": [
+      "floor"
+    ],
+    "first_tread_contact_s": {
+      "floor": 2.0000000000000013
+    },
+    "left_ramp_width": true,
+    "max_tread_overhang_m": 0.36458243922007594,
+    "offside_floor_contact_fraction": 0.3446868431256505,
+    "nonfoot_contact_fraction": 0.0,
+    "stall_saturation_fraction": 0.014127262708924308,
+    "max_contact_penetration_m": 0.0007729578115898382,
+    "warnings": 0,
+    "course_passed": false,
+    "flat_passed": false,
+    "torque_limits_Nm": [
+      0.15205874947770598,
+      0.26833896966654,
+      0.15205874947770598,
+      0.26833896966654,
+      0.15205874947770598,
+      0.26833896966654,
+      0.15205874947770598,
+      0.26833896966654
+    ],
+    "limitations": [
+      "Approximate contact proxies and box inertias",
+      "Rigid 300 mm ramp; flexible real panel is not modelled",
+      "Assumed friction 0.8 and gear efficiency 0.85",
+      "Peak servo model, no thermal limits or voltage sag",
+      "Heading and optional lateral feedback use ideal simulated pose",
+      "No proof of full CAD clearance at combined joint poses"
+    ]
+  }
+}

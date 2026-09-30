@@ -1,0 +1,54 @@
+{
+  "model": "results/rl_flat_straight/best.zip",
+  "physics_timestep_s": 0.001,
+  "episodes": [
+    {
+      "seed": 2000,
+      "reward": 248.14693502597777,
+      "max_joint_speed_rad_s": 8.37735059088353,
+      "forward_m": 1.0307025323534593,
+      "sideways_m": 0.22789897270011197,
+      "elapsed_s": 10.0,
+      "max_lateral_m": 0.2319894386418563,
+      "max_tilt_deg": 1.4875056031353449,
+      "max_heading_deg": 15.741764211451514,
+      "fallen": false,
+      "nonfoot_fraction": 0.0,
+      "warnings": 0,
+      "success": false
+    },
+    {
+      "seed": 2001,
+      "reward": 370.7053577873637,
+      "max_joint_speed_rad_s": 8.51798898860941,
+      "forward_m": 1.0752125969311463,
+      "sideways_m": 0.11598795169121273,
+      "elapsed_s": 10.0,
+      "max_lateral_m": 0.11999637367096247,
+      "max_tilt_deg": 1.3701477179736958,
+      "max_heading_deg": 10.853032947621214,
+      "fallen": false,
+      "nonfoot_fraction": 0.0,
+      "warnings": 0,
+      "success": false
+    },
+    {
+      "seed": 2002,
+      "reward": 480.78243835034255,
+      "max_joint_speed_rad_s": 8.168367180287587,
+      "forward_m": 1.2335722519609549,
+      "sideways_m": -0.04438893841800845,
+      "elapsed_s": 10.0,
+      "max_lateral_m": 0.05555291769518199,
+      "max_tilt_deg": 1.0906480275857098,
+      "max_heading_deg": 6.2796206614218,
+      "fallen": false,
+      "nonfoot_fraction": 0.0,
+      "warnings": 0,
+      "success": false
+    }
+  ],
+  "mean_forward_m": 1.1131624604151868,
+  "success_rate": 0.0,
+  "fall_rate": 0.0
+}

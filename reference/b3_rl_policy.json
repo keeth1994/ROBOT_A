@@ -1,0 +1,7 @@
+{
+  "model": "results\\curriculum_selected\\flat\\policy.zip",
+  "summary": "results/curriculum_selected/flat/summary.json",
+  "model_sha256": "8679570d5795cca1a2b13a6411d3dddba6f8db2e48a4005613c07bc3134d7cb2",
+  "curriculum": true,
+  "slope_deg": 0
+}

@@ -1,0 +1,76 @@
+{
+  "description": "Photo-inspired provisional course; positions, heights and tunnel width are adjustable, not measured from the photo.",
+  "width_m": 0.3,
+  "origin_xy_m": [
+    0.4,
+    0
+  ],
+  "yaw_deg": 0,
+  "panel_thickness_m": 0.006,
+  "profile_xz_m": [
+    [
+      0,
+      0
+    ],
+    [
+      0.6,
+      0.16
+    ],
+    [
+      1.2,
+      0
+    ],
+    [
+      1.8,
+      0.2
+    ],
+    [
+      2.4,
+      0.2
+    ],
+    [
+      3.0,
+      0
+    ]
+  ],
+  "segment_names": [
+    "first_climb",
+    "first_descent",
+    "second_climb",
+    "raised_platform",
+    "final_descent"
+  ],
+  "corridor": {
+    "enabled": true,
+    "origin_xy_m": [
+      3.55,
+      -0.65
+    ],
+    "yaw_deg": 0,
+    "clear_width_m": 0.4,
+    "wall_height_m": 0.18,
+    "wall_thickness_m": 0.012,
+    "centerline_xy_m": [
+      [
+        0,
+        0
+      ],
+      [
+        -0.7,
+        0
+      ],
+      [
+        -1.35,
+        0.2
+      ],
+      [
+        -2.05,
+        -0.05
+      ],
+      [
+        -2.9,
+        -0.05
+      ]
+    ]
+  }
+}

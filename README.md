@@ -1,32 +1,55 @@
-# Robot B3 - Y-fork rocker quadruped
+# Robot B3 - short soles, rounded outer toes and project sensors
 
-Original Parallax servos, top-facing yaw outputs, Y-forks, and pitch servos moving with the rocker legs. Only B3 is retained in this repository.
+Original Parallax servos, top-facing geared yaw outputs, smooth Y-forks and moving pitch servos. Only the current B3 design is retained here.
 
-## Start
+## Current design
 
-In VS Code, press **Ctrl+Shift+B** for the flat / 10-degree uphill / crest / 10-degree downhill test, or run `./start.ps1` in PowerShell. The viewer stays open after 100 simulated seconds.
+- 42 mm runners, reduced from 64 mm, with 8 mm flat soles; inward tread radius 12 mm and outward radius 22 mm.
+- Platform-facing reach 18 mm; outward reach 24 mm. PLA rails 3 mm thick; rubber strips 6 mm wide. Servo support spacing retained.
+- Neutral bounds 241.2 x 241.2 x 106.0 mm. Estimated mass 1.1094 kg (not sliced or measured).
+- Three supplied Sharp IR sensors, one supplied accelerometer/magnetometer board, one supplied ESP32 camera, with open cradles. See [sensor details](SENSORS_B3.md).
 
-## Setup and reproduce
+The MC6470 board has **no gyroscope**. Sensor shapes are packaging envelopes and need physical fit verification.
+
+## Start and rebuild
+
+In VS Code, **Ctrl+Shift+B** runs the photo-inspired double ramp, valley, raised platform and open zigzag corridor. The viewer remains open after 100 simulated seconds. `start.ps1` does the same. The task **B3 - inspect project sensors** writes a sensor log and camera image.
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe build_robot_b3.py
+.\.venv\Scripts\python.exe test_b3_sensors.py
 .\.venv\Scripts\python.exe test_b3_course.py --flat --seconds 25
 .\.venv\Scripts\python.exe test_b3_course.py --seconds 100
 .\.venv\Scripts\python.exe record_b3_course.py --seconds 100
 ```
 
-The builder uses only B3 reference files and `mesh_utils.py`. No previous version is required. `requirements-lock.txt` captures the existing environment.
+For a fresh environment install `requirements.txt` in `.venv`; `requirements-lock.txt` records the pinned environment. To regenerate native CAD, register `cad/B3Builder` in Fusion Scripts and Add-Ins, run B3Builder, then rebuild MuJoCo. `reference/b3_foot_geometry.json`, `b3_sensors.json` and `b3_course_settings.json` hold the geometry settings.
 
-## Contents
+## Validation
 
-- `cad/`: Fusion and STEP snapshots, previews and CAD clearance audit.
-- `models/`: B3 flat/course models and visual meshes.
-- `reference/`: B3 geometry, kinematics, gait, course and mass assumptions.
-- `results/`: current flat/course measurements and replay.
-- `DESIGN_B3_SIM.md`: test setup, results and limitations.
+The course follows the supplied photo. The top-level programmed-gait results predate the short-sole/rounded-toe update. New reinforcement-learning runs use the current geometry; see `RL_CURRICULUM.md` and the experiment subdirectories. Ramp completion and corridor navigation are separate: the existing controller does not navigate the corridor.
 
-## Current result
+The selected yaw sweep is +0.45 rad; the previous -0.45 setting initially moved the smaller feet backward. Motor torque limits are unchanged. This is a physics-driven programmed gait with ideal pose feedback, not learned navigation. No base motion is imposed and no terrain-specific motion sequence is used. Sensor readings are available but do not yet control locomotion.
 
-Flat walking: 0.782 m in 25 s. Course traversal: 2.315 m in 100 s, no falls. **Not a clean 300 mm corridor pass:** tread overhang reaches 78 mm. Steering uses ideal simulated pose; collision geometry and mass are approximate. Full 270-degree CAD yaw is not achieved. These results do not certify hardware performance.
+See [test details](DESIGN_B3_SIM.md), `results/b3_course_test.json` and `results/b3_flat_up_down.mp4`. CAD clearance checks are sampled and do not establish continuous clearance or printed strength. Previous versions are backed up outside this repo.
+
+## Photo-inspired obstacle layout
+
+Edit `reference/b3_course_settings.json` and run `build_robot_b3.py`. The 300 mm-wide ramp is five joined rigid planks: rise to 160 mm, descend to floor level, rise to 200 mm, cross a raised flat section, then descend to the floor. Each section has a provisional 600 mm horizontal length. These are layout assumptions, not measurements from the photo. The resulting slopes are about 14.9 and 18.4 degrees.
+
+The separate zigzag corridor is open at the top, matching the photo. Its provisional clear width is 400 mm and wall height 180 mm. Change its `clear_width_m`, `centerline_xy_m`, `origin_xy_m` and `yaw_deg` independently of the ramp. The ramp has its own `origin_xy_m`, `yaw_deg` and `profile_xz_m`. Setting `corridor.enabled` false hides it. No scripted turn, waypoint path or automatic course traversal was added.
+
+Course reference: `reference/obstacle_course.jpg`. Run `test_b3_terrain.py` to check panel heights, the valley, corridor width and independently moved/rotated configurations.
+
+## Reinforcement learning
+
+Flat-ground PPO training and a learned-policy viewer are now available. See [RL setup and results](RL_B3.md). Run `watch_b3_rl.py` to watch the learned policy; `run_robot_b3.py` remains the programmed gait. New RL results live in `results/rl_flat/`, separately from the historical gait tests.
+
+## Straight-line and gentle-ramp lessons
+
+See [curriculum setup](RL_CURRICULUM.md) for the refined straight-line policy and separate 3/5-degree training ramps. These are separate from the full photographed obstacle course. VS Code has dedicated viewing tasks for each lesson.
+
+## Group meeting demos
+
+Double-click MEETING_DEMOS.cmd for normal walking, learned flat walking, and your successful 3-degree RL ramp. See [meeting guide](MEETING_GUIDE.md). Labelled video backups are in results/meeting.
+

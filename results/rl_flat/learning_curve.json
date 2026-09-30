@@ -1,0 +1,150 @@
+[
+  {
+    "timesteps": 32768,
+    "wall_seconds": 26.06215890008025,
+    "episodes": [
+      {
+        "seed": 1000,
+        "reward": -1.404707562425337,
+        "forward_m": 0.0027259255653155237,
+        "sideways_m": -0.0009026198394872731,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.001010487658142905,
+        "max_tilt_deg": 0.07960757688102721,
+        "max_heading_deg": 0.3761174639691321,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1001,
+        "reward": -1.6346887940781418,
+        "forward_m": 0.00276211623093735,
+        "sideways_m": -0.000959741971733452,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.0010304331786397769,
+        "max_tilt_deg": 0.07947437704829785,
+        "max_heading_deg": 0.44082260553621727,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      }
+    ],
+    "mean_forward_m": 0.0027440208981264367,
+    "mean_reward": -1.5196981782517394,
+    "success_rate": 0.0
+  },
+  {
+    "timesteps": 65536,
+    "wall_seconds": 52.234616100089625,
+    "episodes": [
+      {
+        "seed": 1000,
+        "reward": -2.3755570435937456,
+        "forward_m": 0.004869854566530953,
+        "sideways_m": -0.0013636921678029138,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.0034452273426998333,
+        "max_tilt_deg": 0.1284335281454706,
+        "max_heading_deg": 0.4436874522935666,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1001,
+        "reward": -2.0054629978178804,
+        "forward_m": 0.0038793900549518342,
+        "sideways_m": -0.0009245918672183687,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.0023279671051413472,
+        "max_tilt_deg": 0.12131407650318647,
+        "max_heading_deg": 0.6182806133751565,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      }
+    ],
+    "mean_forward_m": 0.0043746223107413934,
+    "mean_reward": -2.190510020705813,
+    "success_rate": 0.0
+  },
+  {
+    "timesteps": 98304,
+    "wall_seconds": 75.64636970008723,
+    "episodes": [
+      {
+        "seed": 1000,
+        "reward": 1.330616475939139,
+        "forward_m": 0.012575815035594835,
+        "sideways_m": -0.00200129294463836,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.0035512938127082085,
+        "max_tilt_deg": 0.2637838295742736,
+        "max_heading_deg": 0.5875498751369502,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1001,
+        "reward": -1.3129411904086512,
+        "forward_m": 0.012051412979848705,
+        "sideways_m": -0.0018669373536667963,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.003482377292035553,
+        "max_tilt_deg": 0.2405330471946814,
+        "max_heading_deg": 0.9833884927079152,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      }
+    ],
+    "mean_forward_m": 0.01231361400772177,
+    "mean_reward": 0.008837642765243903,
+    "success_rate": 0.0
+  },
+  {
+    "timesteps": 131072,
+    "wall_seconds": 98.79498949996196,
+    "episodes": [
+      {
+        "seed": 1000,
+        "reward": 448.83213276569273,
+        "forward_m": 1.1184963448935712,
+        "sideways_m": 0.0949048925076865,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.0953483807828709,
+        "max_tilt_deg": 0.8242537378282377,
+        "max_heading_deg": 13.304050253901918,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1001,
+        "reward": 429.56951280460606,
+        "forward_m": 1.0676443397731363,
+        "sideways_m": 0.09721211966341034,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.09721211966341034,
+        "max_tilt_deg": 0.805999446669335,
+        "max_heading_deg": 17.87379001046662,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      }
+    ],
+    "mean_forward_m": 1.0930703423333537,
+    "mean_reward": 439.2008227851494,
+    "success_rate": 0.0
+  }
+]

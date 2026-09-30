@@ -1,0 +1,10 @@
+{
+  "demo": "normal",
+  "checkpoint": null,
+  "seed": 4000,
+  "elapsed_s": 12.019999999999833,
+  "forward_m": 0.19378763112189104,
+  "sideways_m": 0.02251623762505801,
+  "final_tilt_deg": 0.09126030858151779,
+  "episode": {}
+}

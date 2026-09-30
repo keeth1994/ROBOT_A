@@ -1,0 +1,62 @@
+{
+  "episodes": [
+    {
+      "seed": 3000,
+      "reward": 92.81583704798479,
+      "forward_m": 1.348947331532527,
+      "sideways_m": 0.04983905462960954,
+      "elapsed_s": 10.0,
+      "max_lateral_m": 0.05905270599509785,
+      "max_tilt_deg": 0.9725406663296251,
+      "max_heading_deg": 5.96510961303871,
+      "fallen": false,
+      "nonfoot_fraction": 0.0,
+      "warnings": 0,
+      "success": false,
+      "slope_deg": 0.0,
+      "touched": [],
+      "edge_violation": false,
+      "course_complete": true
+    },
+    {
+      "seed": 3001,
+      "reward": -98.01726909528298,
+      "forward_m": 0.8009594975731352,
+      "sideways_m": -0.10066909336339723,
+      "elapsed_s": 6.3,
+      "max_lateral_m": 0.10072703387322864,
+      "max_tilt_deg": 0.970317471888105,
+      "max_heading_deg": 7.444883889445214,
+      "fallen": false,
+      "nonfoot_fraction": 0.006349206349206349,
+      "warnings": 0,
+      "success": false,
+      "slope_deg": 0.0,
+      "touched": [],
+      "edge_violation": false,
+      "course_complete": true
+    },
+    {
+      "seed": 3002,
+      "reward": 274.1564862140809,
+      "forward_m": 1.3175711998843436,
+      "sideways_m": -0.02501968175504906,
+      "elapsed_s": 10.0,
+      "max_lateral_m": 0.032164958113682585,
+      "max_tilt_deg": 1.0070211388771653,
+      "max_heading_deg": 6.768165953859101,
+      "fallen": false,
+      "nonfoot_fraction": 0.0,
+      "warnings": 0,
+      "success": false,
+      "slope_deg": 0.0,
+      "touched": [],
+      "edge_violation": false,
+      "course_complete": true
+    }
+  ],
+  "success_rate": 0.0,
+  "mean_forward_m": 1.1558260096633353,
+  "mean_reward": 89.6516847222609,
+  "mean_max_lateral_m": 0.06398156599400302
+}

@@ -1,10 +1,127 @@
 {
+  "description": "Photo-inspired provisional course; positions, heights and tunnel width are adjustable, not measured from the photo.",
   "width_m": 0.3,
-  "approach_end_x": 0.4,
-  "uphill_end_x": 1.0,
-  "crest_end_x": 1.3,
-  "downhill_end_x": 1.9,
-  "slope_deg": 10,
-  "height_m": 0.10579618842507899,
-  "success_base_x": 2.05
+  "origin_xy_m": [
+    0.4,
+    0
+  ],
+  "yaw_deg": 0,
+  "approach_end_x": 0.0,
+  "downhill_end_x": 3.0,
+  "success_base_x": 3.15,
+  "required_surfaces": [
+    "first_climb",
+    "first_descent",
+    "second_climb",
+    "raised_platform",
+    "final_descent"
+  ],
+  "obstacle_geoms": [
+    "first_climb",
+    "first_descent",
+    "second_climb",
+    "raised_platform",
+    "final_descent",
+    "ramp_support_0_-1",
+    "ramp_support_0_1",
+    "ramp_support_2_-1",
+    "ramp_support_2_1",
+    "ramp_support_3_-1",
+    "ramp_support_3_1",
+    "corridor_wall_-1_0",
+    "corridor_wall_-1_1",
+    "corridor_wall_-1_2",
+    "corridor_wall_-1_3",
+    "corridor_wall_1_0",
+    "corridor_wall_1_1",
+    "corridor_wall_1_2",
+    "corridor_wall_1_3"
+  ],
+  "segments": [
+    {
+      "name": "first_climb",
+      "start_x_m": 0.0,
+      "end_x_m": 0.6,
+      "start_height_m": 0.0,
+      "end_height_m": 0.16,
+      "angle_deg": 14.931417178137554
+    },
+    {
+      "name": "first_descent",
+      "start_x_m": 0.6,
+      "end_x_m": 1.2,
+      "start_height_m": 0.16,
+      "end_height_m": 0.0,
+      "angle_deg": -14.931417178137554
+    },
+    {
+      "name": "second_climb",
+      "start_x_m": 1.2,
+      "end_x_m": 1.8,
+      "start_height_m": 0.0,
+      "end_height_m": 0.2,
+      "angle_deg": 18.43494882292201
+    },
+    {
+      "name": "raised_platform",
+      "start_x_m": 1.8,
+      "end_x_m": 2.4,
+      "start_height_m": 0.2,
+      "end_height_m": 0.2,
+      "angle_deg": 0.0
+    },
+    {
+      "name": "final_descent",
+      "start_x_m": 2.4,
+      "end_x_m": 3.0,
+      "start_height_m": 0.2,
+      "end_height_m": 0.0,
+      "angle_deg": -18.43494882292201
+    }
+  ],
+  "corridor": {
+    "enabled": true,
+    "origin_xy_m": [
+      3.55,
+      -0.65
+    ],
+    "yaw_deg": 0,
+    "clear_width_m": 0.4,
+    "wall_height_m": 0.18,
+    "wall_thickness_m": 0.012,
+    "centerline_xy_m": [
+      [
+        0,
+        0
+      ],
+      [
+        -0.7,
+        0
+      ],
+      [
+        -1.35,
+        0.2
+      ],
+      [
+        -2.05,
+        -0.05
+      ],
+      [
+        -2.9,
+        -0.05
+      ]
+    ]
+  },
+  "camera_lookat": [
+    1.775,
+    -0.3805,
+    0.08
+  ],
+  "camera_distance": 4.4375,
+  "assumptions": [
+    "Photo-inspired dimensions, not surveyed",
+    "Rigid planks; no panel bending",
+    "Open corridor, no roof as pictured",
+    "Ramp completion is separate from corridor navigation"
+  ]
 }

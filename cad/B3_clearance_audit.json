@@ -23,7 +23,7 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 20.608737445449513,
+      "mm3": 133.76622376408554,
       "angle": -135,
       "part": "foot",
       "target": "B3 00 integrated chassis"
@@ -44,21 +44,14 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 1954.4339558438685,
+      "mm3": 1215.8677053968418,
       "angle": -135,
       "part": "foot",
       "target": "FL B3 yaw servo fixed"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 132.55161219384027,
-      "angle": -135,
-      "part": "foot",
-      "target": "FR B3 yaw servo fixed"
-    },
-    {
-      "test": "yaw_sweep_neutral_pitch",
-      "mm3": 1712.883234378898,
+      "mm3": 1712.8832343788997,
       "angle": -120,
       "part": "servo",
       "target": "B3 00 integrated chassis"
@@ -72,7 +65,7 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 195.62927577999704,
+      "mm3": 196.80587862948065,
       "angle": -120,
       "part": "foot",
       "target": "B3 00 integrated chassis"
@@ -93,14 +86,21 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 1354.6983870026647,
+      "mm3": 105.695238721591,
+      "angle": -120,
+      "part": "foot",
+      "target": "B3 sensor camera cradle"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 1.2015664098246934,
       "angle": -120,
       "part": "foot",
       "target": "FL B3 yaw servo fixed"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 1182.0062778092074,
+      "mm3": 1182.3268298604094,
       "angle": -105,
       "part": "servo",
       "target": "B3 00 integrated chassis"
@@ -114,7 +114,14 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 584.4184423372922,
+      "mm3": 10.863598038282516,
+      "angle": -105,
+      "part": "servo",
+      "target": "B3 sensor camera cradle"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 330.26785489760766,
       "angle": -105,
       "part": "foot",
       "target": "B3 00 integrated chassis"
@@ -128,10 +135,24 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 965.2025966193373,
+      "mm3": 65.49730489885128,
       "angle": -105,
       "part": "foot",
-      "target": "FL B3 yaw servo fixed"
+      "target": "B3 sensor camera cradle"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 2.17335465338594,
+      "angle": -105,
+      "part": "foot",
+      "target": "B3 sensor ir_ground"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 55.453808464261094,
+      "angle": -105,
+      "part": "foot",
+      "target": "B3 cradle ir_ground"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
@@ -142,14 +163,21 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 515.8088881038128,
+      "mm3": 517.9504345513396,
       "angle": -90,
       "part": "servo",
       "target": "B3 00 integrated chassis"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 218.57529995071695,
+      "mm3": 0.8609806157968769,
+      "angle": -90,
+      "part": "servo",
+      "target": "B3 sensor ir_ground"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 277.64862443113554,
       "angle": -90,
       "part": "foot",
       "target": "B3 00 integrated chassis"
@@ -163,21 +191,35 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 590.1203679684353,
+      "mm3": 44.0588694012649,
       "angle": -90,
       "part": "foot",
-      "target": "FL B3 yaw servo fixed"
+      "target": "B3 sensor camera cradle"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 73.00926907024984,
+      "mm3": 41.30680651874753,
+      "angle": -90,
+      "part": "foot",
+      "target": "B3 sensor ir_ground"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 19.051560505795088,
+      "angle": -90,
+      "part": "foot",
+      "target": "B3 cradle ir_ground"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 73.01844811041697,
       "angle": -75,
       "part": "servo",
       "target": "B3 00 integrated chassis"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 239.33811332341315,
+      "mm3": 194.34873360612215,
       "angle": -75,
       "part": "foot",
       "target": "B3 00 integrated chassis"
@@ -191,52 +233,38 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 367.74567699040546,
+      "mm3": 14.306296627438208,
       "angle": -75,
       "part": "foot",
-      "target": "FL B3 yaw servo fixed"
+      "target": "B3 sensor camera cradle"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 182.31224504686355,
+      "mm3": 1.6596836019212358,
       "angle": -60,
       "part": "foot",
       "target": "B3 00 integrated chassis"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 144.45499051222248,
-      "angle": -60,
-      "part": "foot",
-      "target": "FL B3 yaw servo fixed"
-    },
-    {
-      "test": "yaw_sweep_neutral_pitch",
-      "mm3": 171.7802349752048,
+      "mm3": 11.603835673401871,
       "angle": 60,
       "part": "foot",
       "target": "B3 00 integrated chassis"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 209.22665851206915,
+      "mm3": 237.3393588816184,
       "angle": 75,
       "part": "servo",
       "target": "B3 00 integrated chassis"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 136.20827378347022,
+      "mm3": 128.14100537428212,
       "angle": 75,
       "part": "foot",
       "target": "B3 00 integrated chassis"
-    },
-    {
-      "test": "yaw_sweep_neutral_pitch",
-      "mm3": 228.36084487770498,
-      "angle": 75,
-      "part": "foot",
-      "target": "FL B3 yaw servo fixed"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
@@ -247,49 +275,35 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 897.246601924973,
+      "mm3": 925.3593022945222,
       "angle": 90,
       "part": "servo",
       "target": "B3 00 integrated chassis"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 671.8881666621262,
+      "mm3": 651.3143380924879,
       "angle": 90,
       "part": "foot",
       "target": "B3 00 integrated chassis"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 590.824223255638,
-      "angle": 90,
-      "part": "foot",
-      "target": "FL B3 yaw servo fixed"
-    },
-    {
-      "test": "yaw_sweep_neutral_pitch",
-      "mm3": 1710.607464827817,
+      "mm3": 1738.7201651973662,
       "angle": 105,
       "part": "servo",
       "target": "B3 00 integrated chassis"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 271.6552028991016,
+      "mm3": 170.25113086345104,
       "angle": 105,
       "part": "foot",
       "target": "B3 00 integrated chassis"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 1204.9020095901365,
-      "angle": 105,
-      "part": "foot",
-      "target": "FL B3 yaw servo fixed"
-    },
-    {
-      "test": "yaw_sweep_neutral_pitch",
-      "mm3": 1974.3039392821813,
+      "mm3": 2002.4166396517305,
       "angle": 120,
       "part": "servo",
       "target": "B3 00 integrated chassis"
@@ -303,7 +317,14 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 115.48350739377959,
+      "mm3": 0.6591150803877172,
+      "angle": 120,
+      "part": "servo",
+      "target": "B3 cradle ir_left"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 108.79261687981248,
       "angle": 120,
       "part": "foot",
       "target": "B3 00 integrated chassis"
@@ -317,21 +338,21 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 1512.0034529134277,
+      "mm3": 12.629310127080135,
+      "angle": 120,
+      "part": "foot",
+      "target": "B3 cradle ir_left"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 698.9849721456561,
       "angle": 120,
       "part": "foot",
       "target": "FL B3 yaw servo fixed"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 151.5356621323858,
-      "angle": 120,
-      "part": "foot",
-      "target": "RL B3 yaw servo fixed"
-    },
-    {
-      "test": "yaw_sweep_neutral_pitch",
-      "mm3": 2010.5117398559048,
+      "mm3": 2010.511739855905,
       "angle": 135,
       "part": "servo",
       "target": "B3 00 integrated chassis"
@@ -345,6 +366,13 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
+      "mm3": 42.11950527701591,
+      "angle": 135,
+      "part": "servo",
+      "target": "B3 cradle ir_left"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
       "mm3": 422.2106535597284,
       "angle": 135,
       "part": "servo",
@@ -352,7 +380,7 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 714.4992889592061,
+      "mm3": 630.9645046969481,
       "angle": 135,
       "part": "foot",
       "target": "B3 00 integrated chassis"
@@ -366,18 +394,25 @@
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 869.9800953577318,
+      "mm3": 168.40157948546326,
+      "angle": 135,
+      "part": "foot",
+      "target": "B3 cradle ir_left"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 1742.1671432404612,
       "angle": 135,
       "part": "foot",
       "target": "FL B3 yaw servo fixed"
     },
     {
       "test": "yaw_sweep_neutral_pitch",
-      "mm3": 831.0480849714653,
+      "mm3": 18.90017792127146,
       "angle": 135,
       "part": "foot",
       "target": "RL B3 yaw servo fixed"
     }
   ],
-  "scope": "Own pitch assembly at 5 degree steps; FL yaw vs platform and fixed servos at 15 degree steps. Adjacent moving legs, wires, gear mesh and strength not validated."
+  "scope": "Own pitch assembly at 5 degree steps; FL yaw vs platform and fixed servos at 15 degree steps. Sensor packages/mounts checked against all legs at yaw and pitch -45/0/+45. Adjacent moving legs, wires, gear mesh and strength not validated."
 }

@@ -1,0 +1,174 @@
+{
+  "reward_settings": {
+    "lateral_weight": 15.0,
+    "heading_weight": 1.5
+  },
+  "seed": 42,
+  "timesteps": 262144,
+  "wall_seconds": 107.20736850006506,
+  "training_wall_seconds": 97.56675689993426,
+  "environments": 8,
+  "final": {
+    "episodes": [
+      {
+        "seed": 1000,
+        "reward": -80.03438175110108,
+        "forward_m": 1.023306070207175,
+        "sideways_m": -0.2522172950298691,
+        "elapsed_s": 7.36,
+        "max_lateral_m": 0.2522172950298691,
+        "max_tilt_deg": 1.525471466667797,
+        "max_heading_deg": 42.63427907618716,
+        "fallen": false,
+        "nonfoot_fraction": 0.002717391304347826,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1001,
+        "reward": -146.01088834099372,
+        "forward_m": 1.3210352024220668,
+        "sideways_m": -0.2512053839286946,
+        "elapsed_s": 9.6,
+        "max_lateral_m": 0.2512053839286946,
+        "max_tilt_deg": 1.6692151213237374,
+        "max_heading_deg": 28.90580227866951,
+        "fallen": false,
+        "nonfoot_fraction": 0.008333333333333333,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1002,
+        "reward": -161.19475472661273,
+        "forward_m": 0.9410573878523365,
+        "sideways_m": -0.25036392159113224,
+        "elapsed_s": 7.24,
+        "max_lateral_m": 0.25036392159113224,
+        "max_tilt_deg": 1.977262771035177,
+        "max_heading_deg": 34.1816103741508,
+        "fallen": false,
+        "nonfoot_fraction": 0.016574585635359115,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1003,
+        "reward": -37.245228504756724,
+        "forward_m": 1.2253136444692472,
+        "sideways_m": -0.25096204098896163,
+        "elapsed_s": 8.82,
+        "max_lateral_m": 0.25096204098896163,
+        "max_tilt_deg": 1.8487474732827684,
+        "max_heading_deg": 37.50266475452217,
+        "fallen": false,
+        "nonfoot_fraction": 0.0045351473922902496,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1004,
+        "reward": -72.28469167014647,
+        "forward_m": 0.9610334911794117,
+        "sideways_m": -0.2503703406762089,
+        "elapsed_s": 7.28,
+        "max_lateral_m": 0.2503703406762089,
+        "max_tilt_deg": 1.3155772222540123,
+        "max_heading_deg": 38.06798055570027,
+        "fallen": false,
+        "nonfoot_fraction": 0.0027472527472527475,
+        "warnings": 0,
+        "success": false
+      }
+    ],
+    "mean_forward_m": 1.0943491592260473,
+    "mean_reward": -99.35398899872214,
+    "success_rate": 0.0
+  },
+  "best": {
+    "episodes": [
+      {
+        "seed": 1000,
+        "reward": 554.3765324803977,
+        "forward_m": 1.3728003047378232,
+        "sideways_m": -0.04278861415209275,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.04302697880740485,
+        "max_tilt_deg": 1.2526768225891671,
+        "max_heading_deg": 7.655475186839364,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1001,
+        "reward": 543.625673305702,
+        "forward_m": 1.3430217839592018,
+        "sideways_m": 0.032025347030061026,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.03602226696752783,
+        "max_tilt_deg": 1.3670166476585628,
+        "max_heading_deg": 4.582105449844736,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": true
+      },
+      {
+        "seed": 1002,
+        "reward": -38.81817202948299,
+        "forward_m": 1.2888309654599561,
+        "sideways_m": -0.22508608643875816,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.22508608643875816,
+        "max_tilt_deg": 1.0156781512450073,
+        "max_heading_deg": 21.91932340618497,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1003,
+        "reward": 166.27162772967628,
+        "forward_m": 1.3182732989972354,
+        "sideways_m": -0.12388776266450492,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.1264106712088339,
+        "max_tilt_deg": 1.3912354217847078,
+        "max_heading_deg": 8.492008485047482,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      },
+      {
+        "seed": 1004,
+        "reward": 286.85943541589137,
+        "forward_m": 1.2865230497767282,
+        "sideways_m": -0.1152117181197244,
+        "elapsed_s": 10.0,
+        "max_lateral_m": 0.11526279668050739,
+        "max_tilt_deg": 1.1154968612811513,
+        "max_heading_deg": 14.015620609737724,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false
+      }
+    ],
+    "mean_forward_m": 1.321889880586189,
+    "mean_reward": 302.46301938043683,
+    "success_rate": 0.2
+  },
+  "model_sha256": "8679570d5795cca1a2b13a6411d3dddba6f8db2e48a4005613c07bc3134d7cb2",
+  "cad_revision": "short_flat_round_outer_feet",
+  "policy": "PPO direct absolute joint targets; no gait generator",
+  "observations": "Ideal simulator state, not hardware-ready sensor estimates",
+  "motor_limits_Nm": [
+    0.152058749477706,
+    0.26833896966654
+  ],
+  "success": "At least 0.30 m forward in 10 s, max lateral 0.04 m, heading 15 degrees, no fall/nonfoot contact/warnings"
+}

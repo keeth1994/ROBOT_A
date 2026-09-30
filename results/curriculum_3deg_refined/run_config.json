@@ -1,0 +1,9 @@
+{
+  "slope_deg": 3.0,
+  "normalized_observations": true,
+  "resume": "results/curriculum_3deg/best.zip",
+  "seed": 84,
+  "learning_rate": 0.0001,
+  "exploration_std": null,
+  "requested_additional_steps": 131072
+}

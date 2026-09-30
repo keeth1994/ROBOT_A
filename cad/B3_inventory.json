@@ -3,7 +3,7 @@
     "component": "B3 00 integrated chassis",
     "body": "B3 relieved integrated chassis",
     "kind": "PLA",
-    "volume_cm3": 54.83926900233918,
+    "volume_cm3": 55.066218917332804,
     "min_mm": [
       -72.0,
       -72.0,
@@ -64,19 +64,163 @@
     ]
   },
   {
-    "component": "B3 04 IMU reservation",
-    "body": "IMU envelope and adhesive mount",
+    "component": "B3 04 MC6470 accel magnetometer",
+    "body": "MIKROE-4228 envelope - no gyroscope",
     "kind": "imu",
-    "volume_cm3": 1.200000000000001,
+    "volume_cm3": 7.264400000000001,
     "min_mm": [
-      -10.0,
-      -5.0,
-      63.99999999999999
+      -65.7,
+      5.700000000000001,
+      46.0
     ],
     "max_mm": [
-      10.0,
-      10.0,
-      68.0
+      -40.3,
+      34.3,
+      56.0
+    ]
+  },
+  {
+    "component": "B3 sensor IMU cradle",
+    "body": "Rigid adhesive pad with cable tie slots",
+    "kind": "PLA",
+    "volume_cm3": 2.1740399999999966,
+    "min_mm": [
+      -66.0,
+      3.0000000000000004,
+      43.00000000000001
+    ],
+    "max_mm": [
+      -40.2,
+      37.0,
+      45.7
+    ]
+  },
+  {
+    "component": "B3 sensor camera",
+    "body": "M5Stack TimerCamera-X 48x24x15 envelope",
+    "kind": "camera_sensor",
+    "volume_cm3": 17.28,
+    "min_mm": [
+      47.5,
+      -24.0,
+      48.99999999999999
+    ],
+    "max_mm": [
+      62.5,
+      24.0,
+      73.0
+    ]
+  },
+  {
+    "component": "B3 sensor camera cradle",
+    "body": "Open camera tray and strap slots",
+    "kind": "PLA",
+    "volume_cm3": 6.516719999999999,
+    "min_mm": [
+      44.0,
+      -26.0,
+      42.800000000000004
+    ],
+    "max_mm": [
+      65.0,
+      26.0,
+      70.0
+    ]
+  },
+  {
+    "component": "B3 sensor ir_left",
+    "body": "Sharp GP2Y0A41SK0F envelope - optics face local +Y",
+    "kind": "ir_sensor",
+    "volume_cm3": 5.177250000000002,
+    "min_mm": [
+      -14.75,
+      58.5,
+      48.25
+    ],
+    "max_mm": [
+      14.75,
+      71.5,
+      61.75
+    ]
+  },
+  {
+    "component": "B3 cradle ir_left",
+    "body": "Open Sharp cradle with strap slots",
+    "kind": "PLA",
+    "volume_cm3": 4.077400000000006,
+    "min_mm": [
+      -17.0,
+      53.99999999999999,
+      42.8
+    ],
+    "max_mm": [
+      17.0,
+      71.5,
+      62.5
+    ]
+  },
+  {
+    "component": "B3 sensor ir_right",
+    "body": "Sharp GP2Y0A41SK0F envelope - optics face local +Y",
+    "kind": "ir_sensor",
+    "volume_cm3": 5.177250000000002,
+    "min_mm": [
+      -14.75,
+      -71.5,
+      48.25
+    ],
+    "max_mm": [
+      14.75,
+      -58.5,
+      61.75
+    ]
+  },
+  {
+    "component": "B3 cradle ir_right",
+    "body": "Open Sharp cradle with strap slots",
+    "kind": "PLA",
+    "volume_cm3": 4.077400000000009,
+    "min_mm": [
+      -17.0,
+      -71.5,
+      42.8
+    ],
+    "max_mm": [
+      17.0,
+      -53.99999999999999,
+      62.5
+    ]
+  },
+  {
+    "component": "B3 sensor ir_ground",
+    "body": "Sharp GP2Y0A41SK0F envelope - optics face local +Y",
+    "kind": "ir_sensor",
+    "volume_cm3": 5.17725000000001,
+    "min_mm": [
+      66.99583487540114,
+      -14.75,
+      42.90432852445504
+    ],
+    "max_mm": [
+      85.00416512459886,
+      14.75,
+      61.09567147554497
+    ]
+  },
+  {
+    "component": "B3 cradle ir_ground",
+    "body": "Open Sharp cradle with strap slots",
+    "kind": "PLA",
+    "volume_cm3": 2.7862131017680323,
+    "min_mm": [
+      63.03226017980019,
+      -17.0,
+      40.95577136594005
+    ],
+    "max_mm": [
+      78.12916512459884,
+      17.0,
+      63.2451905283833
     ]
   },
   {
@@ -145,12 +289,12 @@
   },
   {
     "component": "FL B3 yaw turret",
-    "body": "B3 top driven Y fork - two sided pitch support",
+    "body": "B3 smooth R12 Y fork - 8 mm section",
     "kind": "PLA",
-    "volume_cm3": 11.373569368333483,
+    "volume_cm3": 13.364520961355469,
     "min_mm": [
-      31.448505692817783,
-      31.448505692817783,
+      34.93933982822017,
+      34.939339828220184,
       3.999999999999999
     ],
     "max_mm": [
@@ -225,17 +369,17 @@
   },
   {
     "component": "FL B3 rocker foot",
-    "body": "B3 twin rocker and moving servo flange - one print",
+    "body": "B3 compact flat runner and moving servo flange - one print",
     "kind": "PLA",
-    "volume_cm3": 19.485003666922186,
+    "volume_cm3": 13.820935172422724,
     "min_mm": [
-      25.837049096097736,
-      35.73654403270942,
-      -48.00000000000001
+      43.60026567155625,
+      53.499760608167925,
+      -31.999999999999996
     ],
     "max_mm": [
-      119.17514421272202,
-      129.0746391493337,
+      108.21498910433053,
+      118.11448404094222,
       48.00000000000001
     ]
   },
@@ -243,32 +387,32 @@
     "component": "FL B3 rubber tread",
     "body": "B3 replaceable rubber strip 2mm",
     "kind": "rubber",
-    "volume_cm3": 2.010619298297452,
+    "volume_cm3": 0.6991857894892397,
     "min_mm": [
-      58.36396103067894,
-      32.90811690796322,
-      -48.99999999999999
+      76.74873734152916,
+      51.292893218813454,
+      -33.0
     ],
     "max_mm": [
-      122.0035713374682,
-      96.54772721475251,
-      -7.999999999999998
+      110.68986283848344,
+      85.23401871576773,
+      -11.0
     ]
   },
   {
     "component": "FL B3 rubber tread (1)",
     "body": "B3 replaceable rubber strip 2mm",
     "kind": "rubber",
-    "volume_cm3": 2.010619298297457,
+    "volume_cm3": 0.6991857894892394,
     "min_mm": [
-      23.00862197135155,
-      68.26345596729058,
-      -48.99999999999999
+      41.39339828220179,
+      86.64823227814082,
+      -33.0
     ],
     "max_mm": [
-      86.64823227814082,
-      131.9030662740799,
-      -7.999999999999998
+      75.33452377915606,
+      120.58935777509511,
+      -11.0
     ]
   },
   {
@@ -337,16 +481,16 @@
   },
   {
     "component": "RL B3 yaw turret",
-    "body": "B3 top driven Y fork - two sided pitch support",
+    "body": "B3 smooth R12 Y fork - 8 mm section",
     "kind": "PLA",
-    "volume_cm3": 11.373569368333486,
+    "volume_cm3": 13.364520961355456,
     "min_mm": [
       -105.74011537017762,
-      31.448505692817783,
+      34.939339828220184,
       3.999999999999999
     ],
     "max_mm": [
-      -31.448505692817783,
+      -34.93933982822018,
       105.74011537017762,
       37.0
     ]
@@ -417,17 +561,17 @@
   },
   {
     "component": "RL B3 rocker foot",
-    "body": "B3 twin rocker and moving servo flange - one print",
+    "body": "B3 compact flat runner and moving servo flange - one print",
     "kind": "PLA",
-    "volume_cm3": 19.487835538897848,
+    "volume_cm3": 13.821152748057058,
     "min_mm": [
-      -129.07463914933368,
-      25.837049096097743,
-      -48.00000000000001
+      -118.11448404094222,
+      43.60026567155626,
+      -31.999999999999996
     ],
     "max_mm": [
-      -35.73654403270942,
-      119.17514421272202,
+      -53.499760608167925,
+      108.21498910433053,
       48.00000000000001
     ]
   },
@@ -435,32 +579,32 @@
     "component": "RL B3 rubber tread",
     "body": "B3 replaceable rubber strip 2mm",
     "kind": "rubber",
-    "volume_cm3": 2.010619298297474,
+    "volume_cm3": 0.6991857894892428,
     "min_mm": [
-      -96.54772721475248,
-      58.36396103067892,
-      -49.000000000000014
+      -85.23401871576773,
+      76.74873734152916,
+      -33.0
     ],
     "max_mm": [
-      -32.90811690796321,
-      122.0035713374682,
-      -7.999999999999998
+      -51.29289321881345,
+      110.68986283848346,
+      -11.0
     ]
   },
   {
     "component": "RL B3 rubber tread (1)",
     "body": "B3 replaceable rubber strip 2mm",
     "kind": "rubber",
-    "volume_cm3": 2.0106192982974482,
+    "volume_cm3": 0.6991857894892394,
     "min_mm": [
-      -131.9030662740799,
-      23.008621971351552,
-      -49.000000000000014
+      -120.58935777509511,
+      41.3933982822018,
+      -33.0
     ],
     "max_mm": [
-      -68.26345596729061,
-      86.64823227814084,
-      -7.999999999999998
+      -86.64823227814084,
+      75.33452377915609,
+      -11.0
     ]
   },
   {
@@ -529,17 +673,17 @@
   },
   {
     "component": "FR B3 yaw turret",
-    "body": "B3 top driven Y fork - two sided pitch support",
+    "body": "B3 smooth R12 Y fork - 8 mm section",
     "kind": "PLA",
-    "volume_cm3": 11.373569368333488,
+    "volume_cm3": 13.364520961355455,
     "min_mm": [
-      31.448505692817783,
+      34.93933982822017,
       -105.74011537017762,
       3.999999999999999
     ],
     "max_mm": [
       105.74011537017762,
-      -31.448505692817783,
+      -34.93933982822018,
       37.0
     ]
   },
@@ -609,17 +753,17 @@
   },
   {
     "component": "FR B3 rocker foot",
-    "body": "B3 twin rocker and moving servo flange - one print",
+    "body": "B3 compact flat runner and moving servo flange - one print",
     "kind": "PLA",
-    "volume_cm3": 19.48380234304339,
+    "volume_cm3": 13.821152748057097,
     "min_mm": [
-      35.73654403270941,
-      -119.17514421272202,
-      -48.00000000000001
+      53.499760608167925,
+      -108.21498910433053,
+      -31.999999999999996
     ],
     "max_mm": [
-      129.07463914933368,
-      -25.83704909609775,
+      118.1144840409422,
+      -43.60026567155626,
       48.00000000000001
     ]
   },
@@ -627,32 +771,32 @@
     "component": "FR B3 rubber tread",
     "body": "B3 replaceable rubber strip 2mm",
     "kind": "rubber",
-    "volume_cm3": 2.0106192982974607,
+    "volume_cm3": 0.6991857894892403,
     "min_mm": [
-      32.90811690796322,
-      -122.0035713374682,
-      -48.99999999999999
+      51.29289321881345,
+      -110.68986283848345,
+      -33.0
     ],
     "max_mm": [
-      96.54772721475248,
-      -58.36396103067892,
-      -7.999999999999998
+      85.23401871576773,
+      -76.74873734152916,
+      -11.0
     ]
   },
   {
     "component": "FR B3 rubber tread (1)",
     "body": "B3 replaceable rubber strip 2mm",
     "kind": "rubber",
-    "volume_cm3": 2.0106192982974562,
+    "volume_cm3": 0.6991857894892385,
     "min_mm": [
-      68.2634559672906,
-      -86.64823227814082,
-      -48.99999999999999
+      86.64823227814082,
+      -75.33452377915607,
+      -33.0
     ],
     "max_mm": [
-      131.9030662740799,
-      -23.00862197135155,
-      -7.999999999999998
+      120.58935777509511,
+      -41.393398282201794,
+      -11.0
     ]
   },
   {
@@ -721,17 +865,17 @@
   },
   {
     "component": "RR B3 yaw turret",
-    "body": "B3 top driven Y fork - two sided pitch support",
+    "body": "B3 smooth R12 Y fork - 8 mm section",
     "kind": "PLA",
-    "volume_cm3": 11.373569368333463,
+    "volume_cm3": 13.364520961355463,
     "min_mm": [
       -105.74011537017762,
       -105.74011537017762,
       3.999999999999999
     ],
     "max_mm": [
-      -31.448505692817783,
-      -31.448505692817783,
+      -34.93933982822018,
+      -34.93933982822018,
       37.0
     ]
   },
@@ -801,17 +945,17 @@
   },
   {
     "component": "RR B3 rocker foot",
-    "body": "B3 twin rocker and moving servo flange - one print",
+    "body": "B3 compact flat runner and moving servo flange - one print",
     "kind": "PLA",
-    "volume_cm3": 19.480998197952527,
+    "volume_cm3": 13.820935172422713,
     "min_mm": [
-      -119.17514421272202,
-      -129.0746391493337,
-      -48.00000000000001
+      -108.21498910433053,
+      -118.11448404094222,
+      -31.999999999999996
     ],
     "max_mm": [
-      -25.837049096097733,
-      -35.73654403270942,
+      -43.60026567155625,
+      -53.49976060816793,
       48.00000000000001
     ]
   },
@@ -819,32 +963,32 @@
     "component": "RR B3 rubber tread",
     "body": "B3 replaceable rubber strip 2mm",
     "kind": "rubber",
-    "volume_cm3": 2.01061929829745,
+    "volume_cm3": 0.6991857894892402,
     "min_mm": [
-      -122.0035713374682,
-      -96.54772721475251,
-      -49.000000000000014
+      -110.68986283848345,
+      -85.23401871576775,
+      -33.0
     ],
     "max_mm": [
-      -58.36396103067894,
-      -32.90811690796322,
-      -7.999999999999998
+      -76.74873734152916,
+      -51.292893218813454,
+      -11.0
     ]
   },
   {
     "component": "RR B3 rubber tread (1)",
     "body": "B3 replaceable rubber strip 2mm",
     "kind": "rubber",
-    "volume_cm3": 2.0106192982974687,
+    "volume_cm3": 0.6991857894892392,
     "min_mm": [
-      -86.64823227814082,
-      -131.9030662740799,
-      -49.000000000000014
+      -75.33452377915606,
+      -120.58935777509511,
+      -33.0
     ],
     "max_mm": [
-      -23.00862197135155,
-      -68.26345596729058,
-      -7.999999999999998
+      -41.39339828220179,
+      -86.64823227814082,
+      -11.0
     ]
   }
 ]

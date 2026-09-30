@@ -1,20 +1,202 @@
 {
-  "total_mass_kg": 1.0757124710662795,
+  "foot_geometry": {
+    "revision": "short_flat_round_outer_feet",
+    "centers_x_mm": [
+      32,
+      40
+    ],
+    "center_z_mm": -21,
+    "inner_radius_mm": 5,
+    "plastic_radius_mm": 10,
+    "tread_radius_mm": 12,
+    "crossbar_z_mm": -28,
+    "strut_endpoints_mm": [
+      [
+        25,
+        -26
+      ],
+      [
+        54,
+        -24
+      ]
+    ],
+    "rail_y_ranges_mm": [
+      [
+        -19.5,
+        -16.5
+      ],
+      [
+        30.5,
+        33.5
+      ]
+    ],
+    "tread_y_ranges_mm": [
+      [
+        -21,
+        -15
+      ],
+      [
+        29,
+        35
+      ]
+    ],
+    "outer_radius_extra_mm": 10
+  },
+  "sensor_layout": {
+    "source": "Final project introduction 2026.pdf, page 9",
+    "ir_model": "Sharp GP2Y0A41SK0F",
+    "ir_mass_kg": 0.0036,
+    "ir_size_mm": [
+      29.5,
+      13,
+      13.5
+    ],
+    "range_m": [
+      0.04,
+      0.3
+    ],
+    "sample_period_s": 0.02,
+    "ir": [
+      {
+        "name": "ir_left",
+        "center_mm": [
+          0,
+          65,
+          55
+        ],
+        "axes": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "name": "ir_right",
+        "center_mm": [
+          0,
+          -65,
+          55
+        ],
+        "axes": [
+          [
+            -1,
+            0,
+            0
+          ],
+          [
+            0,
+            -1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "name": "ir_ground",
+        "center_mm": [
+          76,
+          0,
+          52
+        ],
+        "axes": [
+          [
+            0,
+            -1,
+            0
+          ],
+          [
+            0.8660254037844387,
+            0,
+            -0.5
+          ],
+          [
+            0.5,
+            0,
+            0.8660254037844387
+          ]
+        ]
+      }
+    ],
+    "imu": {
+      "model": "MIKROE-4228 / MC6470",
+      "center_mm": [
+        -53,
+        20,
+        51
+      ],
+      "size_mm": [
+        25.4,
+        28.6,
+        10
+      ],
+      "mass_kg": 0.017,
+      "mass_note": "Conservative manufacturer listed board weight; verify assembled board",
+      "channels": [
+        "accelerometer",
+        "magnetometer"
+      ],
+      "gyroscope": false
+    },
+    "camera": {
+      "model": "M5Stack TimerCamera-X U082-X",
+      "center_mm": [
+        55,
+        0,
+        61
+      ],
+      "size_mm": [
+        15,
+        48,
+        24
+      ],
+      "mass_kg": 0.014,
+      "diagonal_fov_deg": 66.5
+    },
+    "excluded_force_sensor": {
+      "model": "Ohmite FSR02CE",
+      "reason": "622.3 mm long strip does not fit these small feet; no unverified cutting or force pad model"
+    },
+    "limitations": [
+      "Package envelopes and strap cradles; connector and lens offsets need physical verification",
+      "IR single-ray approximation, not calibrated analogue response",
+      "IMU has no gyroscope; magnetometer interference from motors not modelled",
+      "Sensors are exposed for logging, not yet used for autonomous navigation"
+    ]
+  },
+  "total_mass_kg": 1.1093814973876788,
   "mass_by_kind_kg": {
-    "PLA": 0.277793423524432,
+    "PLA": 0.28420306472334356,
     "battery": 0.18,
     "electronics": 0.09,
-    "imu": 0.003,
+    "imu": 0.017,
+    "camera_sensor": 0.014,
+    "ir_sensor": 0.0108,
     "servo": 0.3519999999999999,
     "bearing": 0.04,
     "hardware": 0.03522559771682994,
-    "rubber": 0.01769344982501763,
+    "rubber": 0.0061528349475053114,
     "unmodeled_horns_fasteners_wiring_straps": 0.08
   },
   "links": [
     {
       "link": "platform",
-      "mass_kg": 0.6889617971942987
+      "mass_kg": 0.7523866137350832
     },
     {
       "link": "FL_driver",
@@ -22,11 +204,11 @@
     },
     {
       "link": "FL_yaw",
-      "mass_kg": 0.018934517995871303
+      "mass_kg": 0.021403297971218566
     },
     {
       "link": "FL_pitch",
-      "mass_kg": 0.07356494391115788
+      "mass_kg": 0.06365634525860048
     },
     {
       "link": "RL_driver",
@@ -34,11 +216,11 @@
     },
     {
       "link": "RL_yaw",
-      "mass_kg": 0.018934517995871307
+      "mass_kg": 0.02140329797121855
     },
     {
       "link": "RL_pitch",
-      "mass_kg": 0.07356845543240771
+      "mass_kg": 0.06365661505238705
     },
     {
       "link": "FR_driver",
@@ -46,11 +228,11 @@
     },
     {
       "link": "FR_yaw",
-      "mass_kg": 0.01893451799587128
+      "mass_kg": 0.021403297971218517
     },
     {
       "link": "FR_pitch",
-      "mass_kg": 0.07356345426954819
+      "mass_kg": 0.0636566150523871
     },
     {
       "link": "RR_driver",
@@ -58,14 +240,15 @@
     },
     {
       "link": "RR_yaw",
-      "mass_kg": 0.01893451799587128
+      "mass_kg": 0.02140329797121856
     },
     {
       "link": "RR_pitch",
-      "mass_kg": 0.07355997712963552
+      "mass_kg": 0.06365634525860046
     }
   ],
   "servo": {
+    "cad_revision": "short_flat_round_outer_feet",
     "legs": {
       "FL": {
         "yaw_center_mm": [

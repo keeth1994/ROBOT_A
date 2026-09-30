@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start B3 - flat uphill downhill - original servos",
+      "label": "Start B3 - photo obstacle course - original servos",
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
@@ -28,6 +28,140 @@
         "${workspaceFolder}\\run_robot_b3.py",
         "--seconds",
         "25"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "B3 - inspect project sensors",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\b3_sensors.py",
+        "--ramp",
+        "--seconds",
+        "3"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "B3 RL - train straight line",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\train_b3_rl.py",
+        "--steps",
+        "262144",
+        "--envs",
+        "8",
+        "--strict"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "B3 RL - watch learned policy",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\watch_b3_rl.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "B3 RL - refined straight line",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\watch_b3_rl.py",
+        "--model",
+        "results\\curriculum_selected\\flat\\policy.zip",
+        "--curriculum",
+        "--slope",
+        "0"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "B3 RL - gentle 3 degree ramp",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\watch_b3_rl.py",
+        "--model",
+        "results\\curriculum_selected\\3deg\\policy.zip",
+        "--curriculum",
+        "--slope",
+        "3"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "B3 RL - gentle 5 degree ramp",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\watch_b3_rl.py",
+        "--model",
+        "results\\curriculum_selected\\5deg\\policy.zip",
+        "--curriculum",
+        "--slope",
+        "5"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Meeting demo - normal",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\meeting_demo.py",
+        "normal"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Meeting demo - rl-flat",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\meeting_demo.py",
+        "rl-flat"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Meeting demo - rl-ramp",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\meeting_demo.py",
+        "rl-ramp"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

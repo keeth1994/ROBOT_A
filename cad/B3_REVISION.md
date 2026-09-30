@@ -1,21 +1,11 @@
-# B3 — top-facing yaw and leg-mounted pitch
+# B3 - narrow asymmetric feet and project sensors
 
-Saved as Robot_B3_Compact_Rockers.f3d and .step. B2 files are preserved. B3_Y_Fork_Detail.f3d/.step show a standalone leg. The authoritative Fusion builder is work/build_b3.py, invoked by work/leg_dispatch.py through JointDesigner.
+Each runner is now 42 mm long instead of 64 mm. The pitch axis is at local x=38 mm: the platform-facing end stops at x=20 (18 mm reach) while the outward end reaches x=62 (24 mm reach). The flat sole is shortened from 18 to 8 mm. The inward tread keeps its 12 mm radius; the outward tread uses a gentler 22 mm radius, centred 10 mm higher so the sole remains level. PLA rail thickness is reduced from 4 to 3 mm, with a 5 mm radial section; tread width is 6 mm instead of 8 mm. Rail spacing is retained to accommodate the servo and opposite support. Ground distance from the pitch axis is 60 mm.
 
-- Retains eight Parallax 900-00005 servo envelopes and the original motor assumptions. No stronger motors or battery change incorporated.
-- Yaw servo outputs and 30T/20T gear pair now face upward. The gearing retains the requested 1.5 speed/travel ratio; this does not mean the assembled robot clears 270 degrees.
-- Two-sided Y fork connects the yaw output to the pitch horn and opposite passive pivot.
-- Pitch servo casing and four-hole flange mounting move with the rocker. The casing's long direction follows the leg. Pitch horn is attached to the fork; a passive M4 axle and bushing support the other side.
-- Relieved platform corners and fork/mount clearances. The rockers retain an 82 mm outside tread diameter.
-- Neutral assembly bounds: 263.8 x 263.8 x 117.0 mm (B2 height 166 mm). These bounds are not a swept-motion envelope.
-- Solid PLA volume estimate at 1.24 g/cm3: 277.8 g, versus B2 331.5 g: 53.7 g less. This is printed geometry only, not sliced weight or total robot mass.
+Mass is regenerated from CAD in `B3_size_mass.json` and `reference/robot_b3_manifest.json`; simulation results have not been rerun for this revision.
 
-## Checks and limits
+Three supplied Sharp GP2Y0A41SK0F sensors face left, right and forward/downward. The supplied TimerCamera-X faces forward. The generic IMU placeholder is replaced by a MIKROE-4228 envelope: this is accelerometer plus magnetometer, with no gyro. Open cradles provide adhesive/cable-tie mounting. Sensor envelopes, connectors and installed board height require physical fit checks; these are not detailed vendor CAD models.
 
-B3_clearance_audit.json records the sampled CAD checks. No overlap above 0.1 mm3 was found between the moving pitch servo/foot and its Y fork at 5-degree increments from -45 to +45 degrees. The static servo-to-foot mounting check also passed. All structural template solids are connected.
+Own pitch is sampled every 5 degrees, FL neutral-pitch yaw every 15 degrees, and all four legs versus sensor packages/cradles at yaw/pitch -45, 0, +45 degrees. Static sensor-package checks are also included. These checks do not certify continuous combined-pose clearance, neighbouring legs, wiring or printed strength.
 
-At neutral pitch, the FL leg clears the tested fixed platform/electronics/yaw-servo geometry from -45 to +45 degrees yaw at 15-degree increments. These separate checks do NOT establish clearance at combined pitch/yaw poses, nor for every other leg against asymmetric electronics reservations.
-
-54 interference records remain at larger yaw angles in the requested +/-135-degree sweep. Full 270-degree assembled yaw is NOT achieved. Do not set that as a safe operating limit. Platform packaging and/or joint placement needs another revision for full travel.
-
-Horn envelopes and mounting patterns are provisional pending measurement of the provided horns. Gear fit, bearing retention, cable routing, fastener access, simultaneous neighbouring-leg motion, strength, print orientation and actual servo travel need validation. This is a CAD concept, not a print-ready release. B3 has not been dynamically tested in MuJoCo; the existing B1 simulation was not changed.
+The canonical F3D, STEP, previews and source exports are rebuilt together. The prior revision is archived outside this repository at `C:/PROJECTS/ROBOT_ARCHIVE/B3_before_round_outer_20260929`. See `SENSORS_B3.md` and `DESIGN_B3_SIM.md` for sensor assumptions and previous-geometry tests.

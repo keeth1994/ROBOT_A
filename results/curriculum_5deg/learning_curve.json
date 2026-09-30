@@ -1,0 +1,300 @@
+[
+  {
+    "steps": 1183744,
+    "wall_seconds": 35.90532280015759,
+    "completion_rate": 0.0,
+    "episodes": [
+      {
+        "seed": 3000,
+        "reward": 165.76142922771962,
+        "forward_m": 0.8987423270413756,
+        "sideways_m": 0.050902743763424074,
+        "elapsed_s": 8.040000000000001,
+        "max_lateral_m": 0.050920294964619195,
+        "max_tilt_deg": 5.589314753715823,
+        "max_heading_deg": 18.096166048847095,
+        "fallen": false,
+        "nonfoot_fraction": 0.03731343283582089,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_down",
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": true,
+        "course_complete": false
+      },
+      {
+        "seed": 3001,
+        "reward": 232.12543109215372,
+        "forward_m": 0.7244785977727911,
+        "sideways_m": 0.04270034977859145,
+        "elapsed_s": 6.8,
+        "max_lateral_m": 0.04264240926876005,
+        "max_tilt_deg": 5.44838130775988,
+        "max_heading_deg": 15.477769022391222,
+        "fallen": false,
+        "nonfoot_fraction": 0.0029411764705882353,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": true,
+        "course_complete": false
+      },
+      {
+        "seed": 3002,
+        "reward": 109.22159680159562,
+        "forward_m": 0.7566206694145271,
+        "sideways_m": 0.05159661155875155,
+        "elapsed_s": 7.8,
+        "max_lateral_m": 0.0531103513125688,
+        "max_tilt_deg": 5.5744690058785284,
+        "max_heading_deg": 22.56558689835424,
+        "fallen": false,
+        "nonfoot_fraction": 0.06923076923076923,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": true,
+        "course_complete": false
+      }
+    ],
+    "success_rate": 0.0,
+    "mean_forward_m": 0.7932805314095646,
+    "mean_reward": 169.036152373823,
+    "mean_max_lateral_m": 0.04889101851531601
+  },
+  {
+    "steps": 1249280,
+    "wall_seconds": 72.45139430020936,
+    "completion_rate": 0.0,
+    "episodes": [
+      {
+        "seed": 3000,
+        "reward": 266.17554678941394,
+        "forward_m": 0.7666039384445857,
+        "sideways_m": 0.038713570909438645,
+        "elapsed_s": 6.7,
+        "max_lateral_m": 0.03957408772230414,
+        "max_tilt_deg": 5.37377726521899,
+        "max_heading_deg": 6.985834313200766,
+        "fallen": false,
+        "nonfoot_fraction": 0.0,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": true,
+        "course_complete": false
+      },
+      {
+        "seed": 3001,
+        "reward": 143.84339021415613,
+        "forward_m": 0.7361236923779542,
+        "sideways_m": 0.05366531929075657,
+        "elapsed_s": 7.74,
+        "max_lateral_m": 0.054299907109046974,
+        "max_tilt_deg": 5.369460678867003,
+        "max_heading_deg": 28.243283787081246,
+        "fallen": false,
+        "nonfoot_fraction": 0.07751937984496124,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": true,
+        "course_complete": false
+      },
+      {
+        "seed": 3002,
+        "reward": -198.07737168105464,
+        "forward_m": 0.7348684477953699,
+        "sideways_m": 0.07737305483877478,
+        "elapsed_s": 10.56,
+        "max_lateral_m": 0.07773985224699755,
+        "max_tilt_deg": 5.54009438495851,
+        "max_heading_deg": 31.82324654231289,
+        "fallen": false,
+        "nonfoot_fraction": 0.14583333333333334,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": true,
+        "course_complete": false
+      }
+    ],
+    "success_rate": 0.0,
+    "mean_forward_m": 0.7458653595393033,
+    "mean_reward": 70.64718844083846,
+    "mean_max_lateral_m": 0.05720461569278288
+  },
+  {
+    "steps": 1314816,
+    "wall_seconds": 114.72936410014518,
+    "completion_rate": 0.3333333333333333,
+    "episodes": [
+      {
+        "seed": 3000,
+        "reward": 7.22071886769103,
+        "forward_m": 0.6932739689223226,
+        "sideways_m": 0.009718210511492058,
+        "elapsed_s": 8.46,
+        "max_lateral_m": 0.01938904608244061,
+        "max_tilt_deg": 5.435105517894446,
+        "max_heading_deg": 40.12610232101086,
+        "fallen": false,
+        "nonfoot_fraction": 0.08747044917257683,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": false,
+        "course_complete": false
+      },
+      {
+        "seed": 3001,
+        "reward": 196.47148653155025,
+        "forward_m": 1.4534685129472469,
+        "sideways_m": 0.03014650487096446,
+        "elapsed_s": 13.6,
+        "max_lateral_m": 0.03943042778155674,
+        "max_tilt_deg": 5.663179093185274,
+        "max_heading_deg": 25.456971314166168,
+        "fallen": false,
+        "nonfoot_fraction": 0.016176470588235296,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_down",
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": false,
+        "course_complete": true
+      },
+      {
+        "seed": 3002,
+        "reward": 150.27200016665117,
+        "forward_m": 0.7478205106091894,
+        "sideways_m": 0.05995975645520559,
+        "elapsed_s": 7.140000000000001,
+        "max_lateral_m": 0.06133281342974231,
+        "max_tilt_deg": 5.3314775492632105,
+        "max_heading_deg": 23.208540390969322,
+        "fallen": false,
+        "nonfoot_fraction": 0.05042016806722689,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": true,
+        "course_complete": false
+      }
+    ],
+    "success_rate": 0.0,
+    "mean_forward_m": 0.964854330826253,
+    "mean_reward": 117.98806852196417,
+    "mean_max_lateral_m": 0.040050762431246556
+  },
+  {
+    "steps": 1380352,
+    "wall_seconds": 159.8890390000306,
+    "completion_rate": 0.0,
+    "episodes": [
+      {
+        "seed": 3000,
+        "reward": 93.38056567443253,
+        "forward_m": 0.7134124182372303,
+        "sideways_m": -0.025251668438822764,
+        "elapsed_s": 8.26,
+        "max_lateral_m": 0.025234117237627644,
+        "max_tilt_deg": 5.850585872115536,
+        "max_heading_deg": 40.84617204082971,
+        "fallen": false,
+        "nonfoot_fraction": 0.05569007263922518,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": false,
+        "course_complete": false
+      },
+      {
+        "seed": 3001,
+        "reward": 121.61891956797976,
+        "forward_m": 0.6365045851879249,
+        "sideways_m": 0.02554661873014066,
+        "elapsed_s": 7.8,
+        "max_lateral_m": 0.02609366196032041,
+        "max_tilt_deg": 5.324354261344907,
+        "max_heading_deg": 40.13236623974345,
+        "fallen": false,
+        "nonfoot_fraction": 0.002564102564102564,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": false,
+        "course_complete": false
+      },
+      {
+        "seed": 3002,
+        "reward": 180.5364313385693,
+        "forward_m": 0.668497228535066,
+        "sideways_m": -0.016013400391320702,
+        "elapsed_s": 7.94,
+        "max_lateral_m": 0.016033360075182156,
+        "max_tilt_deg": 5.48635301333807,
+        "max_heading_deg": 40.17526807924807,
+        "fallen": false,
+        "nonfoot_fraction": 0.007556675062972292,
+        "warnings": 0,
+        "success": false,
+        "slope_deg": 5.0,
+        "touched": [
+          "lesson_top",
+          "lesson_up"
+        ],
+        "edge_violation": false,
+        "course_complete": false
+      }
+    ],
+    "success_rate": 0.0,
+    "mean_forward_m": 0.6728047439867404,
+    "mean_reward": 131.84530552699385,
+    "mean_max_lateral_m": 0.0224537130910434
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "seed": 4002,
+  "contacts": [
+    {
+      "time": 3.1619999999998734,
+      "geom": "FL_foot_crossbar",
+      "penetration_m": -3.0172904624637537e-05,
+      "position_m": [
+        0.5149296876150902,
+        0.055743249630182144,
+        -1.5086452312318768e-05
+      ]
+    },
+    {
+      "time": 3.163999999999873,
+      "geom": "FL_foot_crossbar",
+      "penetration_m": -2.3925552688386538e-05,
+      "position_m": [
+        0.5150765438665204,
+        0.05578988200141055,
+        -1.1962776344193703e-05
+      ]
+    }
+  ],
+  "summary": {
+    "forward_m": 1.4403633454380274,
+    "sideways_m": 0.0016155046137077307,
+    "elapsed_s": 10.0,
+    "max_lateral_m": 0.012295167124813346,
+    "max_tilt_deg": 0.9564982511995982,
+    "max_heading_deg": 5.450340163619244,
+    "fallen": false,
+    "nonfoot_fraction": 0.002,
+    "warnings": 0,
+    "success": false,
+    "slope_deg": 0.0,
+    "touched": [],
+    "edge_violation": false,
+    "course_complete": true
+  }
+}

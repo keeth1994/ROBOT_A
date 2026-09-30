@@ -1,0 +1,49 @@
+{
+  "episodes": [
+    {
+      "seed": 1000,
+      "reward": -0.21668065637179368,
+      "forward_m": 2.108454476236394e-05,
+      "sideways_m": 2.713014960365813e-05,
+      "elapsed_s": 10.0,
+      "max_lateral_m": 2.713014960365813e-05,
+      "max_tilt_deg": 0.00044164366415237006,
+      "max_heading_deg": 0.07279006229552185,
+      "fallen": false,
+      "nonfoot_fraction": 0.0,
+      "warnings": 0,
+      "success": false
+    },
+    {
+      "seed": 1001,
+      "reward": -0.32493914386767175,
+      "forward_m": 6.913015802580976e-05,
+      "sideways_m": -4.751455836404632e-05,
+      "elapsed_s": 10.0,
+      "max_lateral_m": 4.751455836404632e-05,
+      "max_tilt_deg": 0.0023547326361849194,
+      "max_heading_deg": 0.11182983864442356,
+      "fallen": false,
+      "nonfoot_fraction": 0.0,
+      "warnings": 0,
+      "success": false
+    },
+    {
+      "seed": 1002,
+      "reward": -0.27306720185697736,
+      "forward_m": -3.6366130481764686e-05,
+      "sideways_m": -1.6208432043103904e-05,
+      "elapsed_s": 10.0,
+      "max_lateral_m": 1.6279572006584583e-05,
+      "max_tilt_deg": 0.0009196244003348194,
+      "max_heading_deg": 0.09306828203015466,
+      "fallen": false,
+      "nonfoot_fraction": 0.0,
+      "warnings": 0,
+      "success": false
+    }
+  ],
+  "mean_forward_m": 1.7949524102136338e-05,
+  "mean_reward": -0.2715623340321476,
+  "success_rate": 0.0
+}
