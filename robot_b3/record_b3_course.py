@@ -4,7 +4,7 @@ import imageio.v2 as imageio
 import numpy as np
 import mujoco
 from PIL import Image,ImageDraw
-from run_robot_b3 import Robot,ROOT
+from robot_b3.run_robot_b3 import Robot,ROOT
 
 def main():
  ap=argparse.ArgumentParser();ap.add_argument('--seconds',type=float,default=100);a=ap.parse_args()

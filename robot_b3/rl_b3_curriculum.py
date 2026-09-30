@@ -1,8 +1,8 @@
 """Curriculum: narrow straight-line corridor, then a physical 3/5-degree ramp."""
 import math
 import numpy as np
-from rl_b3_env import StraightLineEnv
-from course_b3 import build_course
+from robot_b3.rl_b3_env import StraightLineEnv
+from robot_b3.course_b3 import build_course
 
 OBS_SCALE=np.ones(37,dtype=np.float32)
 OBS_SCALE[16:19]=5;OBS_SCALE[22:24]=3;OBS_SCALE[25]=3;OBS_SCALE[27]=20;OBS_SCALE[28]=10

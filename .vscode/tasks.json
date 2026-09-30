@@ -6,7 +6,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\run_robot_b3.py",
+        "${workspaceFolder}\\robot.py",
+        "walk",
         "--ramp",
         "--seconds",
         "100"
@@ -25,7 +26,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\run_robot_b3.py",
+        "${workspaceFolder}\\robot.py",
+        "walk",
         "--seconds",
         "25"
       ],
@@ -39,7 +41,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\b3_sensors.py",
+        "${workspaceFolder}\\robot.py",
+        "sensors",
         "--ramp",
         "--seconds",
         "3"
@@ -54,7 +57,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\train_b3_rl.py",
+        "${workspaceFolder}\\robot.py",
+        "train-flat",
         "--steps",
         "262144",
         "--envs",
@@ -71,7 +75,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\watch_b3_rl.py"
+        "${workspaceFolder}\\robot.py",
+        "watch"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -83,7 +88,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\watch_b3_rl.py",
+        "${workspaceFolder}\\robot.py",
+        "watch",
         "--model",
         "results\\curriculum_selected\\flat\\policy.zip",
         "--curriculum",
@@ -100,7 +106,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\watch_b3_rl.py",
+        "${workspaceFolder}\\robot.py",
+        "watch",
         "--model",
         "results\\curriculum_selected\\3deg\\policy.zip",
         "--curriculum",
@@ -117,7 +124,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\watch_b3_rl.py",
+        "${workspaceFolder}\\robot.py",
+        "watch",
         "--model",
         "results\\curriculum_selected\\5deg\\policy.zip",
         "--curriculum",
@@ -134,7 +142,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\meeting_demo.py",
+        "${workspaceFolder}\\robot.py",
+        "demo",
         "normal"
       ],
       "options": {
@@ -147,7 +156,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\meeting_demo.py",
+        "${workspaceFolder}\\robot.py",
+        "demo",
         "rl-flat"
       ],
       "options": {
@@ -160,7 +170,8 @@
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "${workspaceFolder}\\meeting_demo.py",
+        "${workspaceFolder}\\robot.py",
+        "demo",
         "rl-ramp"
       ],
       "options": {

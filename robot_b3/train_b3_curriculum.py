@@ -1,6 +1,6 @@
 """Train a curriculum stage; save checkpoints by task success before reward."""
 import argparse,json,time,hashlib
-from rl_b3_curriculum import OBS_SCALE
+from robot_b3.rl_b3_curriculum import OBS_SCALE
 from functools import partial
 from pathlib import Path
 import numpy as np
@@ -10,8 +10,8 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.logger import configure
-from rl_b3_curriculum import CurriculumEnv
-from run_robot_b3 import ROOT
+from robot_b3.rl_b3_curriculum import CurriculumEnv
+from robot_b3.run_robot_b3 import ROOT
 
 def make_env(slope,normalized=False,ramp_width=.3):return Monitor(CurriculumEnv(slope=slope,normalized=normalized,ramp_width=ramp_width))
 def evaluate(policy,slope,seeds,normalized=False):
@@ -81,7 +81,7 @@ def main():
             wall_seconds=time.perf_counter()-t,initial=initial,final=final,heldout=heldout,
             gate_passed=heldout['success_rate']>=.9 and (regression is None or regression['success_rate']>=.9),seed=args.seed,
             model_sha256=hashlib.sha256((ROOT/'models/robot_b3.xml').read_bytes()).hexdigest(),
-            environment_sha256=hashlib.sha256((ROOT/'rl_b3_curriculum.py').read_bytes()).hexdigest(),
+            environment_sha256=hashlib.sha256((ROOT/'robot_b3/rl_b3_curriculum.py').read_bytes()).hexdigest(),
             success='Flat: 0.5 m in 10s; slopes: all three surfaces and exit cleared in 25s; <=3cm drift, <=10deg heading, no nonfoot contact, fall or edge violation')
         (out/'summary.json').write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
     finally:env.close()

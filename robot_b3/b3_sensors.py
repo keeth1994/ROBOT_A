@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 import numpy as np
-ROOT=Path(__file__).resolve().parent
+from robot_b3.paths import ROOT
 CONFIG=json.loads((ROOT/'reference/b3_sensors.json').read_text())
 
 def observe(model,data):
@@ -19,7 +19,7 @@ def observe(model,data):
 
 if __name__=='__main__':
     import argparse,mujoco
-    from run_robot_b3 import Robot
+    from robot_b3.run_robot_b3 import Robot
     ap=argparse.ArgumentParser();ap.add_argument('--ramp',action='store_true');ap.add_argument('--walk',action='store_true');ap.add_argument('--seconds',type=float,default=3);a=ap.parse_args()
     r=Robot(json.loads((ROOT/'reference/b3_gait.json').read_text()),a.ramp);samples=[];next_sample=0
     while r.d.time<a.seconds:

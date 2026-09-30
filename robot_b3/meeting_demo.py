@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 import mujoco
 import numpy as np
-from run_robot_b3 import ROOT, Robot
+from robot_b3.run_robot_b3 import ROOT, Robot
 
 MODES = {
     'normal': ('PROGRAMMED WALK | FLAT', None, 0),
@@ -25,7 +25,7 @@ def main():
     if checkpoint:
         import torch
         from stable_baselines3 import PPO
-        from rl_b3_curriculum import CurriculumEnv
+        from robot_b3.rl_b3_curriculum import CurriculumEnv
         torch.set_num_threads(1)
         path = ROOT / checkpoint
         meta = json.loads((path.parent / 'summary.json').read_text())

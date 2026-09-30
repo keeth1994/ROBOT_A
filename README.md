@@ -1,65 +1,70 @@
-# Robot B3 - short soles, rounded outer toes and project sensors
+# Robot B3
 
-Original Parallax servos, top-facing geared yaw outputs, smooth Y-forks and moving pitch servos. Only the current B3 design is retained here.
+Compact four-legged rocker robot with original Parallax servos, MuJoCo simulation, a programmed walking controller and PPO reinforcement learning.
 
-## Quick entry points
+## Run
 
-- **Meeting:** double-click `MEETING_DEMOS.cmd`; instructions in [MEETING_GUIDE.md](MEETING_GUIDE.md).
-- **Full obstacle course:** `start.ps1` or the default VS Code build task.
-- **Continue learning:** [RL_CURRICULUM.md](RL_CURRICULUM.md).
-- **CAD:** `cad/`; simulation geometry: `models/`; configuration: `reference/`.
-- **Results and checkpoints:** `results/`; presentation videos: `results/meeting/`.
-
-Historical training runs are retained because reports and checkpoint metadata reference them. Generated meshes, logs and the virtual environment are hidden in VS Code Explorer but remain on disk.
-
-## Current design
-
-- 42 mm runners, reduced from 64 mm, with 8 mm flat soles; inward tread radius 12 mm and outward radius 22 mm.
-- Platform-facing reach 18 mm; outward reach 24 mm. PLA rails 3 mm thick; rubber strips 6 mm wide. Servo support spacing retained.
-- Neutral bounds 241.2 x 241.2 x 106.0 mm. Estimated mass 1.1094 kg (not sliced or measured).
-- Three supplied Sharp IR sensors, one supplied accelerometer/magnetometer board, one supplied ESP32 camera, with open cradles. See [sensor details](SENSORS_B3.md).
-
-The MC6470 board has **no gyroscope**. Sensor shapes are packaging envelopes and need physical fit verification.
-
-## Start and rebuild
-
-In VS Code, **Ctrl+Shift+B** runs the photo-inspired double ramp, valley, raised platform and open zigzag corridor. The viewer remains open after 100 simulated seconds. `start.ps1` does the same. The task **B3 - inspect project sensors** writes a sensor log and camera image.
+From this folder in PowerShell:
 
 ```powershell
-.\.venv\Scripts\python.exe build_robot_b3.py
-.\.venv\Scripts\python.exe test_b3_sensors.py
-.\.venv\Scripts\python.exe test_b3_course.py --flat --seconds 25
-.\.venv\Scripts\python.exe test_b3_course.py --seconds 100
-.\.venv\Scripts\python.exe record_b3_course.py --seconds 100
+# Normal walking
+.\.venv\Scripts\python.exe robot.py walk
+
+# Full obstacle course
+.\.venv\Scripts\python.exe robot.py walk --ramp --seconds 100
+
+# Meeting demos: normal, rl-flat, or rl-ramp
+.\.venv\Scripts\python.exe robot.py demo rl-ramp
+
+# All available commands
+.\.venv\Scripts\python.exe robot.py --help
 ```
 
-For a fresh environment install `requirements.txt` in `.venv`; `requirements-lock.txt` records the pinned environment. To regenerate native CAD, register `cad/B3Builder` in Fusion Scripts and Add-Ins, run B3Builder, then rebuild MuJoCo. `reference/b3_foot_geometry.json`, `b3_sensors.json` and `b3_course_settings.json` hold the geometry settings.
+`MEETING_DEMOS.cmd`, `start.ps1`, and the VS Code tasks also launch these workflows. Ctrl+Shift+B starts the full course. Relative checkpoint and output paths resolve against this repository, even when the launcher is called from another folder.
 
-## Validation
+## Continue training
 
-The course follows the supplied photo. The top-level programmed-gait results predate the short-sole/rounded-toe update. New reinforcement-learning runs use the current geometry; see `RL_CURRICULUM.md` and the experiment subdirectories. Ramp completion and corridor navigation are separate: the existing controller does not navigate the corridor.
+```powershell
+.\.venv\Scripts\python.exe robot.py train --slope 5 --resume results/my_3deg_run_02/best.zip --out results/my_5deg_run_01 --steps 1000000 --minutes 15
+```
 
-The selected yaw sweep is +0.45 rad; the previous -0.45 setting initially moved the smaller feet backward. Motor torque limits are unchanged. This is a physics-driven programmed gait with ideal pose feedback, not learned navigation. No base motion is imposed and no terrain-specific motion sequence is used. Sensor readings are available but do not yet control locomotion.
+Always choose a new output folder. Continue a lesson from `latest.zip`; advance to a harder lesson from a validated `best.zip`. See the [curriculum guide](docs/RL_CURRICULUM.md) for evaluation and stage gates. The 3-degree lesson and the full photographed course are different terrains.
 
-See [test details](DESIGN_B3_SIM.md), `results/b3_course_test.json` and `results/b3_flat_up_down.mp4`. CAD clearance checks are sampled and do not establish continuous clearance or printed strength. Previous versions are backed up outside this repo.
+## Repository map
 
-## Photo-inspired obstacle layout
+| Location | Purpose |
+|---|---|
+| `robot.py` | One command entry point |
+| `robot_b3/` | Simulation, controllers, sensors, model builder and RL tools |
+| `tests/` | Physics, terrain, sensor and RL checks |
+| `docs/` | Design notes, meeting instructions and training guides |
+| `cad/` | Current Fusion/STEP model and Fusion scripts |
+| `reference/` | Geometry, sensor, course and selected-policy configuration |
+| `models/` | MuJoCo XML and meshes |
+| `results/` | Experiment history, checkpoints, reports and videos |
+| `logs/` | Ignored local diagnostics |
 
-Edit `reference/b3_course_settings.json` and run `build_robot_b3.py`. The 300 mm-wide ramp is five joined rigid planks: rise to 160 mm, descend to floor level, rise to 200 mm, cross a raised flat section, then descend to the floor. Each section has a provisional 600 mm horizontal length. These are layout assumptions, not measurements from the photo. The resulting slopes are about 14.9 and 18.4 degrees.
+Model and result paths are stable. Historical experiments remain available because their reports and checkpoints reference them. Source modules moved from the root to `robot_b3/`; use `robot.py` instead of the previous standalone script commands. Existing source-file hashes in old reports describe the source at the time of that experiment.
 
-The separate zigzag corridor is open at the top, matching the photo. Its provisional clear width is 400 mm and wall height 180 mm. Change its `clear_width_m`, `centerline_xy_m`, `origin_xy_m` and `yaw_deg` independently of the ramp. The ramp has its own `origin_xy_m`, `yaw_deg` and `profile_xz_m`. Setting `corridor.enabled` false hides it. No scripted turn, waypoint path or automatic course traversal was added.
+## Setup and checks
 
-Course reference: `reference/obstacle_course.jpg`. Run `test_b3_terrain.py` to check panel heights, the valley, corridor width and independently moved/rotated configurations.
+Use Python 3.12. Install `requirements.txt` into `.venv`, plus `requirements-rl.txt` for learning. The corresponding lock files record the dependency versions.
 
-## Reinforcement learning
+```powershell
+.\.venv\Scripts\python.exe robot.py check all
+.\.venv\Scripts\python.exe robot.py build
+```
 
-Flat-ground PPO training and a learned-policy viewer are now available. See [RL setup and results](RL_B3.md). Run `watch_b3_rl.py` to watch the learned policy; `run_robot_b3.py` remains the programmed gait. New RL results live in `results/rl_flat/`, separately from the historical gait tests.
+`check all` runs regression checks; it does not certify successful course traversal. `build` regenerates simulation geometry from the current CAD export. Run it only after changing the source geometry/configuration.
 
-## Straight-line and gentle-ramp lessons
+## Guides
 
-See [curriculum setup](RL_CURRICULUM.md) for the refined straight-line policy and separate 3/5-degree training ramps. These are separate from the full photographed obstacle course. VS Code has dedicated viewing tasks for each lesson.
+- [Meeting demos](docs/MEETING_GUIDE.md)
+- [Curriculum training](docs/RL_CURRICULUM.md)
+- [Original flat-ground RL workflow](docs/RL_B3.md)
+- [Project details](docs/PROJECT.md)
+- [Simulation assumptions](docs/DESIGN_B3_SIM.md)
+- [Sensors](docs/SENSORS_B3.md)
+- [Experiment results](results/README.md)
 
-## Group meeting demos
-
-Double-click MEETING_DEMOS.cmd for normal walking, learned flat walking, and your successful 3-degree RL ramp. See [meeting guide](MEETING_GUIDE.md). Labelled video backups are in results/meeting.
-
+Locomotion comes from simulated motor forces. Feedback remains idealized; simulation success alone does not demonstrate hardware performance or corridor navigation.

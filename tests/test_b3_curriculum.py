@@ -2,7 +2,7 @@
 import math
 import numpy as np
 import mujoco
-from rl_b3_curriculum import CurriculumEnv
+from robot_b3.rl_b3_curriculum import CurriculumEnv
 
 def main():
     for angle in [3,5]:

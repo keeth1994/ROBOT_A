@@ -3,8 +3,8 @@ from pathlib import Path
 import argparse,json,math
 import numpy as np
 import mujoco
-from run_robot_b3 import Robot,ROOT
-from course_b3 import local_points
+from robot_b3.run_robot_b3 import Robot,ROOT
+from robot_b3.course_b3 import local_points
 
 def test(params,seconds=80,course=True):
  settings=json.loads((ROOT/'reference/b3_course.json').read_text())

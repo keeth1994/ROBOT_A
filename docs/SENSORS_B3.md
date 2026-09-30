@@ -18,11 +18,11 @@ Open PLA cradles use adhesive pads/cable-tie slots. Body clearance and connector
 
 ## Simulation interface
 
-`b3_sensors.py` exposes three range readings, 3-axis specific acceleration and magnetic field, plus a `project_camera` RGB view. Run:
+`robot.py sensors` exposes three range readings, 3-axis specific acceleration and magnetic field, plus a `project_camera` RGB view. Run:
 
 ```powershell
-.\.venv\Scripts\python.exe test_b3_sensors.py
-.\.venv\Scripts\python.exe b3_sensors.py --ramp --seconds 3
+.\.venv\Scripts\python.exe robot.py check sensors
+.\.venv\Scripts\python.exe robot.py sensors --ramp --seconds 3
 ```
 
 Outputs are `results/b3_sensor_test.json`, `results/b3_sensor_samples.json` and `results/b3_camera_view.png`. Range observations outside 0.04-0.30 m are marked unknown. A missing return is not a proven drop-off. The rays are ideal point samples, not models of Sharp analogue response, beam footprint, dark-rubber reflectance or electrical noise. Magnetometer motor interference is not simulated. Camera FOV uses the published 66.5-degree diagonal angle with an assumed 4:3 image.

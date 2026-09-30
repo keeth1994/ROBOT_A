@@ -9,8 +9,8 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.logger import configure
-from rl_b3_env import StraightLineEnv
-from run_robot_b3 import ROOT
+from robot_b3.rl_b3_env import StraightLineEnv
+from robot_b3.run_robot_b3 import ROOT
 
 def make_env(env_kwargs=None):
     return Monitor(StraightLineEnv(**(env_kwargs or {})))

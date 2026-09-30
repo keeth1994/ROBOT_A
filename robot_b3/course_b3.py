@@ -2,7 +2,7 @@
 import math
 import numpy as np
 import xml.etree.ElementTree as E
-from mesh_utils import fmt
+from robot_b3.mesh_utils import fmt
 
 def transform(points,origin,yaw):
     p=np.asarray(points,dtype=float).copy();a=math.radians(yaw)

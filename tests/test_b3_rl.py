@@ -1,7 +1,7 @@
 """Check RL physics parity, repeatability, servo limits and headless model fidelity."""
 import numpy as np
 from stable_baselines3.common.env_checker import check_env
-from rl_b3_env import StraightLineEnv
+from robot_b3.rl_b3_env import StraightLineEnv
 
 def main():
     lite=StraightLineEnv();full=StraightLineEnv(visuals=True)

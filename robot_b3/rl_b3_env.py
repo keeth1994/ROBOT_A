@@ -5,7 +5,7 @@ import gymnasium as gym
 from gymnasium import spaces
 import mujoco
 import numpy as np
-from run_robot_b3 import Robot, ROOT
+from robot_b3.run_robot_b3 import Robot, ROOT
 
 class StraightLineEnv(gym.Env):
     metadata = {'render_modes': []}

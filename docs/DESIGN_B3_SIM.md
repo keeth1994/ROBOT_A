@@ -22,7 +22,7 @@ The programmed-gait tests below have not been rerun for the short-sole/rounded-t
 
 ## Sensors
 
-Three Sharp GP2Y0A41SK0F rays provide left, right and downward-forward range observations. Outside 4-30 cm is unknown. MC6470 accelerometer and magnetometer channels are present, with no invented gyro. The TimerCamera-X is represented by a forward RGB camera. `b3_sensors.py` logs observations and captures a camera view. `test_b3_sensors.py` checks wall distances, ground-ray orientation, invalid ranges and channel presence. These tests passed on the previous foot geometry; analogue noise, surface reflectivity, magnetic interference and perception software remain unmodelled. The gait does not yet use these readings. See `SENSORS_B3.md`.
+Three Sharp GP2Y0A41SK0F rays provide left, right and downward-forward range observations. Outside 4-30 cm is unknown. MC6470 accelerometer and magnetometer channels are present, with no invented gyro. The TimerCamera-X is represented by a forward RGB camera. `robot.py sensors` logs observations and captures a camera view. `robot.py check sensors` checks wall distances, ground-ray orientation, invalid ranges and channel presence. These tests passed on the previous foot geometry; analogue noise, surface reflectivity, magnetic interference and perception software remain unmodelled. The gait does not yet use these readings. See `SENSORS_B3.md`.
 
 ## CAD checks
 

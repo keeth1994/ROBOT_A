@@ -28,9 +28,9 @@ Ideal simulation state feedback is used. Real sensor estimation, friction, print
 ## Terminal commands (from the repository)
 
 ```powershell
-.\.venv\Scripts\python.exe meeting_demo.py normal
-.\.venv\Scripts\python.exe meeting_demo.py rl-flat
-.\.venv\Scripts\python.exe meeting_demo.py rl-ramp
+.\.venv\Scripts\python.exe robot.py demo normal
+.\.venv\Scripts\python.exe robot.py demo rl-flat
+.\.venv\Scripts\python.exe robot.py demo rl-ramp
 ```
 
 Add --record to regenerate the corresponding labelled MP4 and JSON report in results/meeting.

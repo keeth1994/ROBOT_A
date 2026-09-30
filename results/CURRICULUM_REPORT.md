@@ -34,9 +34,9 @@ A contact diagnostic on the earlier flat checkpoint found a brief foot-crossbar 
 Default `watch_b3_rl.py` now opens the selected flat policy. VS Code has dedicated tasks for refined straight-line motion and 3/5-degree ramps.
 
 ```powershell
-.\.venv\Scripts\python.exe watch_b3_rl.py
-.\.venv\Scripts\python.exe watch_b3_rl.py --model results/curriculum_selected/3deg/policy.zip --seed 8000
-.\.venv\Scripts\python.exe watch_b3_rl.py --model results/curriculum_selected/5deg/policy.zip --seed 8000
+.\.venv\Scripts\python.exe robot.py watch
+.\.venv\Scripts\python.exe robot.py watch --model results/curriculum_selected/3deg/policy.zip --seed 8000
+.\.venv\Scripts\python.exe robot.py watch --model results/curriculum_selected/5deg/policy.zip --seed 8000
 ```
 
 Replays (seed 8000, one trial each): [flat](curriculum_final_validation/flat/replay.mp4), [3 degrees](curriculum_final_validation/3deg/replay.mp4), [5 degrees](curriculum_final_validation/5deg/replay.mp4). A replay is not a success-rate estimate; use the twenty-trial metrics above.

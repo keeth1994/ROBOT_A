@@ -4,8 +4,8 @@ from pathlib import Path
 import torch
 from stable_baselines3 import PPO
 from mujoco import viewer
-from rl_b3_env import StraightLineEnv
-from run_robot_b3 import ROOT
+from robot_b3.rl_b3_env import StraightLineEnv
+from robot_b3.run_robot_b3 import ROOT
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--model',default=None);ap.add_argument('--seconds',type=float,default=None);ap.add_argument('--curriculum',action='store_true');ap.add_argument('--slope',type=float,default=None,choices=[0,3,5]);ap.add_argument('--seed',type=int,default=1000);ap.add_argument('--record',help='Write an MP4 instead of opening the viewer');args=ap.parse_args()
@@ -23,7 +23,7 @@ def main():
     if args.slope is None:args.slope=run_meta.get('slope_deg',0)
     torch.set_num_threads(1);policy=PPO.load(args.model,device='cpu')
     if args.curriculum:
-        from rl_b3_curriculum import CurriculumEnv
+        from robot_b3.rl_b3_curriculum import CurriculumEnv
         normalized=run_meta.get('normalized_observations',False)
         env=CurriculumEnv(slope=args.slope,seconds=args.seconds,visuals=True,normalized=normalized)
     else:env=StraightLineEnv(seconds=args.seconds or 10,visuals=True)

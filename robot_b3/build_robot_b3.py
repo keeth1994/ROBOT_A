@@ -4,8 +4,8 @@ from collections import defaultdict
 import json,gzip,math
 import numpy as np
 import xml.etree.ElementTree as E
-from mesh_utils import visual_mesh,fmt
-ROOT=Path(__file__).resolve().parent
+from robot_b3.mesh_utils import visual_mesh,fmt
+from robot_b3.paths import ROOT
 LEGS=['FL','RL','FR','RR']
 def rz(a):
  a=math.radians(a);return np.array([[math.cos(a),-math.sin(a),0],[math.sin(a),math.cos(a),0],[0,0,1]])
@@ -120,7 +120,7 @@ def main():
  cam=sensor_cfg['camera'];fovy=math.degrees(2*math.atan(math.tan(math.radians(cam['diagonal_fov_deg']/2))*.6))
  E.SubElement(root,'camera',name='project_camera',pos=fmt((np.array(cam['center_mm'])+np.array([7.6,0,0]))/1000),xyaxes='0 -1 0 0 0 1',fovy=str(fovy))
  E.indent(xml);E.ElementTree(xml).write(ROOT/'models/robot_b3.xml',encoding='utf-8',xml_declaration=True)
- from course_b3 import build_course
+ from robot_b3.course_b3 import build_course
  course=json.loads((ref/'b3_course_settings.json').read_text())
  metadata=build_course(asset,wb,course)
  E.indent(xml);E.ElementTree(xml).write(ROOT/'models/robot_b3_course.xml',encoding='utf-8',xml_declaration=True)

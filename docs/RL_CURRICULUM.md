@@ -11,16 +11,16 @@ Checkpoint selection prioritizes the success rate on three development seeds, th
 ## Commands
 
 ```powershell
-.\.venv\Scripts\python.exe train_b3_curriculum.py --resume results/rl_flat_straight/best.zip --out results/curriculum_flat --steps 393216
-.\.venv\Scripts\python.exe train_b3_curriculum.py --slope 3 --resume results/curriculum_flat/best.zip --out results/curriculum_3deg --steps 262144
-.\.venv\Scripts\python.exe train_b3_curriculum.py --slope 5 --resume results/curriculum_3deg/best.zip --out results/curriculum_5deg --steps 262144
-.\.venv\Scripts\python.exe watch_b3_rl.py --curriculum --slope 3 --model results/curriculum_3deg/best.zip
-.\.venv\Scripts\python.exe watch_b3_rl.py --curriculum --slope 5 --model results/curriculum_5deg/best.zip
+.\.venv\Scripts\python.exe robot.py train --resume results/rl_flat_straight/best.zip --out results/curriculum_flat --steps 393216
+.\.venv\Scripts\python.exe robot.py train --slope 3 --resume results/curriculum_flat/best.zip --out results/curriculum_3deg --steps 262144
+.\.venv\Scripts\python.exe robot.py train --slope 5 --resume results/curriculum_3deg/best.zip --out results/curriculum_5deg --steps 262144
+.\.venv\Scripts\python.exe robot.py watch --curriculum --slope 3 --model results/curriculum_3deg/best.zip
+.\.venv\Scripts\python.exe robot.py watch --curriculum --slope 5 --model results/curriculum_5deg/best.zip
 ```
 
 Each run saves its initial evaluation, learning curve, best and latest checkpoints, and a summary with validation metrics and model/environment hashes. Continuing from a checkpoint adds `--steps` transitions; it does not reset the learned policy. `--minutes` caps the training portion, with evaluation time additional. Keep each experiment in a distinct output folder.
 
-Checks: `test_b3_curriculum.py` verifies physical ramp heights/width, headless/full-CAD parity, contact accounting and rejection of a stationary policy. `test_b3_rl.py` checks original environment compatibility and actuator limits.
+Checks: `robot.py check curriculum` verifies physical ramp heights/width, headless/full-CAD parity, contact accounting and rejection of a stationary policy. `robot.py check rl` checks original environment compatibility and actuator limits.
 
 ## Observation scaling and continued practice
 
@@ -30,14 +30,24 @@ Slope runs use two flat and six sloped training environments. After training, th
 
 VS Code offers separate viewing tasks for the refined flat policy and each gentle ramp. These do not replace the original full obstacle-course task.
 
-## Current measured results
+## Earlier selected-checkpoint results
 
-See [final fresh-seed report](results/CURRICULUM_REPORT.md). Flat: 20/20 clean passes. 3 degrees: 17/20 physical completions, 6/20 clean passes. 5 degrees: 3/20 physical completions, 1/20 clean pass. These are separate selected checkpoints, not one policy verified for every terrain. Selected files are listed in `reference/b3_curriculum_policies.json`; the default viewer opens the selected flat policy.
+See [final fresh-seed report](../results/CURRICULUM_REPORT.md). Flat: 20/20 clean passes. 3 degrees: 17/20 physical completions, 6/20 clean passes. 5 degrees: 3/20 physical completions, 1/20 clean pass. These are separate selected checkpoints, not one policy verified for every terrain. Selected files are listed in `reference/b3_curriculum_policies.json`; the default viewer opens the selected flat policy.
 
 The commands above reproduce the original experiment sequence; choose unused output directories when rerunning them. To continue the 5-degree lesson:
 
 ```powershell
-.\.venv\Scripts\python.exe train_b3_curriculum.py --slope 5 --resume results/curriculum_selected/5deg/policy.zip --out results/curriculum_5deg_next --steps 1000000 --minutes 15
+.\.venv\Scripts\python.exe robot.py train --slope 5 --resume results/curriculum_selected/5deg/policy.zip --out results/curriculum_5deg_next --steps 1000000 --minutes 15
 ```
 
 For a fresh evaluation, use `--evaluate-only --evaluation-seed 9000` with a new output directory. Viewer `--seed` selects the reset seed.
+
+## Latest successful 3-degree run
+
+`results/my_3deg_run_02/best.zip` is the later checkpoint used by the meeting ramp demo. Its saved summary reports `gate_passed: true`. The earlier selected-checkpoint statistics above describe different policies and must not be presented as the result of this newer run.
+
+To advance from this successful checkpoint, choose an unused output folder:
+
+```powershell
+.\.venv\Scripts\python.exe robot.py train --slope 5 --resume results/my_3deg_run_02/best.zip --out results/my_5deg_run_01 --steps 1000000 --minutes 15
+```

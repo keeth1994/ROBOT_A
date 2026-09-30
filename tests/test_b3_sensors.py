@@ -3,8 +3,8 @@ import json,xml.etree.ElementTree as E
 from pathlib import Path
 import numpy as np
 import mujoco
-from b3_sensors import observe
-ROOT=Path(__file__).resolve().parent
+from robot_b3.b3_sensors import observe
+from robot_b3.paths import ROOT
 
 def main():
     tree=E.parse(ROOT/'models/robot_b3.xml');xml=tree.getroot()

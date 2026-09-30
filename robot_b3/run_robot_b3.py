@@ -3,7 +3,7 @@ import argparse,json,math,time
 from pathlib import Path
 import numpy as np
 import mujoco
-ROOT=Path(__file__).resolve().parent
+from robot_b3.paths import ROOT
 LEGS=['FL','RL','FR','RR']
 DEFAULT=dict(period=1.8,duty=.75,yaw_amplitude=.22,pitch_lift=.65,pitch_stance=0.,kp=1.6,kd=.04,heading_gain=.8,pattern='crawl')
 class Robot:

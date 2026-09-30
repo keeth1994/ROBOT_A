@@ -9,13 +9,13 @@ choice /c 1234 /m "Choose demo"
 if errorlevel 4 goto videos
 if errorlevel 3 goto ramp
 if errorlevel 2 goto flat
-.venv\Scripts\python.exe meeting_demo.py normal
+.venv\Scripts\python.exe robot.py demo normal
 goto end
 :flat
-.venv\Scripts\python.exe meeting_demo.py rl-flat
+.venv\Scripts\python.exe robot.py demo rl-flat
 goto end
 :ramp
-.venv\Scripts\python.exe meeting_demo.py rl-ramp
+.venv\Scripts\python.exe robot.py demo rl-ramp
 goto end
 :videos
 start "" "%~dp0results\meeting"

@@ -1,2 +1,2 @@
 $ErrorActionPreference = 'Stop'
-& "$PSScriptRoot\.venv\Scripts\python.exe" "$PSScriptRoot\run_robot_b3.py" --ramp --seconds 100
+& "$PSScriptRoot\.venv\Scripts\python.exe" "$PSScriptRoot\robot.py" walk --ramp --seconds 100

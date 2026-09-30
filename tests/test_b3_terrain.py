@@ -4,8 +4,8 @@ import copy,json,math
 import xml.etree.ElementTree as E
 import numpy as np
 import mujoco
-from course_b3 import build_course,transform,local_points
-ROOT=Path(__file__).resolve().parent
+from robot_b3.course_b3 import build_course,transform,local_points
+from robot_b3.paths import ROOT
 
 def check(cfg):
     xml=E.parse(ROOT/'models/robot_b3.xml').getroot()

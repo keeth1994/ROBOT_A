@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from stable_baselines3 import PPO
-from rl_b3_env import StraightLineEnv
+from robot_b3.rl_b3_env import StraightLineEnv
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--model',required=True);ap.add_argument('--episodes',type=int,default=10);ap.add_argument('--seed',type=int,default=2000);ap.add_argument('--fine',action='store_true');ap.add_argument('--out',required=True);args=ap.parse_args()
