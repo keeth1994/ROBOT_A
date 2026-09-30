@@ -2,3 +2,9 @@
 __pycache__/
 *.pyc
 logs/
+
+# Disposable local tool output; retain checkpoints and demo videos
+.pytest_cache/
+.ruff_cache/
+results/meeting/*_stdout.log
+results/meeting/*_stderr.log

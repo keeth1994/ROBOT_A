@@ -2,6 +2,16 @@
 
 Original Parallax servos, top-facing geared yaw outputs, smooth Y-forks and moving pitch servos. Only the current B3 design is retained here.
 
+## Quick entry points
+
+- **Meeting:** double-click `MEETING_DEMOS.cmd`; instructions in [MEETING_GUIDE.md](MEETING_GUIDE.md).
+- **Full obstacle course:** `start.ps1` or the default VS Code build task.
+- **Continue learning:** [RL_CURRICULUM.md](RL_CURRICULUM.md).
+- **CAD:** `cad/`; simulation geometry: `models/`; configuration: `reference/`.
+- **Results and checkpoints:** `results/`; presentation videos: `results/meeting/`.
+
+Historical training runs are retained because reports and checkpoint metadata reference them. Generated meshes, logs and the virtual environment are hidden in VS Code Explorer but remain on disk.
+
 ## Current design
 
 - 42 mm runners, reduced from 64 mm, with 8 mm flat soles; inward tread radius 12 mm and outward radius 22 mm.

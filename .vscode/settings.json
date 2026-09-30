@@ -1,5 +1,10 @@
 {
   "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-  "files.exclude": {"**/__pycache__": true},
+  "files.exclude": {
+    "**/__pycache__": true,
+    ".venv": true,
+    "logs": true,
+    "models/robot_meshes_b3": true
+  },
   "python.terminal.activateEnvironment": true
 }
