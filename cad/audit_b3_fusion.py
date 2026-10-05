@@ -45,5 +45,14 @@ copies=[(o.component.name,b.name,tx(b,inv(pm)),b.appearance) for o,b,k in parts 
 detail=app.documents.add(C.DocumentTypes.FusionDesignDocumentType);detail.name='B3 Y fork detail - top yaw and leg aligned pitch';dd=F.Design.cast(app.activeProduct);dd.designType=F.DesignTypes.DirectDesignType;rr=dd.rootComponent
 for cn,bn,geo,ap in copies:
  o=rr.occurrences.addNewComponent(C.Matrix3D.create());o.component.name=cn;b=o.component.bRepBodies.add(geo);b.name=bn;b.appearance=ap
-save(dd,rr,'B3_Y_Fork_Detail');render('B3_Y_Fork_Detail',(170,-220,135),(15,0,0))
+save(dd,rr,DETAIL_NAME);render(DETAIL_NAME,(170,-220,135),(15,0,0))
 robotdoc.activate()
+
+if REINFORCED:
+ mountdoc=app.documents.add(C.DocumentTypes.FusionDesignDocumentType)
+ mountdoc.name='B4 rocker - four reinforced harness ties'
+ md=F.Design.cast(app.activeProduct);md.designType=F.DesignTypes.DirectDesignType
+ body=md.rootComponent.bRepBodies.add(tm.copy(foot));body.name='Rocker with four reinforced harness ties';body.appearance=white
+ save(md,md.rootComponent,'B4_Reinforced_Rocker')
+ render('B4_Reinforced_Rocker',(140,-210,110),(38,-4,3))
+ mountdoc.activate()

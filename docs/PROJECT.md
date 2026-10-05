@@ -1,6 +1,12 @@
-# B3 project details
+# Project details
 
-## Current design
+## Current mechanical revision
+
+[B5](../cad/B5_plain_pivots/README.md) is the current CAD assembly, with integral sliding pivots and the user's revised rocker. Rebuild it using `cad/B5Builder` in Fusion. The B4 archives and saved user rocker are required source inputs; retain them.
+
+B5 has not been transferred to MuJoCo. The dimensions, mass, commands and results below describe the existing B3 simulation, not B5 hardware validation.
+
+## B3 simulation design
 
 - 42 mm runners, reduced from 64 mm, with 8 mm flat soles; inward tread radius 12 mm and outward radius 22 mm.
 - Platform-facing reach 18 mm; outward reach 24 mm. PLA rails 3 mm thick; rubber strips 6 mm wide. Servo support spacing retained.
@@ -21,7 +27,7 @@ In VS Code, **Ctrl+Shift+B** runs the photo-inspired double ramp, valley, raised
 .\.venv\Scripts\python.exe robot.py record-course --seconds 100
 ```
 
-For a fresh environment install `requirements.txt` in `.venv`; `requirements-lock.txt` records the pinned environment. To regenerate native CAD, register `cad/B3Builder` in Fusion Scripts and Add-Ins, run B3Builder, then rebuild MuJoCo. `reference/b3_foot_geometry.json`, `b3_sensors.json` and `b3_course_settings.json` hold the geometry settings.
+For a fresh environment install `requirements.txt` in `.venv`; `requirements-lock.txt` records the pinned environment. To rebuild the current B5 CAD, register `cad/B5Builder` in Fusion Scripts and Add-Ins and run B5Builder. This does not rebuild MuJoCo. The older `cad/B3Builder` regenerates historical B3 geometry only. `reference/b3_foot_geometry.json`, `b3_sensors.json` and `b3_course_settings.json` hold the geometry settings.
 
 ## Validation
 

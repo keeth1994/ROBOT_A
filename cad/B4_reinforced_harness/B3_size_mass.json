@@ -1,0 +1,11 @@
+{
+  "neutral_size_mm": [
+    241.17871555019022,
+    241.17871555019022,
+    106.0
+  ],
+  "solid_PLA_g": 295.29132507027697,
+  "servo_count": 8,
+  "servo_model": "Parallax 900-00005",
+  "mass_note": "Solid PLA geometry only, not sliced or measured. No motor upgrade."
+}

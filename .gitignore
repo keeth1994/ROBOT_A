@@ -8,3 +8,6 @@ logs/
 .ruff_cache/
 results/meeting/*_stdout.log
 results/meeting/*_stderr.log
+
+# Document rendering intermediates
+tmp/pdfs/

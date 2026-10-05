@@ -2,7 +2,10 @@ from pathlib import Path
 import gzip,math,json,traceback
 import adsk.core as C,adsk.fusion as F,adsk
 BASE=Path(__file__).resolve().parent.parent
-OUT=BASE/'cad'
+OUT=Path(globals().get('OUTPUT_DIR',BASE/'cad'));OUT.mkdir(parents=True,exist_ok=True)
+REINFORCED=globals().get('REINFORCED',False)
+ASSEMBLY_NAME=globals().get('ASSEMBLY_NAME','Robot_B3_Compact_Rockers')
+DETAIL_NAME=globals().get('DETAIL_NAME','B3_Y_Fork_Detail')
 foot_cfg=json.loads((BASE/'reference/b3_foot_geometry.json').read_text())
 sensor_cfg=json.loads((BASE/'reference/b3_sensors.json').read_text())
 app=C.Application.get();tm=F.TemporaryBRepManager.get()
@@ -20,7 +23,7 @@ def frame(origin,ax=(1,0,0),ay=(0,1,0),az=(0,0,1)):
 def rot(deg,origin=(0,0,0),axis=(0,0,1)):
  m=C.Matrix3D.create();m.setToRotation(math.radians(deg),v(*axis),p(*origin));return m
 def load(filename,title):
- doc=app.importManager.importToNewDocument(app.importManager.createFusionArchiveImportOptions(str(OUT/filename)));doc.name=title
+ doc=app.importManager.importToNewDocument(app.importManager.createFusionArchiveImportOptions(str(BASE/'cad'/filename)));doc.name=title
  d=F.Design.cast(app.activeProduct);return doc,d,d.rootComponent
 def overlap(a,b):
  aa=a.boundingBox;bb=b.boundingBox
@@ -43,7 +46,7 @@ def intersect(b,t):
 def inv(m):
  q=m.copy();assert q.invert();return q
 def rod(a,b,r):return tm.createCylinderOrCone(p(*a),r/10,p(*b),r/10)
-logfile=BASE/'logs/b3_cad.log'
+logfile=BASE/('logs/b4_cad.log' if REINFORCED else 'logs/b3_cad.log')
 logfile.parent.mkdir(exist_ok=True)
 def note(s):
  with logfile.open('a') as f:f.write(s+'\n')
@@ -53,7 +56,7 @@ logfile.write_text('START\n')
 source_doc,source_design,src=load('Robot_B3_Compact_Rockers.f3d','B3 appearance source')
 aps=[b.appearance for o in src.occurrences for b in o.component.bRepBodies]
 white=next((a for a in aps if 'white' in a.name.lower()),aps[0]);black=next((a for a in aps if 'black' in a.name.lower()),white);gold=next((a for a in aps if 'yellow' in a.name.lower()),white);green=next((a for a in aps if 'green' in a.name.lower()),white)
-nd=app.documents.add(C.DocumentTypes.FusionDesignDocumentType);nd.name='Design B3 - short soles and rounded outer toes';d=F.Design.cast(app.activeProduct);d.designType=F.DesignTypes.DirectDesignType;root=d.rootComponent
+nd=app.documents.add(C.DocumentTypes.FusionDesignDocumentType);nd.name='Design B4 - four reinforced servo mount ties' if REINFORCED else 'Design B3 - short soles and rounded outer toes';d=F.Design.cast(app.activeProduct);d.designType=F.DesignTypes.DirectDesignType;root=d.rootComponent
 parts=[]
 def comp(n):
  o=root.occurrences.addNewComponent(C.Matrix3D.create());o.component.name=n;return o
@@ -191,20 +194,45 @@ for y0,y1 in foot_cfg['rail_y_ranges_mm']:
  else:union(foot,q)
 union(foot,rod((36,-18,foot_cfg['crossbar_z_mm']),(36,32,foot_cfg['crossbar_z_mm']),4))
 # Four-hole flange plate stays with the moving rocker, not the yaw fork.
-plate=box(23,-10,-13,53,-8,48)
-cut(plate,box(27.4,-11,-3.7,48.6,-7,38))
-for x in [33,43]:
- for z in [-8.1,42.4]:cut(plate,rod((x,-11,z),(x,-7,z),2.25))
-union(foot,plate)
-for z in [-9,44]:
- union(foot,box(23,-18,z-2,27,-8,z+2))
- union(foot,rod((25,-18,z),(38,-18,27),2))
+if REINFORCED:
+ plate=box(23,-11,-13,53,-8,48)
+ cut(plate,box(27.4,-12,-3.7,48.6,-7,38))
+ for x in [33,43]:
+  for z in [-8.1,42.4]:cut(plate,rod((x,-12,z),(x,-7,z),2.25))
+ union(foot,plate)
+ # Four independent corner bridges outside the servo insertion window.
+ for x in [25,51]:
+  for z in [-9,44]:
+   union(foot,box(x-3,-21,z-3,x+3,-8,z+3))
+   # Top ties land on the pitch ring; lower ties land on the existing leg struts.
+   endpoint=(34 if x==25 else 42,-18,32) if z==44 else (29.2 if x==25 else 49.3,-18,-9)
+   union(foot,rod((x,-18,z),endpoint,3))
+ # Preserve the original clearance around the moving pitch horn.
+ cut(foot,rod((38,-25,27),(38,-14,27),6.4))
+else:
+ plate=box(23,-10,-13,53,-8,48)
+ cut(plate,box(27.4,-11,-3.7,48.6,-7,38))
+ for x in [33,43]:
+  for z in [-8.1,42.4]:cut(plate,rod((x,-11,z),(x,-7,z),2.25))
+ union(foot,plate)
+ for z in [-9,44]:
+  union(foot,box(23,-18,z-2,27,-8,z+2))
+  union(foot,rod((25,-18,z),(38,-18,27),2))
 # Clearance around the moving motor casing, including reinforcing webs.
 cut(foot,box(27.5,-15.5,-3.6,48.5,21.6,37.9))
 # Relieve mounting webs around the actual casing/flanges with 0.3 mm clearance.
 for off in [(0,0,0),(.3,0,0),(-.3,0,0),(0,.3,0),(0,-.3,0),(0,0,.3),(0,0,-.3)]:
  cut(foot,tx(pitchservo,frame(off)))
 assert foot.lumps.count==1,'Foot disconnected'
+if REINFORCED:
+ tie_checks=[]
+ for x in [25,51]:
+  for z in [-9,44]:
+   # Verify a 4x4 mm core survives at each plate-to-frame bridge after servo cuts.
+   core=box(x-2,-15,z-2,x+2,-13,z+2)
+   kept=overlap(foot,core);assert kept>31.5,('Corner tie removed by clearance',x,z,kept)
+   tie_checks.append(dict(x_mm=x,z_mm=z,retained_core_mm3=kept,expected_core_mm3=32))
+ (OUT/'harness_ties.json').write_text(json.dumps(dict(ties=tie_checks,plate_mm=3,bridge_width_mm=6,rib_diameter_mm=6),indent=2))
 # Small local fork reliefs for the moving motor and its mounting frame.
 for angle in range(-46,47,2):
  m=rot(angle,(38,0,27),(0,1,0))
@@ -253,14 +281,16 @@ for o,body,kind in parts:
  record=dict(component=o.component.name,body=body.name,kind=kind,vertices=[[vv[k]/100,vv[k+1]/100,vv[k+2]/100] for k in range(0,len(vv),3)],indices=list(m.nodeIndices),appearance=body.appearance.name,volume_m3=body.volume/1e6,com_m=[x/100 for x in body.physicalProperties.centerOfMass.asArray()]);records.append(record)
  bb=body.boundingBox;inventory.append(dict(component=o.component.name,body=body.name,kind=kind,volume_cm3=body.volume,min_mm=[x*10 for x in bb.minPoint.asArray()],max_mm=[x*10 for x in bb.maxPoint.asArray()]))
 (OUT/'B3_inventory.json').write_text(json.dumps(inventory,indent=2))
-ref=BASE/'reference'
-with gzip.open(ref/'b3_cad_meshes.json.gz','wt') as f:json.dump(dict(source='Robot_B3_Compact_Rockers.f3d',revision=foot_cfg['revision'],bodies=records),f)
+ref=OUT/'reference' if REINFORCED else BASE/'reference'
+ref.mkdir(parents=True,exist_ok=True)
+if REINFORCED:foot_cfg['revision']='reinforced_four_tie_harness'
+with gzip.open(ref/'b3_cad_meshes.json.gz','wt') as f:json.dump(dict(source=ASSEMBLY_NAME+'.f3d',revision=foot_cfg['revision'],bodies=records),f)
 (ref/'b3_kinematics.json').write_text(json.dumps(dict(cad_revision=foot_cfg['revision'],legs=leg_templates,yaw_requested_range_deg=[-135,135],pitch_requested_range_deg=[-45,45],clearance_status='See B3 clearance audit; requested travel is not clearance certified',pitch_servo_moves_with_foot=True,gear_ratio_speed=1.5,gear_efficiency_assumed=.85,servo_stall_Nm=.26833896966654,servo_free_speed_deg_s=315.7894736842,servo_mass_kg=.044),indent=2))
 # Exclude construction solids from manufacturing exports.
 proto.deleteMe()
-save(d,root,'Robot_B3_Compact_Rockers');note('Saved F3D and STEP')
+save(d,root,ASSEMBLY_NAME);note('Saved F3D and STEP')
 cam=app.activeViewport.camera;cam.isSmoothTransition=False;cam.eye=p(450,-570,370);cam.target=p(0,0,-5);cam.upVector=v(0,0,1);cam.isFitView=True;app.activeViewport.camera=cam;app.activeViewport.refresh();adsk.doEvents()
-app.activeViewport.saveAsImageFile(str(OUT/'Robot_B3_Compact_Rockers.png'),1600,1200)
+app.activeViewport.saveAsImageFile(str(OUT/(ASSEMBLY_NAME+'.png')),1600,1200)
 note('BUILT')
 exec(compile((BASE/'cad/audit_b3_fusion.py').read_text(), 'audit_b3.py','exec'))
 note('DONE')

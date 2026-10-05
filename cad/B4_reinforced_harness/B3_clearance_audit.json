@@ -1,0 +1,425 @@
+{
+  "issues": [
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 2235.0558866850374,
+      "angle": -135,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 26.76038782032436,
+      "angle": -135,
+      "part": "servo",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 10.501013953111734,
+      "angle": -135,
+      "part": "servo",
+      "target": "FL B3 yaw servo fixed"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 139.4942324806183,
+      "angle": -135,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 260.43666551251596,
+      "angle": -135,
+      "part": "foot",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 144.00000000000009,
+      "angle": -135,
+      "part": "foot",
+      "target": "B3 02 battery reservation"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 220.10378639244394,
+      "angle": -135,
+      "part": "foot",
+      "target": "B3 03 electronics reservation"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 1345.5112767837306,
+      "angle": -135,
+      "part": "foot",
+      "target": "FL B3 yaw servo fixed"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 1712.8832343788997,
+      "angle": -120,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 76.13564781503293,
+      "angle": -120,
+      "part": "servo",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 209.8691706789961,
+      "angle": -120,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 289.4681750890547,
+      "angle": -120,
+      "part": "foot",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 45.1056999915647,
+      "angle": -120,
+      "part": "foot",
+      "target": "B3 03 electronics reservation"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 241.1702620758161,
+      "angle": -120,
+      "part": "foot",
+      "target": "B3 sensor camera cradle"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 15.716746543008052,
+      "angle": -120,
+      "part": "foot",
+      "target": "FL B3 yaw servo fixed"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 1182.3268298604094,
+      "angle": -105,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 50.90704546106946,
+      "angle": -105,
+      "part": "servo",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 10.863598038282516,
+      "angle": -105,
+      "part": "servo",
+      "target": "B3 sensor camera cradle"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 401.00370154948405,
+      "angle": -105,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 303.9880596872749,
+      "angle": -105,
+      "part": "foot",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 197.32995205175098,
+      "angle": -105,
+      "part": "foot",
+      "target": "B3 sensor camera cradle"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 2.341668011150787,
+      "angle": -105,
+      "part": "foot",
+      "target": "B3 sensor ir_ground"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 202.15777516194058,
+      "angle": -105,
+      "part": "foot",
+      "target": "B3 cradle ir_ground"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 124.34614790245615,
+      "angle": -90,
+      "part": "fork",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 517.9504345513396,
+      "angle": -90,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 0.8609806157968769,
+      "angle": -90,
+      "part": "servo",
+      "target": "B3 sensor ir_ground"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 277.51191648245464,
+      "angle": -90,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 235.98575273565137,
+      "angle": -90,
+      "part": "foot",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 118.06366983551307,
+      "angle": -90,
+      "part": "foot",
+      "target": "B3 sensor camera cradle"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 215.2845818017249,
+      "angle": -90,
+      "part": "foot",
+      "target": "B3 sensor ir_ground"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 124.79794117031942,
+      "angle": -90,
+      "part": "foot",
+      "target": "B3 cradle ir_ground"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 73.01844811041697,
+      "angle": -75,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 198.73459599430103,
+      "angle": -75,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 80.35579312720765,
+      "angle": -75,
+      "part": "foot",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 62.664184016973834,
+      "angle": -75,
+      "part": "foot",
+      "target": "B3 sensor camera cradle"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 4.773624374308766,
+      "angle": -60,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 11.603835673401871,
+      "angle": 60,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 237.3393588816184,
+      "angle": 75,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 128.14100537428212,
+      "angle": 75,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 120.92582465877993,
+      "angle": 90,
+      "part": "fork",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 925.3593022945222,
+      "angle": 90,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 651.3143380924879,
+      "angle": 90,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 1738.7201651973662,
+      "angle": 105,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 170.2511308634455,
+      "angle": 105,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 2002.4166396517305,
+      "angle": 120,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 5.30554472715206,
+      "angle": 120,
+      "part": "servo",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 0.6591150803877172,
+      "angle": 120,
+      "part": "servo",
+      "target": "B3 cradle ir_left"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 125.07565332022902,
+      "angle": 120,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 1.5434803041418457,
+      "angle": 120,
+      "part": "foot",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 12.629310127080135,
+      "angle": 120,
+      "part": "foot",
+      "target": "B3 cradle ir_left"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 698.9849721456561,
+      "angle": 120,
+      "part": "foot",
+      "target": "FL B3 yaw servo fixed"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 2010.511739855905,
+      "angle": 135,
+      "part": "servo",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 77.52077564064874,
+      "angle": 135,
+      "part": "servo",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 42.11950527701591,
+      "angle": 135,
+      "part": "servo",
+      "target": "B3 cradle ir_left"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 422.2106535597284,
+      "angle": 135,
+      "part": "servo",
+      "target": "FL B3 yaw servo fixed"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 711.2847969407558,
+      "angle": 135,
+      "part": "foot",
+      "target": "B3 00 integrated chassis"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 254.0326196417399,
+      "angle": 135,
+      "part": "foot",
+      "target": "B3 01 removable electronics deck"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 415.4200972593165,
+      "angle": 135,
+      "part": "foot",
+      "target": "B3 cradle ir_left"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 1742.1671432404612,
+      "angle": 135,
+      "part": "foot",
+      "target": "FL B3 yaw servo fixed"
+    },
+    {
+      "test": "yaw_sweep_neutral_pitch",
+      "mm3": 18.90017792127146,
+      "angle": 135,
+      "part": "foot",
+      "target": "RL B3 yaw servo fixed"
+    }
+  ],
+  "scope": "Own pitch assembly at 5 degree steps; FL yaw vs platform and fixed servos at 15 degree steps. Sensor packages/mounts checked against all legs at yaw and pitch -45/0/+45. Adjacent moving legs, wires, gear mesh and strength not validated."
+}

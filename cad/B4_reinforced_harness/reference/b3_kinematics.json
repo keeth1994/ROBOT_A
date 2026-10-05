@@ -1,0 +1,72 @@
+{
+  "cad_revision": "reinforced_four_tie_harness",
+  "legs": {
+    "FL": {
+      "yaw_center_mm": [
+        52.0,
+        52.0,
+        0
+      ],
+      "neutral_yaw_deg": 45,
+      "pitch_local_mm": [
+        38,
+        0,
+        27
+      ]
+    },
+    "RL": {
+      "yaw_center_mm": [
+        -52.0,
+        52.0,
+        0
+      ],
+      "neutral_yaw_deg": 135,
+      "pitch_local_mm": [
+        38,
+        0,
+        27
+      ]
+    },
+    "FR": {
+      "yaw_center_mm": [
+        52.0,
+        -52.0,
+        0
+      ],
+      "neutral_yaw_deg": -45,
+      "pitch_local_mm": [
+        38,
+        0,
+        27
+      ]
+    },
+    "RR": {
+      "yaw_center_mm": [
+        -52.0,
+        -52.0,
+        0
+      ],
+      "neutral_yaw_deg": -135,
+      "pitch_local_mm": [
+        38,
+        0,
+        27
+      ]
+    }
+  },
+  "yaw_requested_range_deg": [
+    -135,
+    135
+  ],
+  "pitch_requested_range_deg": [
+    -45,
+    45
+  ],
+  "clearance_status": "See B3 clearance audit; requested travel is not clearance certified",
+  "pitch_servo_moves_with_foot": true,
+  "gear_ratio_speed": 1.5,
+  "gear_efficiency_assumed": 0.85,
+  "servo_stall_Nm": 0.26833896966654,
+  "servo_free_speed_deg_s": 315.7894736842,
+  "servo_mass_kg": 0.044
+}

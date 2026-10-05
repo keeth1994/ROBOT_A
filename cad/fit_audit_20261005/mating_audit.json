@@ -1,0 +1,566 @@
+{
+  "baseline_neutral": [
+    {
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "target": "FL B3 pitch servo",
+      "intersection_mm3": 0
+    },
+    {
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425718134283734
+    },
+    {
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.027206791238937
+    }
+  ],
+  "health": [
+    {
+      "name": "Base Feature1",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Extrude1",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet1",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet2",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Extrude2",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Loft1",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Extrude3",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet3",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet4",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Extrude4",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Loft2",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Extrude5",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Loft3",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet5",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet6",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Extrude6",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet7",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet8",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Extrude7",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet9",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Extrude8",
+      "health": "4",
+      "message": ""
+    },
+    {
+      "name": "Extrude9",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Extrude10",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Loft4",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Loft5",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet10",
+      "health": "0",
+      "message": ""
+    },
+    {
+      "name": "Fillet11",
+      "health": "0",
+      "message": ""
+    }
+  ],
+  "parts": [
+    "FL B3 yaw servo fixed",
+    "FL B3 yaw driver",
+    "FL B3 yaw bearing",
+    "FL B3 retention washer",
+    "FL B3 yaw turret",
+    "FL B3 pitch servo",
+    "FL B3 pitch bushing",
+    "FL B3 pitch pin",
+    "FL B3 pitch horn",
+    "FL B3 rocker foot",
+    "FL B3 rubber tread",
+    "FL B3 rubber tread (1)"
+  ],
+  "previous_volume_mm3": 16061.890414945194,
+  "new_volume_mm3": 16393.295265061435,
+  "added_mm3": 840.235763165207,
+  "removed_mm3": 509.15082222312833,
+  "checks": [
+    {
+      "angle": -45,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -45,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -45,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.4256428478031635
+    },
+    {
+      "angle": -45,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.381465539751426
+    },
+    {
+      "angle": -40,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -40,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -40,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425643061362346
+    },
+    {
+      "angle": -40,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.381229069222146
+    },
+    {
+      "angle": -35,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -35,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -35,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425647437239851
+    },
+    {
+      "angle": -35,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.350006782600649
+    },
+    {
+      "angle": -30,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -30,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -30,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425657373522925
+    },
+    {
+      "angle": -30,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.230990822566053
+    },
+    {
+      "angle": -25,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -25,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -25,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425670144262027
+    },
+    {
+      "angle": -25,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.027487763381954
+    },
+    {
+      "angle": -20,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -20,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -20,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425687314893316
+    },
+    {
+      "angle": -20,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 5.803133312730337
+    },
+    {
+      "angle": -15,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -15,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -15,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425705005135523
+    },
+    {
+      "angle": -15,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 5.683894628370331
+    },
+    {
+      "angle": -10,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -10,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -10,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425711188147651
+    },
+    {
+      "angle": -10,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 5.724677426220182
+    },
+    {
+      "angle": -5,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -5,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": -5,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425713652768706
+    },
+    {
+      "angle": -5,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 5.897738071492096
+    },
+    {
+      "angle": 0,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 0,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 0,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425718134283896
+    },
+    {
+      "angle": 0,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.0272066199852405
+    },
+    {
+      "angle": 5,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 5,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 5,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.4257170026292245
+    },
+    {
+      "angle": 5,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.004911080700759
+    },
+    {
+      "angle": 10,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 10,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 10,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425712654245701
+    },
+    {
+      "angle": 10,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 5.846607226577654
+    },
+    {
+      "angle": 15,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 15,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 15,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425710519585904
+    },
+    {
+      "angle": 15,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 5.697693083623665
+    },
+    {
+      "angle": 20,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 20,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 20,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425700032408432
+    },
+    {
+      "angle": 20,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 5.7003064707630715
+    },
+    {
+      "angle": 25,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 25,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 25,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425682600861267
+    },
+    {
+      "angle": 25,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 5.8604859680636485
+    },
+    {
+      "angle": 30,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 30,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 30,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425666164784397
+    },
+    {
+      "angle": 30,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.088877090705433
+    },
+    {
+      "angle": 35,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 35,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 35,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425654530484059
+    },
+    {
+      "angle": 35,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.273133322362289
+    },
+    {
+      "angle": 40,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 40,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 40,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425644977590812
+    },
+    {
+      "angle": 40,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.365834367643694
+    },
+    {
+      "angle": 45,
+      "target": "FL B3 yaw turret",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 45,
+      "target": "FL B3 pitch bushing",
+      "intersection_mm3": 0
+    },
+    {
+      "angle": 45,
+      "target": "FL B3 pitch pin",
+      "intersection_mm3": 6.425642847803101
+    },
+    {
+      "angle": 45,
+      "target": "FL B3 pitch horn",
+      "intersection_mm3": 6.3814655398273095
+    },
+    {
+      "angle": 0,
+      "target": "pitch servo casing",
+      "intersection_mm3": 0
+    }
+  ]
+}

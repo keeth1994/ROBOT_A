@@ -1,0 +1,1 @@
+CAD export and sampled fit checks passed. Physical validation pending.
