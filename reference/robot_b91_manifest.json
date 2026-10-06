@@ -1,0 +1,703 @@
+{
+  "revision": "B9-1",
+  "source_sha256": "42f93b8e3420fbde01c428dbe5be318b81ede1fbdafe319aa56953b3abe0ae33",
+  "cad_bodies": 97,
+  "collision_hulls": 639,
+  "total_mass_kg": 1.2099896239202712,
+  "neutral_bounds_m": [
+    0.2722914123535156,
+    0.2722914123535156,
+    0.13199999809265137
+  ],
+  "parts": [
+    {
+      "component": "B8 00 integrated chassis",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.14407557600447574,
+      "volume_m3": 0.00011618998064877075
+    },
+    {
+      "component": "B8 sensor camera",
+      "link": "platform",
+      "kind": "camera",
+      "mass_kg": 0.014,
+      "volume_m3": 1.728e-05
+    },
+    {
+      "component": "FL B8 yaw servo fixed",
+      "link": "platform",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.0120915905434862e-05
+    },
+    {
+      "component": "FL B8 yaw driver - measured cross draft",
+      "link": "FL_driver",
+      "kind": "PLA",
+      "mass_kg": 0.003996232668609624,
+      "volume_m3": 3.2227682811367936e-06
+    },
+    {
+      "component": "FL B8 yaw turret",
+      "link": "FL_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.01788195046927279,
+      "volume_m3": 1.442092779780064e-05
+    },
+    {
+      "component": "FL B8 pitch servo",
+      "link": "FL_pitch",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.0120915905426053e-05
+    },
+    {
+      "component": "FL B8 pitch horn - measured cross draft",
+      "link": "FL_yaw",
+      "kind": "horn",
+      "mass_kg": 0.001050555088336501,
+      "volume_m3": 9.135261637708705e-07
+    },
+    {
+      "component": "FL B8 rocker foot",
+      "link": "FL_pitch",
+      "kind": "PLA",
+      "mass_kg": 0.019281739674992106,
+      "volume_m3": 1.5549790060477506e-05
+    },
+    {
+      "component": "FL B8 rubber tread",
+      "link": "FL_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007633304303058214,
+      "volume_m3": 6.93936754823474e-07
+    },
+    {
+      "component": "FL B8 rubber tread (1)",
+      "link": "FL_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007487948330767305,
+      "volume_m3": 6.807225755243005e-07
+    },
+    {
+      "component": "RL B8 yaw servo fixed",
+      "link": "platform",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.0120915905434865e-05
+    },
+    {
+      "component": "RL B8 yaw driver - measured cross draft",
+      "link": "RL_driver",
+      "kind": "PLA",
+      "mass_kg": 0.003996232668609626,
+      "volume_m3": 3.222768281136795e-06
+    },
+    {
+      "component": "RL B8 yaw turret",
+      "link": "RL_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.01788195047124799,
+      "volume_m3": 1.4420927799393539e-05
+    },
+    {
+      "component": "RL B8 pitch servo",
+      "link": "RL_pitch",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.0120915905434886e-05
+    },
+    {
+      "component": "RL B8 pitch horn - measured cross draft",
+      "link": "RL_yaw",
+      "kind": "horn",
+      "mass_kg": 0.0010505550882936338,
+      "volume_m3": 9.135261637335946e-07
+    },
+    {
+      "component": "RL B8 rocker foot",
+      "link": "RL_pitch",
+      "kind": "PLA",
+      "mass_kg": 0.019281968474601313,
+      "volume_m3": 1.5549974576291382e-05
+    },
+    {
+      "component": "RL B8 rubber tread",
+      "link": "RL_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007632760976913149,
+      "volume_m3": 6.93887361537559e-07
+    },
+    {
+      "component": "RL B8 rubber tread (1)",
+      "link": "RL_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007487948330767265,
+      "volume_m3": 6.807225755242968e-07
+    },
+    {
+      "component": "FR B8 yaw servo fixed",
+      "link": "platform",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.0120915905434886e-05
+    },
+    {
+      "component": "FR B8 yaw driver - measured cross draft",
+      "link": "FR_driver",
+      "kind": "PLA",
+      "mass_kg": 0.003996232668609625,
+      "volume_m3": 3.222768281136794e-06
+    },
+    {
+      "component": "FR B8 yaw turret",
+      "link": "FR_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.01788195046927279,
+      "volume_m3": 1.442092779780064e-05
+    },
+    {
+      "component": "FR B8 pitch servo",
+      "link": "FR_pitch",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.012091590544381e-05
+    },
+    {
+      "component": "FR B8 pitch horn - measured cross draft",
+      "link": "FR_yaw",
+      "kind": "horn",
+      "mass_kg": 0.001050555088293632,
+      "volume_m3": 9.135261637335931e-07
+    },
+    {
+      "component": "FR B8 rocker foot",
+      "link": "FR_pitch",
+      "kind": "PLA",
+      "mass_kg": 0.019281886503786694,
+      "volume_m3": 1.5549908470795722e-05
+    },
+    {
+      "component": "FR B8 rubber tread",
+      "link": "FR_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007636817492090992,
+      "volume_m3": 6.942561356446356e-07
+    },
+    {
+      "component": "FR B8 rubber tread (1)",
+      "link": "FR_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007487948330767297,
+      "volume_m3": 6.807225755242997e-07
+    },
+    {
+      "component": "RR B8 yaw servo fixed",
+      "link": "platform",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.012091590543488e-05
+    },
+    {
+      "component": "RR B8 yaw driver - measured cross draft",
+      "link": "RR_driver",
+      "kind": "PLA",
+      "mass_kg": 0.003996232668609622,
+      "volume_m3": 3.2227682811367923e-06
+    },
+    {
+      "component": "RR B8 yaw turret",
+      "link": "RR_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.01788195047183645,
+      "volume_m3": 1.4420927799868105e-05
+    },
+    {
+      "component": "RR B8 pitch servo",
+      "link": "RR_pitch",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.0120915905434862e-05
+    },
+    {
+      "component": "RR B8 pitch horn - measured cross draft",
+      "link": "RR_yaw",
+      "kind": "horn",
+      "mass_kg": 0.001050555088336506,
+      "volume_m3": 9.135261637708747e-07
+    },
+    {
+      "component": "RR B8 rocker foot",
+      "link": "RR_pitch",
+      "kind": "PLA",
+      "mass_kg": 0.01928238366510149,
+      "volume_m3": 1.5550309407339913e-05
+    },
+    {
+      "component": "RR B8 rubber tread",
+      "link": "RR_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.000763577528539611,
+      "volume_m3": 6.941613895814646e-07
+    },
+    {
+      "component": "RR B8 rubber tread (1)",
+      "link": "RR_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007487948330767321,
+      "volume_m3": 6.807225755243019e-07
+    },
+    {
+      "component": "B8 sensor ir_left - Sharp body and mounting ears",
+      "link": "platform",
+      "kind": "ir",
+      "mass_kg": 0.0036,
+      "volume_m3": 5.67918253845709e-06
+    },
+    {
+      "component": "B8 ir_left M3 ear bracket",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.0019629849643679163,
+      "volume_m3": 1.5830523906192874e-06
+    },
+    {
+      "component": "B8 sensor ir_right - Sharp body and mounting ears",
+      "link": "platform",
+      "kind": "ir",
+      "mass_kg": 0.0036,
+      "volume_m3": 5.679182538457088e-06
+    },
+    {
+      "component": "B8 ir_right M3 ear bracket",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.001962984964367916,
+      "volume_m3": 1.583052390619287e-06
+    },
+    {
+      "component": "B8 sensor ir_ground - Sharp body and mounting ears",
+      "link": "platform",
+      "kind": "ir",
+      "mass_kg": 0.0036,
+      "volume_m3": 5.679182538457089e-06
+    },
+    {
+      "component": "B8 ir_ground M3 ear bracket",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.0021783891775015263,
+      "volume_m3": 1.7567654657270372e-06
+    },
+    {
+      "component": "B8 camera bolt clamp base",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.006112573982765316,
+      "volume_m3": 4.929495147391384e-06
+    },
+    {
+      "component": "B8 camera removable M3 top clamp",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.0017775707313995763,
+      "volume_m3": 1.4335247833867552e-06
+    },
+    {
+      "component": "FL B8 original yaw cross - measured pattern envelope",
+      "link": "FL_driver",
+      "kind": "horn",
+      "mass_kg": 0.0010505550883150529,
+      "volume_m3": 9.135261637522198e-07
+    },
+    {
+      "component": "FL B8 yaw bearing 6x19x6 -3",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250893e-06
+    },
+    {
+      "component": "FL B8 yaw bearing 6x19x6 6.7",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250902e-06
+    },
+    {
+      "component": "FL B8 pitch bearing 4x13x5",
+      "link": "FL_yaw",
+      "kind": "bearing4",
+      "mass_kg": 0.003,
+      "volume_m3": 6.008295949990667e-07
+    },
+    {
+      "component": "FL B8 pitch inner ring spacer",
+      "link": "FL_yaw",
+      "kind": "PLA",
+      "mass_kg": 1.5270653570568096e-05,
+      "volume_m3": 1.2315043202071045e-08
+    },
+    {
+      "component": "FL B8 yaw inner ring spacer",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 1.2434675050321324e-05,
+      "volume_m3": 1.0027963750259132e-08
+    },
+    {
+      "component": "FL B8 yaw inner ring spacing tube",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.000153360992287295,
+      "volume_m3": 1.2367821958652823e-07
+    },
+    {
+      "component": "FL B8 yaw steel axle - retention pending",
+      "link": "FL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.006395654324178102,
+      "volume_m3": 8.199556825869361e-07
+    },
+    {
+      "component": "FL B8 pitch steel axle 4mm - thread detail pending",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0015976883599095545,
+      "volume_m3": 2.0483184101404544e-07
+    },
+    {
+      "component": "FL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012007167122019742,
+      "volume_m3": 1.539380400258941e-07
+    },
+    {
+      "component": "FL B8 pitch inner clamp washer 33.5",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0001536917391381341,
+      "volume_m3": 1.97040691202736e-08
+    },
+    {
+      "component": "FL B8 pitch M4 locknut envelope - outside access",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012556066190454827,
+      "volume_m3": 1.6097520756993367e-07
+    },
+    {
+      "component": "RL B8 original yaw cross - measured pattern envelope",
+      "link": "RL_driver",
+      "kind": "horn",
+      "mass_kg": 0.001050555088315053,
+      "volume_m3": 9.135261637522201e-07
+    },
+    {
+      "component": "RL B8 yaw bearing 6x19x6 -3",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250902e-06
+    },
+    {
+      "component": "RL B8 yaw bearing 6x19x6 6.7",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250906e-06
+    },
+    {
+      "component": "RL B8 pitch bearing 4x13x5",
+      "link": "RL_yaw",
+      "kind": "bearing4",
+      "mass_kg": 0.003,
+      "volume_m3": 6.008295949990612e-07
+    },
+    {
+      "component": "RL B8 pitch inner ring spacer",
+      "link": "RL_yaw",
+      "kind": "PLA",
+      "mass_kg": 1.5270653570569722e-05,
+      "volume_m3": 1.2315043202072357e-08
+    },
+    {
+      "component": "RL B8 yaw inner ring spacer",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 1.2434675050321319e-05,
+      "volume_m3": 1.0027963750259129e-08
+    },
+    {
+      "component": "RL B8 yaw inner ring spacing tube",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.000153360992287295,
+      "volume_m3": 1.2367821958652823e-07
+    },
+    {
+      "component": "RL B8 yaw steel axle - retention pending",
+      "link": "RL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.006395654324178102,
+      "volume_m3": 8.199556825869361e-07
+    },
+    {
+      "component": "RL B8 pitch steel axle 4mm - thread detail pending",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0015976883599095545,
+      "volume_m3": 2.0483184101404544e-07
+    },
+    {
+      "component": "RL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.001200716712201967,
+      "volume_m3": 1.539380400258932e-07
+    },
+    {
+      "component": "RL B8 pitch inner clamp washer 33.5",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00015369173913812382,
+      "volume_m3": 1.9704069120272284e-08
+    },
+    {
+      "component": "RL B8 pitch M4 locknut envelope - outside access",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.001255606619045488,
+      "volume_m3": 1.6097520756993436e-07
+    },
+    {
+      "component": "FR B8 original yaw cross - measured pattern envelope",
+      "link": "FR_driver",
+      "kind": "horn",
+      "mass_kg": 0.0010505550883150533,
+      "volume_m3": 9.135261637522203e-07
+    },
+    {
+      "component": "FR B8 yaw bearing 6x19x6 -3",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250893e-06
+    },
+    {
+      "component": "FR B8 yaw bearing 6x19x6 6.7",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250902e-06
+    },
+    {
+      "component": "FR B8 pitch bearing 4x13x5",
+      "link": "FR_yaw",
+      "kind": "bearing4",
+      "mass_kg": 0.003,
+      "volume_m3": 6.008295949990659e-07
+    },
+    {
+      "component": "FR B8 pitch inner ring spacer",
+      "link": "FR_yaw",
+      "kind": "PLA",
+      "mass_kg": 1.5270653570569034e-05,
+      "volume_m3": 1.2315043202071802e-08
+    },
+    {
+      "component": "FR B8 yaw inner ring spacer",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 1.2434675050321319e-05,
+      "volume_m3": 1.0027963750259129e-08
+    },
+    {
+      "component": "FR B8 yaw inner ring spacing tube",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.000153360992287295,
+      "volume_m3": 1.2367821958652823e-07
+    },
+    {
+      "component": "FR B8 yaw steel axle - retention pending",
+      "link": "FR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.006395654324178103,
+      "volume_m3": 8.199556825869363e-07
+    },
+    {
+      "component": "FR B8 pitch steel axle 4mm - thread detail pending",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0015976883599095589,
+      "volume_m3": 2.04831841014046e-07
+    },
+    {
+      "component": "FR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012007167122019733,
+      "volume_m3": 1.53938040025894e-07
+    },
+    {
+      "component": "FR B8 pitch inner clamp washer 33.5",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00015369173913814198,
+      "volume_m3": 1.9704069120274613e-08
+    },
+    {
+      "component": "FR B8 pitch M4 locknut envelope - outside access",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012556066190454842,
+      "volume_m3": 1.6097520756993388e-07
+    },
+    {
+      "component": "RR B8 original yaw cross - measured pattern envelope",
+      "link": "RR_driver",
+      "kind": "horn",
+      "mass_kg": 0.001050555088315053,
+      "volume_m3": 9.135261637522201e-07
+    },
+    {
+      "component": "RR B8 yaw bearing 6x19x6 -3",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.53152641862509e-06
+    },
+    {
+      "component": "RR B8 yaw bearing 6x19x6 6.7",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250902e-06
+    },
+    {
+      "component": "RR B8 pitch bearing 4x13x5",
+      "link": "RR_yaw",
+      "kind": "bearing4",
+      "mass_kg": 0.003,
+      "volume_m3": 6.008295949990607e-07
+    },
+    {
+      "component": "RR B8 pitch inner ring spacer",
+      "link": "RR_yaw",
+      "kind": "PLA",
+      "mass_kg": 1.5270653570569637e-05,
+      "volume_m3": 1.2315043202072288e-08
+    },
+    {
+      "component": "RR B8 yaw inner ring spacer",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 1.2434675050321324e-05,
+      "volume_m3": 1.0027963750259132e-08
+    },
+    {
+      "component": "RR B8 yaw inner ring spacing tube",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.00015336099228729515,
+      "volume_m3": 1.2367821958652834e-07
+    },
+    {
+      "component": "RR B8 yaw steel axle - retention pending",
+      "link": "RR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.006395654324178104,
+      "volume_m3": 8.199556825869364e-07
+    },
+    {
+      "component": "RR B8 pitch steel axle 4mm - thread detail pending",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0015976883599095556,
+      "volume_m3": 2.048318410140456e-07
+    },
+    {
+      "component": "RR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012007167122019724,
+      "volume_m3": 1.539380400258939e-07
+    },
+    {
+      "component": "RR B8 pitch inner clamp washer 33.5",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00015369173913814686,
+      "volume_m3": 1.970406912027524e-08
+    },
+    {
+      "component": "RR B8 pitch M4 locknut envelope - outside access",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.001255606619045484,
+      "volume_m3": 1.6097520756993383e-07
+    },
+    {
+      "component": "B8 removable equipment deck - flush z40",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.05221419877348032,
+      "volume_m3": 4.2108224817322836e-05
+    },
+    {
+      "component": "B8 battery maximum reservation 73x41x42",
+      "link": "platform",
+      "kind": "battery",
+      "mass_kg": 0.18,
+      "volume_m3": 0.00012570599999999995
+    },
+    {
+      "component": "B8 SERVO2 54.2x54.2x19.7",
+      "link": "platform",
+      "kind": "driver_board",
+      "mass_kg": 0.035,
+      "volume_m3": 5.787150800000002e-05
+    },
+    {
+      "component": "B8 ESP32 provisional 32x65x20",
+      "link": "platform",
+      "kind": "esp32",
+      "mass_kg": 0.025,
+      "volume_m3": 4.16e-05
+    },
+    {
+      "component": "B8 removable IMU shelf - 8.3 mm above driver",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.007673452301263852,
+      "volume_m3": 6.188267984890203e-06
+    },
+    {
+      "component": "B8 IMU reservation 25.4x28.6x10",
+      "link": "platform",
+      "kind": "imu",
+      "mass_kg": 0.017,
+      "volume_m3": 7.2644e-06
+    },
+    {
+      "component": "B8 DFR0753 RS2473223 carrier and wiring allowance 20x14x20",
+      "link": "platform",
+      "kind": "regulator",
+      "mass_kg": 0.01,
+      "volume_m3": 5.6000000000000014e-06
+    }
+  ],
+  "limitations": [
+    "Solid-material CAD mass plus provisional component allowances; not measured",
+    "Bounding-box inertia approximation",
+    "Segmented convex CAD hulls after 0.5 mm vertex clustering; small holes/fasteners omitted",
+    "Original servo torque/speed model, 85% gear efficiency; no backlash/thermal model",
+    "Yaw conservatively limited to +/-45 degrees; larger range not cleared",
+    "Rigid terrain and assumed 0.8 friction",
+    "IR rays and camera pose approximate; IMU exposes acceleration only pending exact board confirmation",
+    "No learned policy is validated for this model"
+  ]
+}

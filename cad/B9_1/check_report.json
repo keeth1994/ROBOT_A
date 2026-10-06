@@ -1,0 +1,4617 @@
+{
+  "chassis_added_volume_mm3": 48891.66915298189,
+  "yaw_feature_messages": [],
+  "checks": [
+    {
+      "test": "chassis neutral",
+      "target": "B8 sensor camera",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 sensor ir_left - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 ir_left M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 sensor ir_right - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 ir_right M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 sensor ir_ground - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 ir_ground M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 camera bolt clamp base",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 camera removable M3 top clamp",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "FR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "RR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 removable equipment deck - flush z40",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 battery maximum reservation 73x41x42",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 SERVO2 54.2x54.2x19.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 ESP32 provisional 32x65x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 removable IMU shelf - 8.3 mm above driver",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 IMU reservation 25.4x28.6x10",
+      "volume_mm3": 0
+    },
+    {
+      "test": "chassis neutral",
+      "target": "B8 DFR0753 RS2473223 carrier and wiring allowance 20x14x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 00 integrated chassis",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 sensor camera",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 sensor ir_left - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 ir_left M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 sensor ir_right - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 ir_right M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 sensor ir_ground - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 ir_ground M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 camera bolt clamp base",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 camera removable M3 top clamp",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "FR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "RR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 removable equipment deck - flush z40",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 battery maximum reservation 73x41x42",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 SERVO2 54.2x54.2x19.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 ESP32 provisional 32x65x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 removable IMU shelf - 8.3 mm above driver",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 IMU reservation 25.4x28.6x10",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FL B8 yaw turret",
+      "target": "B8 DFR0753 RS2473223 carrier and wiring allowance 20x14x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 pitch servo",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rocker foot",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FL B8 rubber tread (1)",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 00 integrated chassis",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 sensor camera",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 sensor ir_left - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 ir_left M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 sensor ir_right - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 ir_right M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 sensor ir_ground - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 ir_ground M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 camera bolt clamp base",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 camera removable M3 top clamp",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "FR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "RR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 removable equipment deck - flush z40",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 battery maximum reservation 73x41x42",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 SERVO2 54.2x54.2x19.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 ESP32 provisional 32x65x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 removable IMU shelf - 8.3 mm above driver",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 IMU reservation 25.4x28.6x10",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RL B8 yaw turret",
+      "target": "B8 DFR0753 RS2473223 carrier and wiring allowance 20x14x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 pitch servo",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rocker foot",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RL B8 rubber tread (1)",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 00 integrated chassis",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 sensor camera",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 sensor ir_left - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 ir_left M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 sensor ir_right - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 ir_right M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 sensor ir_ground - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 ir_ground M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 camera bolt clamp base",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 camera removable M3 top clamp",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "FR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "RR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 removable equipment deck - flush z40",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 battery maximum reservation 73x41x42",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 SERVO2 54.2x54.2x19.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 ESP32 provisional 32x65x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 removable IMU shelf - 8.3 mm above driver",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 IMU reservation 25.4x28.6x10",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "FR B8 yaw turret",
+      "target": "B8 DFR0753 RS2473223 carrier and wiring allowance 20x14x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 pitch servo",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rocker foot",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "FR B8 rubber tread (1)",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 00 integrated chassis",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 sensor camera",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 yaw turret",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 yaw servo fixed",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 yaw driver - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 pitch servo",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 pitch horn - measured cross draft",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 rocker foot",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 rubber tread",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 rubber tread (1)",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 sensor ir_left - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 ir_left M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 sensor ir_right - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 ir_right M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 sensor ir_ground - Sharp body and mounting ears",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 ir_ground M3 ear bracket",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 camera bolt clamp base",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 camera removable M3 top clamp",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RL B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "FR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 original yaw cross - measured pattern envelope",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 yaw bearing 6x19x6 -3",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 yaw bearing 6x19x6 6.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 pitch bearing 4x13x5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 pitch inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 yaw inner ring spacer",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 yaw inner ring spacing tube",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 yaw steel axle - retention pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 pitch steel axle 4mm - thread detail pending",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 pitch inner clamp washer 33.5",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "RR B8 pitch M4 locknut envelope - outside access",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 removable equipment deck - flush z40",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 battery maximum reservation 73x41x42",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 SERVO2 54.2x54.2x19.7",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 ESP32 provisional 32x65x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 removable IMU shelf - 8.3 mm above driver",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 IMU reservation 25.4x28.6x10",
+      "volume_mm3": 0
+    },
+    {
+      "test": "fork neutral",
+      "part": "RR B8 yaw turret",
+      "target": "B8 DFR0753 RS2473223 carrier and wiring allowance 20x14x20",
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": -45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": -40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": -35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": -30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": -25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": -20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": -15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": -10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": -5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 0,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 5,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 10,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 15,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 20,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 25,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 30,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 35,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 40,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 pitch servo",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rocker foot",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread",
+      "angle": 45,
+      "volume_mm3": 0
+    },
+    {
+      "test": "pitch sweep",
+      "part": "RR B8 rubber tread (1)",
+      "angle": 45,
+      "volume_mm3": 0
+    }
+  ],
+  "issues": [],
+  "pitch_unchanged": true,
+  "limitations": "Neutral and sampled pitch only; no full yaw/structural/physical hardware validation."
+}

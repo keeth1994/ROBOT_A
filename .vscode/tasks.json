@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start B3 - photo obstacle course - original servos",
+      "label": "Start B9-1 - photo obstacle course - original servos",
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
@@ -22,7 +22,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Start B3 - flat walking",
+      "label": "Start B9-1 - flat walking",
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
@@ -30,149 +30,6 @@
         "walk",
         "--seconds",
         "25"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "B3 - inspect project sensors",
-      "type": "process",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": [
-        "${workspaceFolder}\\robot.py",
-        "sensors",
-        "--ramp",
-        "--seconds",
-        "3"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "B3 RL - train straight line",
-      "type": "process",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": [
-        "${workspaceFolder}\\robot.py",
-        "train-flat",
-        "--steps",
-        "262144",
-        "--envs",
-        "8",
-        "--strict"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "B3 RL - watch learned policy",
-      "type": "process",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": [
-        "${workspaceFolder}\\robot.py",
-        "watch"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "B3 RL - refined straight line",
-      "type": "process",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": [
-        "${workspaceFolder}\\robot.py",
-        "watch",
-        "--model",
-        "results\\curriculum_selected\\flat\\policy.zip",
-        "--curriculum",
-        "--slope",
-        "0"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "B3 RL - gentle 3 degree ramp",
-      "type": "process",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": [
-        "${workspaceFolder}\\robot.py",
-        "watch",
-        "--model",
-        "results\\curriculum_selected\\3deg\\policy.zip",
-        "--curriculum",
-        "--slope",
-        "3"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "B3 RL - gentle 5 degree ramp",
-      "type": "process",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": [
-        "${workspaceFolder}\\robot.py",
-        "watch",
-        "--model",
-        "results\\curriculum_selected\\5deg\\policy.zip",
-        "--curriculum",
-        "--slope",
-        "5"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Meeting demo - normal",
-      "type": "process",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": [
-        "${workspaceFolder}\\robot.py",
-        "demo",
-        "normal"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Meeting demo - rl-flat",
-      "type": "process",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": [
-        "${workspaceFolder}\\robot.py",
-        "demo",
-        "rl-flat"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Meeting demo - rl-ramp",
-      "type": "process",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-      "args": [
-        "${workspaceFolder}\\robot.py",
-        "demo",
-        "rl-ramp"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

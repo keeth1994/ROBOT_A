@@ -1,9 +1,0 @@
-{
-  "slope_deg": 0,
-  "normalized_observations": true,
-  "resume": "results/curriculum_flat_refined/best.zip",
-  "seed": 84,
-  "learning_rate": 0.0001,
-  "exploration_std": 0.15,
-  "requested_additional_steps": 131072
-}

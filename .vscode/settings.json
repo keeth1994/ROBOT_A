@@ -4,7 +4,7 @@
     "**/__pycache__": true,
     ".venv": true,
     "logs": true,
-    "models/robot_meshes_b3": true
+    "models/robot_meshes_b91": true
   },
   "python.terminal.activateEnvironment": true
 }

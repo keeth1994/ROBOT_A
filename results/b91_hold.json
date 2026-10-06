@@ -1,0 +1,38 @@
+{
+  "revision": "B9-1",
+  "parameters": {
+    "period": 1.0,
+    "duty": 0.6,
+    "yaw_amplitude": 0.45,
+    "pitch_lift": 0.65,
+    "pitch_stance": 0.0,
+    "kp": 1.6,
+    "kd": 0.04,
+    "heading_gain": 0.8,
+    "pattern": "trot",
+    "lateral_gain": 5.0
+  },
+  "duration_s": 4.0,
+  "walk": false,
+  "ramp": false,
+  "forward_m": -1.2313124253719102e-07,
+  "sideways_m": -6.962985020723428e-07,
+  "final_height_m": 0.04498739216647003,
+  "max_tilt_deg": 0.00031691452132725183,
+  "fallen": false,
+  "nonfoot_ground_fraction": 0.0,
+  "stall_saturation_fraction": 0.0,
+  "ramp_contact": false,
+  "total_mass_kg": 1.2099896242400003,
+  "torque_limits_Nm": [
+    0.15205874947770598,
+    0.26833896966654,
+    0.15205874947770598,
+    0.26833896966654,
+    0.15205874947770598,
+    0.26833896966654,
+    0.15205874947770598,
+    0.26833896966654
+  ],
+  "warnings": 0
+}

@@ -1,1 +1,1 @@
-"""Executable checks for B3 physics, terrain, sensors and RL."""
+"""Executable checks for B9-1 physics and repository structure."""

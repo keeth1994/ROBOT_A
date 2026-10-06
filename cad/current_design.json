@@ -1,15 +1,32 @@
 {
-  "cad_revision": "B5",
-  "simulation_revision": "B3",
-  "fusion_launcher": "cad/B5Builder",
-  "assembly": "cad/B5_plain_pivots/Robot_B5_Plain_Pivots.f3d",
-  "step": "cad/B5_plain_pivots/Robot_B5_Plain_Pivots.step",
-  "fit_report": "cad/B5_plain_pivots/fit_report.json",
-  "simulation_transferred": false,
+  "cad_revision": "B9-1",
+  "simulation_revision": "B9-1",
+  "fusion_launcher": null,
+  "assembly": "cad/B9_1/Robot_B9_1.f3d",
+  "step": "cad/B9_1/Robot_B9_1.step",
+  "fit_report": "cad/B9_1/check_report.json",
+  "simulation_transferred": true,
   "sha256": {
-    "cad/B4_reinforced_harness/Robot_B4_Reinforced_Harness.f3d": "d5f7898e85fe5b5e96e35e3fb60859b6e10853c0e0ea2c8fc486276bd385fd74",
-    "cad/fit_audit_20261005/User_updated_rocker.f3d": "e01043609c1043a9a6ad09dae94e9e9c79f52459d3ed362577084aa8b360f396",
-    "cad/B5_plain_pivots/Robot_B5_Plain_Pivots.f3d": "85c9e62be2220fbba56b5365bfbee2de2f87b40952afa88af89f17b7abd82471",
-    "cad/B5_plain_pivots/Robot_B5_Plain_Pivots.step": "41bb2a7880806730f85bdcf32adb8bfa62556e8ed8b0dccf50a248e573200ebd"
-  }
+    "cad/B9_1/Robot_B9_1.f3d": "42f93b8e3420fbde01c428dbe5be318b81ede1fbdafe319aa56953b3abe0ae33",
+    "cad/B9_1/Robot_B9_1.step": "539143f92ddfa5699d76d1c97fa8d1149429a0b34d0009a302a83f097635f03b",
+    "cad/B9_1/check_report.json": "9f2e9f9fb7e8982abea0690d0cce1b781a5b830983102626638be01999f5e666",
+    "models/robot_b91.xml": "cd4d335a87364c9dbf1021972553fb2ddf078d6edfccce5edab157d125a4aefb",
+    "models/robot_b91_course.xml": "28b40e38cb2bba1e90f665b4f185c1f3f49ce58f3c13e02fde634119bf4b4398",
+    "reference/robot_b91_manifest.json": "e61d5d5321aa98cb219465f9ee6efd13f3f4bb15a70b189c891db61efcb5531e"
+  },
+  "hardware_fit_draft": {
+    "revision": "B9-1",
+    "status": "Current user yaw fork and pitch/rocker geometry; flat chassis underside. Sampled clearance checks passed; physical fit and strength pending.",
+    "assembly": "cad/B9_1/Robot_B9_1.f3d",
+    "step": "cad/B9_1/Robot_B9_1.step",
+    "fit_report": "cad/B9_1/check_report.json",
+    "release_ready": false,
+    "user_yaw_source": "cad/B9_1/User_yaw_backup.f3d",
+    "rebuild_note": "Open the saved assembly for CAD edits; ExportB91 exports geometry, robot.py build regenerates simulation."
+  },
+  "rebuild_note": "Open the saved assembly for CAD edits; ExportB91 exports geometry, robot.py build regenerates simulation.",
+  "simulation_model": "models/robot_b91.xml",
+  "simulation_course": "models/robot_b91_course.xml",
+  "simulation_manifest": "reference/robot_b91_manifest.json",
+  "simulation_status": "CAD transferred and checked; programmed gait walks on flat ground but falls in the 100 s course test. No trained policy included."
 }

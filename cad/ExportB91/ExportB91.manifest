@@ -1,0 +1,11 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "script",
+  "author": "Robot project",
+  "description": {
+    "": "Export saved B9-1 geometry for MuJoCo"
+  },
+  "version": "1.0.0",
+  "runOnStartup": false,
+  "supportedOS": "windows"
+}
