@@ -3,7 +3,7 @@
   "source_sha256": "42f93b8e3420fbde01c428dbe5be318b81ede1fbdafe319aa56953b3abe0ae33",
   "cad_bodies": 97,
   "collision_hulls": 639,
-  "total_mass_kg": 1.2099896239202712,
+  "total_mass_kg": 1.1629896239202713,
   "neutral_bounds_m": [
     0.2722914123535156,
     0.2722914123535156,
@@ -28,7 +28,7 @@
       "component": "FL B8 yaw servo fixed",
       "link": "platform",
       "kind": "servo",
-      "mass_kg": 0.044,
+      "mass_kg": 0.04,
       "volume_m3": 3.0120915905434862e-05
     },
     {
@@ -84,7 +84,7 @@
       "component": "RL B8 yaw servo fixed",
       "link": "platform",
       "kind": "servo",
-      "mass_kg": 0.044,
+      "mass_kg": 0.055,
       "volume_m3": 3.0120915905434865e-05
     },
     {
@@ -140,7 +140,7 @@
       "component": "FR B8 yaw servo fixed",
       "link": "platform",
       "kind": "servo",
-      "mass_kg": 0.044,
+      "mass_kg": 0.04,
       "volume_m3": 3.0120915905434886e-05
     },
     {
@@ -196,7 +196,7 @@
       "component": "RR B8 yaw servo fixed",
       "link": "platform",
       "kind": "servo",
-      "mass_kg": 0.044,
+      "mass_kg": 0.055,
       "volume_m3": 3.012091590543488e-05
     },
     {
@@ -651,14 +651,14 @@
       "component": "B8 battery maximum reservation 73x41x42",
       "link": "platform",
       "kind": "battery",
-      "mass_kg": 0.18,
+      "mass_kg": 0.126,
       "volume_m3": 0.00012570599999999995
     },
     {
       "component": "B8 SERVO2 54.2x54.2x19.7",
       "link": "platform",
       "kind": "driver_board",
-      "mass_kg": 0.035,
+      "mass_kg": 0.028,
       "volume_m3": 5.787150800000002e-05
     },
     {
@@ -694,10 +694,10 @@
     "Solid-material CAD mass plus provisional component allowances; not measured",
     "Bounding-box inertia approximation",
     "Segmented convex CAD hulls after 0.5 mm vertex clustering; small holes/fasteners omitted",
-    "Original servo torque/speed model, 85% gear efficiency; no backlash/thermal model",
+    "Estimated 5 V servo ratings, 85% yaw gear efficiency; no backlash, thermal or supply-current model",
     "Yaw conservatively limited to +/-45 degrees; larger range not cleared",
     "Rigid terrain and assumed 0.8 friction",
-    "IR rays and camera pose approximate; IMU exposes acceleration only pending exact board confirmation",
+    "Ideal IMU and IR rays; no calibrated sensor noise",
     "No learned policy is validated for this model"
   ]
 }

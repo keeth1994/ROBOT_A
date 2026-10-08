@@ -9,6 +9,7 @@ from robot_b91.paths import ROOT
 from robot_b91.mesh_utils import fmt,visual_mesh
 from robot_b91.geometry import rz
 from robot_b91.course import build_course
+from robot_b91 import servo_properties
 LEGS=['FL','RL','FR','RR']
 
 def classify(n):
@@ -87,7 +88,7 @@ def main():
         for suffix,origin,parent,axis,limits in [('yaw',y,'platform',[0,0,1],[-45,45]),('pitch',p,l+'_yaw',R@np.array([0,1,0]),[-45,45]),('driver',d,'platform',[0,0,1],[-90,90])]:
             n=l+'_'+suffix;origins[n]=origin;bodies[n]=E.SubElement(bodies[parent],'body',name=n,pos=fmt(origin-origins[parent]));E.SubElement(bodies[n],'joint',name=n,axis=fmt(axis),range=fmt(np.radians(limits)),damping='.001',armature='.000001')
             if suffix!='driver':
-                limit=cfg['servo_stall_Nm']*(cfg['gear_efficiency_assumed']/cfg['gear_ratio_speed'] if suffix=='yaw' else 1)
+                limit=servo_properties(cfg,n)[0]
                 E.SubElement(act,'motor',name=n,joint=n,ctrlrange=fmt([-limit,limit]))
         E.SubElement(eq,'joint',joint1=l+'_driver',joint2=l+'_yaw',polycoef=fmt([0,-1/cfg['gear_ratio_speed'],0,0,0]),solref='.004 1')
     folder=ROOT/'models/robot_meshes_b91';folder.mkdir(parents=True,exist_ok=True)
@@ -95,7 +96,9 @@ def main():
     colors={'PLA':'.75 .8 .87 1','servo':'.08 .09 .11 1','battery':'.9 .65 .1 1','rubber':'.06 .065 .07 1','horn':'.9 .65 .1 1'}
     for i,r in enumerate(records):
         n=r['component'];g=group(n);kind=classify(n);v=np.array(r['vertices']);f=np.array(r['indices']).reshape(-1,3)
-        mass=masscfg['fixed_mass_kg'].get(kind,r['volume_m3']*masscfg['density_kg_m3'].get(kind,1240));groups[g].append((mass,np.array(r['com_m']),np.ptp(v,axis=0)))
+        mass=masscfg['fixed_mass_kg'].get(kind,r['volume_m3']*masscfg['density_kg_m3'].get(kind,1240))
+        if kind=='servo':mass=servo_properties(cfg,n[:2]+('_pitch' if 'pitch servo' in n else '_yaw'))[2]
+        groups[g].append((mass,np.array(r['com_m']),np.ptp(v,axis=0)))
         audit.append(dict(component=n,link=g,kind=kind,mass_kg=mass,volume_m3=r['volume_m3']))
         vv,ff=visual_mesh(r,origins[g]);name='cad_'+str(i);path=folder/(name+'.obj')
         with path.open('w') as out:
@@ -127,12 +130,14 @@ def main():
     def center(key):
         rr=next(r for r in records if key in r['component']);v=np.array(rr['vertices']);return (v.min(0)+v.max(0))/2
     E.SubElement(root,'site',name='imu_site',pos=fmt(center('IMU reservation')),size='.001');E.SubElement(sensors,'accelerometer',name='imu_acceleration',site='imu_site')
+    E.SubElement(sensors,'gyro',name='imu_angular_velocity',site='imu_site')
     for s in sc['ir']:
         ax,ay,az=np.array(s['axes']);E.SubElement(root,'site',name=s['name']+'_site',pos=fmt(center('sensor '+s['name'])+ay*.0066),xyaxes=fmt(np.r_[ax,-az]),size='.001');E.SubElement(sensors,'rangefinder',name=s['name'],site=s['name']+'_site')
-    E.SubElement(root,'camera',name='project_camera',pos=fmt(center('sensor camera')+[.0076,0,0]),xyaxes='0 -1 0 0 0 1',fovy='43')
+    # TimerCamera-X: 66.5 degree diagonal FOV converted to vertical for 4:3.
+    E.SubElement(root,'camera',name='project_camera',pos=fmt(center('sensor camera')+[.0076,0,0]),xyaxes='0 -1 0 0 0 1',fovy='42.9470936')
     E.indent(xml);E.ElementTree(xml).write(ROOT/'models/robot_b91.xml',encoding='utf-8',xml_declaration=True)
     terrain=build_course(asset,wb,json.loads((ref/'b91_course_settings.json').read_text()));(ref/'b91_course.json').write_text(json.dumps(terrain,indent=2));E.indent(xml);E.ElementTree(xml).write(ROOT/'models/robot_b91_course.xml',encoding='utf-8',xml_declaration=True)
-    manifest=dict(revision='B9-1',source_sha256=export['source_sha256'],cad_bodies=len(records),collision_hulls=collision_count,total_mass_kg=sum(x['mass_kg'] for x in audit)+masscfg['extra_wiring_fasteners_kg'],neutral_bounds_m=np.ptp(allv,axis=0).tolist(),parts=audit,limitations=['Solid-material CAD mass plus provisional component allowances; not measured','Bounding-box inertia approximation','Segmented convex CAD hulls after 0.5 mm vertex clustering; small holes/fasteners omitted','Original servo torque/speed model, 85% gear efficiency; no backlash/thermal model','Yaw conservatively limited to +/-45 degrees; larger range not cleared','Rigid terrain and assumed 0.8 friction','IR rays and camera pose approximate; IMU exposes acceleration only pending exact board confirmation','No learned policy is validated for this model'])
+    manifest=dict(revision='B9-1',source_sha256=export['source_sha256'],cad_bodies=len(records),collision_hulls=collision_count,total_mass_kg=sum(x['mass_kg'] for x in audit)+masscfg['extra_wiring_fasteners_kg'],neutral_bounds_m=np.ptp(allv,axis=0).tolist(),parts=audit,limitations=['Solid-material CAD mass plus provisional component allowances; not measured','Bounding-box inertia approximation','Segmented convex CAD hulls after 0.5 mm vertex clustering; small holes/fasteners omitted','Estimated 5 V servo ratings, 85% yaw gear efficiency; no backlash, thermal or supply-current model','Yaw conservatively limited to +/-45 degrees; larger range not cleared','Rigid terrain and assumed 0.8 friction','Ideal IMU and IR rays; no calibrated sensor noise','No learned policy is validated for this model'])
     (ref/'robot_b91_manifest.json').write_text(json.dumps(manifest,indent=2));print(json.dumps({k:v for k,v in manifest.items() if k!='parts'},indent=2))
 if __name__=='__main__':main()
 

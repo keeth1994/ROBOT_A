@@ -1,6 +1,6 @@
 # Robot B9-1
 
-Current Fusion assembly and CAD-derived MuJoCo simulation, using eight original Parallax servos and a physics-driven walking controller.
+Current Fusion assembly and CAD-derived MuJoCo simulation, using eight Parallax servos on pitch, HS-475HB on front yaw and MG995 on rear yaw, modeled at 5 V
 
 ## Run
 
@@ -38,4 +38,4 @@ Use Python 3.12 and install `requirements.txt` into `.venv`. The lock file recor
 
 After CAD edits, export the saved assembly using `cad/ExportB91` inside Fusion, then run `robot.py build`. This regenerates the simulation from the CAD export. Edit `reference/b91_course_settings.json` to change terrain, then rebuild.
 
-The provisional mass is 1.21 kg. The initial flat test moved 0.505 m in 15 seconds without falling. The 100-second course test drifted and fell; successful course traversal is not established. Physical mass, friction, tolerances and strength still need verification.
+Provisional mass: 1.163 kg. Flat test: 0.502 m in 15 seconds without falling.

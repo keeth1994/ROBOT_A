@@ -66,7 +66,17 @@
   "pitch_servo_moves_with_foot": true,
   "gear_ratio_speed": 1.5,
   "gear_efficiency_assumed": 0.85,
-  "servo_stall_Nm": 0.26833896966654,
-  "servo_free_speed_deg_s": 315.7894736842,
-  "servo_mass_kg": 0.044
+  "servo_voltage_V": 5.0,
+  "servo_command_hz": 50.0,
+  "servos": {
+    "Parallax": {"stall_Nm": 0.22361580805544998, "free_speed_deg_s": 270.0228832951945, "mass_kg": 0.044},
+    "HS-475HB": {"stall_Nm": 0.4494714583333334, "free_speed_deg_s": 272.94685990338166, "mass_kg": 0.040},
+    "MG995": {"stall_Nm": 0.8580818750000001, "free_speed_deg_s": 312.5, "mass_kg": 0.055}
+  },
+  "joint_servos": {
+    "FL_yaw": "HS-475HB", "FL_pitch": "Parallax",
+    "RL_yaw": "MG995", "RL_pitch": "Parallax",
+    "FR_yaw": "HS-475HB", "FR_pitch": "Parallax",
+    "RR_yaw": "MG995", "RR_pitch": "Parallax"
+  }
 }

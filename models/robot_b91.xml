@@ -1535,23 +1535,23 @@
       <geom name="collision_95_0" type="mesh" mesh="collision_95_0" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
       <geom type="mesh" mesh="cad_96" rgba=".2 .5 .3 1" contype="0" conaffinity="0" group="1" mass="0" />
       <geom name="collision_96_0" type="mesh" mesh="collision_96_0" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
-      <inertial mass="0.800420914" pos="-0.00466476016 -0.00565870101 0.0289265487" fullinertia="0.00189694881 0.00197190062 0.00221949111 -7.0880115e-05 0.00016539109 0.000169263487" />
+      <inertial mass="0.753420914" pos="-0.00406813219 -0.00385978486 0.0254051613" fullinertia="0.00177775301 0.00184947771 0.00213508759 -4.32006403e-05 9.57219355e-05 0.00011790589" />
       <site name="imu_site" pos="-0.0442999995 0.0192999995 0.08" size=".001" />
       <site name="ir_left_site" pos="0 0.0716 0.0579499984" xyaxes="1 0 0 0 0 -1" size=".001" />
       <site name="ir_right_site" pos="0 -0.0716 0.0579499984" xyaxes="-1 0 0 0 0 -1" size=".001" />
       <site name="ir_ground_site" pos="0.0877157658 0 0.0512547748" xyaxes="0 -1 0 -0.5 -0 -0.866025404" size=".001" />
-      <camera name="project_camera" pos="0.0626 0 0.0610000014" xyaxes="0 -1 0 0 0 1" fovy="43" />
+      <camera name="project_camera" pos="0.0626 0 0.0610000014" xyaxes="0 -1 0 0 0 1" fovy="42.9470936" />
     </body>
   </worldbody>
   <actuator>
-    <motor name="FL_yaw" joint="FL_yaw" ctrlrange="-0.152058749 0.152058749" />
-    <motor name="FL_pitch" joint="FL_pitch" ctrlrange="-0.26833897 0.26833897" />
-    <motor name="RL_yaw" joint="RL_yaw" ctrlrange="-0.152058749 0.152058749" />
-    <motor name="RL_pitch" joint="RL_pitch" ctrlrange="-0.26833897 0.26833897" />
-    <motor name="FR_yaw" joint="FR_yaw" ctrlrange="-0.152058749 0.152058749" />
-    <motor name="FR_pitch" joint="FR_pitch" ctrlrange="-0.26833897 0.26833897" />
-    <motor name="RR_yaw" joint="RR_yaw" ctrlrange="-0.152058749 0.152058749" />
-    <motor name="RR_pitch" joint="RR_pitch" ctrlrange="-0.26833897 0.26833897" />
+    <motor name="FL_yaw" joint="FL_yaw" ctrlrange="-0.254700493 0.254700493" />
+    <motor name="FL_pitch" joint="FL_pitch" ctrlrange="-0.223615808 0.223615808" />
+    <motor name="RL_yaw" joint="RL_yaw" ctrlrange="-0.486246396 0.486246396" />
+    <motor name="RL_pitch" joint="RL_pitch" ctrlrange="-0.223615808 0.223615808" />
+    <motor name="FR_yaw" joint="FR_yaw" ctrlrange="-0.254700493 0.254700493" />
+    <motor name="FR_pitch" joint="FR_pitch" ctrlrange="-0.223615808 0.223615808" />
+    <motor name="RR_yaw" joint="RR_yaw" ctrlrange="-0.486246396 0.486246396" />
+    <motor name="RR_pitch" joint="RR_pitch" ctrlrange="-0.223615808 0.223615808" />
   </actuator>
   <equality>
     <joint joint1="FL_driver" joint2="FL_yaw" polycoef="0 -0.666666667 0 0 0" solref=".004 1" />
@@ -1561,6 +1561,7 @@
   </equality>
   <sensor>
     <accelerometer name="imu_acceleration" site="imu_site" />
+    <gyro name="imu_angular_velocity" site="imu_site" />
     <rangefinder name="ir_left" site="ir_left_site" />
     <rangefinder name="ir_right" site="ir_right_site" />
     <rangefinder name="ir_ground" site="ir_ground_site" />
