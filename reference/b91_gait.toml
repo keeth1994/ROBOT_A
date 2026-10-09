@@ -1,38 +1,52 @@
-# Duration of one complete gait cycle in seconds. A longer period commands
-# slower leg motion and generally leaves more servo torque available.
-period = 1.5
+# Select this profile when --gait-profile is omitted.
+default_profile = "flat"
 
-# Fraction of each cycle spent in stance (foot on the ground). Must be between
-# 0 and 1. With 0.75, each foot spends 75% in stance and 25% in swing.
+# Units shared by all profiles:
+# - period: seconds per complete gait cycle
+# - duty: fraction of the cycle spent in stance (0 < duty < 1)
+# - yaw_amplitude, pitch_lift, pitch_stance: radians
+# - kp: Nm/rad; kd: Nm*s/rad
+# - heading_gain: strength of left/right stride correction
+# - pattern: "crawl" moves one leg at a time; "trot" moves diagonal pairs
+# - lateral_gain: lateral steering response in 1/m; 0 disables it
+
+# Normal flat-ground gait. These are the previous single-profile values.
+[profiles.flat]
+period = 1.0
 duty = 0.6
-
-# Maximum side-to-side yaw angle in radians. Increasing this lengthens the
-# stride, but may require more speed and make the feet slip.
 yaw_amplitude = 0.45
-
-# Maximum pitch change in radians used to lift a foot during swing. The
-# controller subtracts this positive value from pitch_stance.
 pitch_lift = 0.65
-
-# Resting pitch target in radians during stance and while standing still.
 pitch_stance = 0.0
-
-# Proportional position-controller gain in Nm/rad. Higher values track the
-# target more aggressively but reach the servo torque limit sooner.
 kp = 1.6
-
-# Derivative position-controller gain in Nm*s/rad. This damps joint motion;
-# too much damping can resist the commanded gait.
 kd = 0.04
-
-# Strength of left/right stride correction from heading and lateral error.
-# The final correction is limited to the range -0.5 to 0.5.
 heading_gain = 0.8
-
-# Leg phase pattern: "crawl" moves one leg at a time, while "trot" moves
-# diagonal leg pairs together.
 pattern = "trot"
-
-# Converts lateral displacement in metres into steering error. Set this to
-# 0.0 to disable lateral-position correction. This uses ideal simulator state.
 lateral_gain = 5.0
+
+# Conservative ramp gait: a slower crawl, longer ground contact, and a
+# shorter stride reduce speed demand and keep more feet supporting the body.
+[profiles.slope]
+period = 1.8
+duty = 0.8
+yaw_amplitude = 0.35
+pitch_lift = 0.55
+pitch_stance = 0.0
+kp = 1.6
+kd = 0.04
+heading_gain = 0.6
+pattern = "crawl"
+lateral_gain = 3.0
+
+# Very conservative gait for sharp crests and valleys. It uses the slowest,
+# shortest steps and the longest stance time of the three profiles.
+[profiles.transition]
+period = 2.2
+duty = 0.85
+yaw_amplitude = 0.25
+pitch_lift = 0.45
+pitch_stance = 0.0
+kp = 1.6
+kd = 0.04
+heading_gain = 0.5
+pattern = "crawl"
+lateral_gain = 2.0

@@ -5,10 +5,16 @@ import numpy as np
 import mujoco
 from robot_b91.paths import ROOT
 from robot_b91.geometry import rz
-from robot_b91.run import Robot
+from robot_b91.run import GAIT_PROFILES, Robot, load_gait_parameters
 
 
 def main():
+    gait_path = ROOT / "reference/b91_gait.toml"
+    default_gait, default_profile = load_gait_parameters(gait_path)
+    assert default_profile == "flat" and default_gait["pattern"] == "trot"
+    for profile in GAIT_PROFILES:
+        gait, selected = load_gait_parameters(gait_path, profile)
+        assert selected == profile and 0 < gait["duty"] < 1
     manifest = json.loads((ROOT / "reference/robot_b91_manifest.json").read_text())
     cfg = json.loads((ROOT / "reference/b91_kinematics.json").read_text())
     assert (

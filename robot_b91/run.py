@@ -9,6 +9,7 @@ from robot_b91.paths import ROOT
 from robot_b91 import servo_properties
 
 LEGS = ["FL", "RL", "FR", "RR"]
+GAIT_PROFILES = ("flat", "slope", "transition")
 DEFAULT = dict(
     period=1.8,
     duty=0.75,
@@ -20,6 +21,34 @@ DEFAULT = dict(
     heading_gain=0.8,
     pattern="crawl",
 )
+
+
+def load_gait_parameters(path, profile=None):
+    """Load one gait profile, retaining support for legacy flat JSON files."""
+    if not path.exists():
+        if profile not in (None, "flat"):
+            raise ValueError(f"Cannot select gait profile {profile!r}: {path} is missing")
+        return DEFAULT.copy(), "flat"
+
+    if path.suffix == ".toml":
+        with path.open("rb") as f:
+            config = tomllib.load(f)
+    else:
+        config = json.loads(path.read_text())
+
+    profiles = config.get("profiles")
+    if profiles is None:
+        if profile is not None:
+            raise ValueError(
+                "--gait-profile requires a configuration containing profiles"
+            )
+        return config, None
+
+    selected = profile or config.get("default_profile", "flat")
+    if selected not in profiles:
+        available = ", ".join(sorted(profiles))
+        raise ValueError(f"Unknown gait profile {selected!r}; choose from: {available}")
+    return profiles[selected], selected
 
 
 class Robot:
@@ -197,19 +226,22 @@ def main():
     ap.add_argument("--seconds", type=float, default=20)
     ap.add_argument("--render")
     ap.add_argument("--params")
+    ap.add_argument(
+        "--gait-profile",
+        choices=GAIT_PROFILES,
+        help="select flat, slope, or transition gait parameters",
+    )
     args = ap.parse_args()
     print(
         "B9-1: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
     )
     pp = Path(args.params) if args.params else ROOT / "reference/b91_gait.toml"
-    if pp.exists():
-        if pp.suffix == ".toml":
-            with pp.open("rb") as f:
-                p = tomllib.load(f)
-        else:
-            p = json.loads(pp.read_text())
-    else:
-        p = DEFAULT
+    try:
+        p, selected_profile = load_gait_parameters(pp, args.gait_profile)
+    except ValueError as error:
+        ap.error(str(error))
+    if selected_profile:
+        print(f"Gait profile: {selected_profile}")
     if args.test:
         result = evaluate(p, args.seconds, not args.hold, args.ramp)
         name = "b91_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")

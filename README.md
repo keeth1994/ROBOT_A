@@ -8,6 +8,8 @@ From this folder in PowerShell:
 
 ```powershell
 .\.venv\Scripts\python.exe robot.py walk
+.\.venv\Scripts\python.exe robot.py walk --gait-profile slope
+.\.venv\Scripts\python.exe robot.py walk --gait-profile transition
 .\.venv\Scripts\python.exe robot.py walk --ramp --seconds 100
 .\.venv\Scripts\python.exe robot.py walk --test --seconds 15
 .\.venv\Scripts\python.exe robot.py check all

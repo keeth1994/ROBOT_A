@@ -17,7 +17,8 @@ Use `--test --seconds 15` to save a report, or `python robot.py check all` for c
 - Rigid bodies, assumed friction 0.8; no supply limits, voltage sag, heat or backlash.
 
 Servo settings: `reference/b91_kinematics.json`. Masses: `reference/b91_mass.json`.
-Commented gait settings: `reference/b91_gait.toml`.
+Commented flat, slope and transition gait settings: `reference/b91_gait.toml`.
+Select one with `--gait-profile`; selection is manual and does not change with terrain.
 Run `python robot.py build` after changes. CAD edits additionally require export
 through `cad/ExportB91` in Fusion. No CAD edits are needed for servo settings.
 
