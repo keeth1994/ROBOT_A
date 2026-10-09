@@ -1,0 +1,38 @@
+# Duration of one complete gait cycle in seconds. A longer period commands
+# slower leg motion and generally leaves more servo torque available.
+period = 1.5
+
+# Fraction of each cycle spent in stance (foot on the ground). Must be between
+# 0 and 1. With 0.75, each foot spends 75% in stance and 25% in swing.
+duty = 0.6
+
+# Maximum side-to-side yaw angle in radians. Increasing this lengthens the
+# stride, but may require more speed and make the feet slip.
+yaw_amplitude = 0.45
+
+# Maximum pitch change in radians used to lift a foot during swing. The
+# controller subtracts this positive value from pitch_stance.
+pitch_lift = 0.65
+
+# Resting pitch target in radians during stance and while standing still.
+pitch_stance = 0.0
+
+# Proportional position-controller gain in Nm/rad. Higher values track the
+# target more aggressively but reach the servo torque limit sooner.
+kp = 1.6
+
+# Derivative position-controller gain in Nm*s/rad. This damps joint motion;
+# too much damping can resist the commanded gait.
+kd = 0.04
+
+# Strength of left/right stride correction from heading and lateral error.
+# The final correction is limited to the range -0.5 to 0.5.
+heading_gain = 0.8
+
+# Leg phase pattern: "crawl" moves one leg at a time, while "trot" moves
+# diagonal leg pairs together.
+pattern = "trot"
+
+# Converts lateral displacement in metres into steering error. Set this to
+# 0.0 to disable lateral-position correction. This uses ideal simulator state.
+lateral_gain = 5.0

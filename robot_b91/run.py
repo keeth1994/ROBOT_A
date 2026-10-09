@@ -1,6 +1,7 @@
 """B9-1 torque/speed-limited rocker gait experiment. No imposed base forces."""
 
 import argparse, json, math, time
+import tomllib
 from pathlib import Path
 import numpy as np
 import mujoco
@@ -200,8 +201,15 @@ def main():
     print(
         "B9-1: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
     )
-    pp = Path(args.params) if args.params else ROOT / "reference/b91_gait.json"
-    p = json.loads(pp.read_text()) if pp.exists() else DEFAULT
+    pp = Path(args.params) if args.params else ROOT / "reference/b91_gait.toml"
+    if pp.exists():
+        if pp.suffix == ".toml":
+            with pp.open("rb") as f:
+                p = tomllib.load(f)
+        else:
+            p = json.loads(pp.read_text())
+    else:
+        p = DEFAULT
     if args.test:
         result = evaluate(p, args.seconds, not args.hold, args.ramp)
         name = "b91_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
