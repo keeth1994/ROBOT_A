@@ -17,6 +17,8 @@ From this folder in PowerShell:
 
 `start.ps1` and Ctrl+Shift+B in VS Code start the course. Run `robot.py --help` for available commands. No RL training pipeline or trained policy is included.
 
+A small gait control window opens, allowing you to switch between gait profiles.
+
 ## Current files
 
 - [Fusion assembly](cad/B9_1/Robot_B9_1.f3d)

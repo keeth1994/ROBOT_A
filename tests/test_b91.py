@@ -23,6 +23,11 @@ def main():
     )
     r = Robot()
     assert r.m.nu == 8 and r.m.nq == 19
+    slope_gait, _ = load_gait_parameters(gait_path, "slope")
+    r.set_gait_parameters(slope_gait)
+    assert r.p["pattern"] == "crawl" and r.p["period"] == slope_gait["period"]
+    r.set_gait_parameters(default_gait, transition_seconds=0)
+    r.reset()
     # Output limits include yaw gearing; pitch is direct drive at 5 V.
     np.testing.assert_allclose(
         r.limit,

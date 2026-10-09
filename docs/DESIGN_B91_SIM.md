@@ -19,6 +19,8 @@ Use `--test --seconds 15` to save a report, or `python robot.py check all` for c
 Servo settings: `reference/b91_kinematics.json`. Masses: `reference/b91_mass.json`.
 Commented flat, slope and transition gait settings: `reference/b91_gait.toml`.
 Select one with `--gait-profile`; selection is manual and does not change with terrain.
+Interactive runs also provide a separate gait-control window. Profile changes
+preserve gait phase and blend joint targets over 0.5 seconds.
 Run `python robot.py build` after changes. CAD edits additionally require export
 through `cad/ExportB91` in Fusion. No CAD edits are needed for servo settings.
 

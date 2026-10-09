@@ -51,6 +51,65 @@ def load_gait_parameters(path, profile=None):
     return profiles[selected], selected
 
 
+class GaitControlPanel:
+
+    def __init__(self, profiles, active_profile):
+        import tkinter as tk
+        from tkinter import ttk
+
+        self._tk = tk
+        self._closed = False
+        self._pending_profile = None
+        self.root = tk.Tk()
+        self.root.title("B9-1 gait controls")
+        self.root.resizable(False, False)
+        self.root.protocol("WM_DELETE_WINDOW", self.close)
+
+        frame = ttk.Frame(self.root, padding=12)
+        frame.grid()
+        ttk.Label(frame, text="Select gait profile").grid(
+            row=0, column=0, columnspan=len(profiles), pady=(0, 8)
+        )
+        for column, profile in enumerate(profiles):
+            ttk.Button(
+                frame,
+                text=profile.title(),
+                width=12,
+                command=lambda name=profile: self._select(name),
+            ).grid(row=1, column=column, padx=3)
+
+        self._active_text = tk.StringVar()
+        ttk.Label(frame, textvariable=self._active_text).grid(
+            row=2, column=0, columnspan=len(profiles), pady=(10, 0)
+        )
+        self.set_active(active_profile)
+
+    def _select(self, profile):
+        self._pending_profile = profile
+
+    def poll(self):
+        """Process UI events and return a newly requested profile, if any."""
+        if self._closed:
+            return None
+        try:
+            self.root.update_idletasks()
+            self.root.update()
+        except self._tk.TclError:
+            self._closed = True
+            return None
+        requested = self._pending_profile
+        self._pending_profile = None
+        return requested
+
+    def set_active(self, profile):
+        self._active_text.set(f"Active: {profile.title()}")
+
+    def close(self):
+        if not self._closed:
+            self._closed = True
+            self.root.destroy()
+
+
 class Robot:
     def __init__(self, params=None, ramp=False):
         self.p = DEFAULT | (params or {})
@@ -92,7 +151,21 @@ class Robot:
         self.next_command_time = 0.0
         self.next_ir_time = 0.0
         self.ir_distances_m = np.full(3, np.nan)
+        self.gait_time_origin = 2.0
+        self._transition_start_time = None
+        self._transition_from = None
         self._sample_ir()
+
+    def set_gait_parameters(self, params, transition_seconds=0.5):
+        """Change gait while preserving phase and blending away target jumps."""
+        if self.d.time > 2:
+            phase = (self.d.time - self.gait_time_origin) / self.p["period"]
+            self.gait_time_origin = self.d.time - phase * params["period"]
+        self._transition_from = self.target.copy()
+        self._transition_start_time = self.d.time
+        self._transition_seconds = transition_seconds
+        self.p = DEFAULT | params
+        self.m.geom_friction[:, 0] = self.p.get("friction", 0.8)
 
     def step(self, walk=True):
         t = self.d.time - 2
@@ -108,7 +181,8 @@ class Robot:
             error = heading + math.atan(p.get("lateral_gain", 0) * self.d.qpos[1])
             correction = np.clip(p["heading_gain"] * error, -0.5, 0.5)
             for i, l in enumerate(LEGS):
-                u = (t / p["period"] + offsets[i]) % 1
+                gait_time = self.d.time - self.gait_time_origin
+                u = (gait_time / p["period"] + offsets[i]) % 1
                 duty = p["duty"]
                 ramp = min(1, t / p["period"])
                 if u < duty:
@@ -121,6 +195,18 @@ class Robot:
                 sign = 1 if i < 2 else -1
                 self.target[2 * i] = yaw * sign * ramp * (1 + sign * correction)
                 self.target[2 * i + 1] = p["pitch_stance"] + lift * ramp
+        if self._transition_start_time is not None:
+            progress = (self.d.time - self._transition_start_time) / max(
+                self._transition_seconds, self.m.opt.timestep
+            )
+            if progress >= 1:
+                self._transition_start_time = None
+                self._transition_from = None
+            else:
+                blend = progress * progress * (3 - 2 * progress)
+                self.target = self._transition_from + blend * (
+                    self.target - self._transition_from
+                )
         self.step_targets(self.target)
 
     def step_targets(self, target):
@@ -242,6 +328,11 @@ def main():
         ap.error(str(error))
     if selected_profile:
         print(f"Gait profile: {selected_profile}")
+    profile_parameters = {}
+    if selected_profile:
+        profile_parameters = {
+            name: load_gait_parameters(pp, name)[0] for name in GAIT_PROFILES
+        }
     if args.test:
         result = evaluate(p, args.seconds, not args.hold, args.ramp)
         name = "b91_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
@@ -275,14 +366,33 @@ def main():
         v.cam.azimuth = 100 if args.ramp else 135
         v.cam.elevation = -38
         v.opt.geomgroup[3] = 0
-        while v.is_running():
-            t = time.perf_counter()
-            if r.d.time < args.seconds:
-                r.step(not args.hold)
-            if not args.ramp:
-                v.cam.lookat[:2] = r.d.qpos[:2]
-            v.sync()
-            time.sleep(max(0, r.m.opt.timestep - (time.perf_counter() - t)))
+        controls = None
+        if profile_parameters:
+            try:
+                controls = GaitControlPanel(GAIT_PROFILES, selected_profile)
+            except Exception as error:
+                print(f"Gait control window unavailable: {error}")
+        next_control_poll = 0.0
+        try:
+            while v.is_running():
+                t = time.perf_counter()
+                if controls and t >= next_control_poll:
+                    requested_profile = controls.poll()
+                    next_control_poll = t + 1 / 30
+                    if requested_profile and requested_profile != selected_profile:
+                        r.set_gait_parameters(profile_parameters[requested_profile])
+                        selected_profile = requested_profile
+                        controls.set_active(selected_profile)
+                        print(f"Gait profile: {selected_profile}")
+                if r.d.time < args.seconds:
+                    r.step(not args.hold)
+                if not args.ramp:
+                    v.cam.lookat[:2] = r.d.qpos[:2]
+                v.sync()
+                time.sleep(max(0, r.m.opt.timestep - (time.perf_counter() - t)))
+        finally:
+            if controls:
+                controls.close()
 
 
 if __name__ == "__main__":
