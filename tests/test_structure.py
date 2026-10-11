@@ -16,8 +16,11 @@ def main():
             timeout=30,
         )
         assert run.returncode == 0, (command, run.stderr)
-    for task in json.loads((ROOT / ".vscode/tasks.json").read_text())["tasks"]:
-        assert task["args"][1] in robot.COMMANDS or task["args"][1] == "check"
+    # Editor configuration is optional and ignored by git.
+    tasks = ROOT / ".vscode/tasks.json"
+    if tasks.exists():
+        for task in json.loads(tasks.read_text())["tasks"]:
+            assert task["args"][1] in robot.COMMANDS or task["args"][1] == "check"
     cfg = json.loads((ROOT / "cad/current_design.json").read_text())
     for key in [
         "assembly",

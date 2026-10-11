@@ -9,7 +9,7 @@ COMMANDS = {
     'walk': ('robot_b91.run', 'Programmed walking; --ramp for course, --test for report'),
     'build': ('robot_b91.build', 'Rebuild MuJoCo assets from the saved CAD export'),
 }
-CHECKS = {'b91': 'tests.test_b91', 'structure': 'tests.test_structure'}
+CHECKS = {'b91': 'tests.test_b91', 'structure': 'tests.test_structure', 'course': 'tests.test_course'}
 
 def main():
     os.chdir(ROOT)
@@ -18,7 +18,7 @@ def main():
         print('B9-1: python robot.py COMMAND [options]')
         for name, (_, description) in COMMANDS.items():
             print(f'  {name:10} {description}')
-        print('  check      Run checks: all, b91, structure')
+        print('  check      Run checks: all, b91, structure, course')
         return
     command, *rest = args
     if command == 'check':

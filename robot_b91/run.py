@@ -7,9 +7,12 @@ import numpy as np
 import mujoco
 from robot_b91.paths import ROOT
 from robot_b91 import servo_properties
+from robot_b91.course import local_points
+from robot_b91.progress import CourseProgress
+from robot_b91.gait import rocker_targets
 
 LEGS = ["FL", "RL", "FR", "RR"]
-GAIT_PROFILES = ("flat", "slope", "transition")
+GAIT_PROFILES = ("flat", "slope", "transition", "course")
 DEFAULT = dict(
     period=1.8,
     duty=0.75,
@@ -23,6 +26,13 @@ DEFAULT = dict(
 )
 
 
+def read_gait_config(path):
+    if path.suffix == ".toml":
+        with path.open("rb") as f:
+            return tomllib.load(f)
+    return json.loads(path.read_text())
+
+
 def load_gait_parameters(path, profile=None):
     """Load one gait profile, retaining support for legacy flat JSON files."""
     if not path.exists():
@@ -30,11 +40,7 @@ def load_gait_parameters(path, profile=None):
             raise ValueError(f"Cannot select gait profile {profile!r}: {path} is missing")
         return DEFAULT.copy(), "flat"
 
-    if path.suffix == ".toml":
-        with path.open("rb") as f:
-            config = tomllib.load(f)
-    else:
-        config = json.loads(path.read_text())
+    config = read_gait_config(path)
 
     profiles = config.get("profiles")
     if profiles is None:
@@ -122,6 +128,10 @@ class Robot:
         js = [self.m.joint(n).id for n in self.names]
         self.qa = self.m.jnt_qposadr[js]
         self.da = self.m.jnt_dofadr[js]
+        self.joint_ranges = self.m.jnt_range[js].copy()
+        self.course = (
+            json.loads((ROOT / "reference/b91_course.json").read_text()) if ramp else None
+        )
         self.ai = [self.m.actuator(n).id for n in self.names]
         ratings = np.array([servo_properties(cfg, n) for n in self.names])
         self.limit = ratings[:, 0]
@@ -172,29 +182,18 @@ class Robot:
         p = self.p
         self.target = np.tile([0.0, p["pitch_stance"]], 4)
         if walk and t > 0:
-            offsets = (
-                [0, 0.5, 0.25, 0.75] if p["pattern"] == "crawl" else [0, 0.5, 0.5, 0]
-            )
             R = self.d.xmat[self.m.body("platform").id].reshape(3, 3)
             heading = math.atan2(R[1, 0], R[0, 0])
             # Optional ideal lateral position feedback for simulation, not an implemented sensor estimator.
-            error = heading + math.atan(p.get("lateral_gain", 0) * self.d.qpos[1])
-            correction = np.clip(p["heading_gain"] * error, -0.5, 0.5)
-            for i, l in enumerate(LEGS):
-                gait_time = self.d.time - self.gait_time_origin
-                u = (gait_time / p["period"] + offsets[i]) % 1
-                duty = p["duty"]
-                ramp = min(1, t / p["period"])
-                if u < duty:
-                    yaw = p["yaw_amplitude"] * (2 * u / duty - 1)
-                    lift = 0
-                else:
-                    v = (u - duty) / (1 - duty)
-                    yaw = p["yaw_amplitude"] * (1 - 2 * v * v * (3 - 2 * v))
-                    lift = -p["pitch_lift"] * math.sin(math.pi * v) ** 2
-                sign = 1 if i < 2 else -1
-                self.target[2 * i] = yaw * sign * ramp * (1 + sign * correction)
-                self.target[2 * i + 1] = p["pitch_stance"] + lift * ramp
+            lateral = self.d.qpos[1]
+            if self.course:
+                lateral = local_points(self.d.qpos[:3], self.course)[1]
+                heading -= math.radians(self.course["yaw_deg"])
+                heading = math.atan2(math.sin(heading), math.cos(heading))
+            self.target = rocker_targets(
+                p, t, self.d.time - self.gait_time_origin,
+                heading, lateral, self.joint_ranges,
+            )
         if self._transition_start_time is not None:
             progress = (self.d.time - self._transition_start_time) / max(
                 self._transition_seconds, self.m.opt.timestep
@@ -214,6 +213,7 @@ class Robot:
         p = self.p
         if self.target.shape != (8,) or not np.isfinite(self.target).all():
             raise ValueError("Expected eight finite joint targets")
+        self.target = np.clip(self.target, self.joint_ranges[:, 0], self.joint_ranges[:, 1])
         if self.d.time + 1e-10 >= self.next_command_time:
             self.command_target = self.target.copy()
             self.next_command_time += self.command_period
@@ -248,13 +248,19 @@ class Robot:
         )
 
 
-def evaluate(p=None, seconds=15, walk=True, ramp=False):
+def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial_yaw_rad=0.0,
+             observer=None):
     if not math.isfinite(seconds) or seconds <= 2:
         raise ValueError("Evaluation duration must exceed the 2-second settling period")
     terrain = json.loads((ROOT / "reference/b91_course.json").read_text())
     surfaces = terrain["required_surfaces"]
     obstacles = terrain["obstacle_geoms"]
     r = Robot(p, ramp)
+    if initial_y_m or initial_yaw_rad:
+        r.d.qpos[1] = initial_y_m
+        r.d.qpos[3:7] = [math.cos(initial_yaw_rad / 2), 0, 0, math.sin(initial_yaw_rad / 2)]
+        mujoco.mj_forward(r.m, r.d)
+    progress = CourseProgress(r.m, terrain) if ramp else None
     start = None
     tilt = 0
     sat = 0
@@ -269,6 +275,8 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False):
             tilt = max(tilt, r.tilt())
             sat += int(np.count_nonzero(np.abs(r.torque) > 0.95 * r.limit))
             n += 1
+            if progress:
+                progress.update(r.d, r.tilt())
             for c in r.d.contact:
                 names = [
                     mujoco.mj_id2name(r.m, mujoco.mjtObj.mjOBJ_GEOM, g) or ""
@@ -283,11 +291,18 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False):
                     break
         if not np.isfinite(r.d.qpos).all():
             raise RuntimeError("Non-finite physics state")
+        if observer:
+            observer(r, progress)
+        if progress and progress.completed_at is not None:
+            break
     delta = r.d.qpos[:3] - start
-    return dict(
+    result = dict(
         revision="B9-1",
         parameters=r.p,
-        duration_s=seconds,
+        duration_s=float(r.d.time),
+        requested_duration_s=seconds,
+        initial_y_m=initial_y_m,
+        initial_yaw_rad=initial_yaw_rad,
         walk=walk,
         ramp=ramp,
         forward_m=float(delta[0]),
@@ -301,7 +316,11 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False):
         total_mass_kg=float(sum(r.m.body_mass)),
         torque_limits_Nm=r.limit.tolist(),
         warnings=int(sum(w.number for w in r.d.warning)),
+        feedback_source="ideal simulator heading and lateral position; no hardware estimator",
     )
+    if progress:
+        result.update(progress.report())
+    return result
 
 
 def main():
@@ -309,38 +328,57 @@ def main():
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--hold", action="store_true")
     ap.add_argument("--ramp", action="store_true")
-    ap.add_argument("--seconds", type=float, default=20)
+    ap.add_argument("--seconds", type=float, help="simulation duration (default: 120 on course, 20 on flat)")
     ap.add_argument("--render")
+    ap.add_argument("--video", help="save a headless MP4 evaluation at 2x playback speed")
     ap.add_argument("--params")
     ap.add_argument(
         "--gait-profile",
         choices=GAIT_PROFILES,
-        help="select flat, slope, or transition gait parameters",
+        help="select a gait (default: course with --ramp, otherwise configuration default)",
     )
     args = ap.parse_args()
+    if args.video and args.render:
+        ap.error("Choose either --video or --render")
+    if args.seconds is None:
+        args.seconds = 120 if args.ramp else 20
     print(
         "B9-1: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
     )
     pp = Path(args.params) if args.params else ROOT / "reference/b91_gait.toml"
     try:
-        p, selected_profile = load_gait_parameters(pp, args.gait_profile)
+        profile = args.gait_profile
+        if profile is None and args.ramp and args.params is None:
+            profile = "course"
+        p, selected_profile = load_gait_parameters(pp, profile)
     except ValueError as error:
         ap.error(str(error))
     if selected_profile:
         print(f"Gait profile: {selected_profile}")
     profile_parameters = {}
-    if selected_profile:
+    if selected_profile and pp.exists():
         profile_parameters = {
-            name: load_gait_parameters(pp, name)[0] for name in GAIT_PROFILES
+            name: parameters
+            for name, parameters in read_gait_config(pp).get("profiles", {}).items()
+            if name in GAIT_PROFILES
         }
-    if args.test:
-        result = evaluate(p, args.seconds, not args.hold, args.ramp)
+    if args.test or args.video:
+        recording = None
+        if args.video:
+            from robot_b91.recording import Recording
+            recording = Recording(Path(args.video))
+        try:
+            result = evaluate(p, args.seconds, not args.hold, args.ramp, observer=recording)
+        finally:
+            if recording:
+                recording.close()
         name = "b91_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
         (ROOT / "results" / f"{name}.json").write_text(json.dumps(result, indent=2))
         print(json.dumps(result, indent=2))
         return
     r = Robot(p, args.ramp)
     course = json.loads((ROOT / "reference/b91_course.json").read_text())
+    progress = CourseProgress(r.m, course) if args.ramp else None
     if args.render:
         from PIL import Image
 
@@ -369,7 +407,7 @@ def main():
         controls = None
         if profile_parameters:
             try:
-                controls = GaitControlPanel(GAIT_PROFILES, selected_profile)
+                controls = GaitControlPanel(tuple(profile_parameters), selected_profile)
             except Exception as error:
                 print(f"Gait control window unavailable: {error}")
         next_control_poll = 0.0
@@ -384,8 +422,12 @@ def main():
                         selected_profile = requested_profile
                         controls.set_active(selected_profile)
                         print(f"Gait profile: {selected_profile}")
-                if r.d.time < args.seconds:
+                if r.d.time < args.seconds and not (progress and progress.completed_at is not None):
                     r.step(not args.hold)
+                    if progress:
+                        progress.update(r.d, r.tilt())
+                        if progress.completed_at is not None:
+                            print(f"Course completed in {progress.completed_at:.2f} simulated seconds; simulation paused.")
                 if not args.ramp:
                     v.cam.lookat[:2] = r.d.qpos[:2]
                 v.sync()

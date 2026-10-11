@@ -45,6 +45,10 @@ def main():
         np.testing.assert_allclose(r.command_target, 0.1)
     r.step_targets(np.full(8, -0.1))
     np.testing.assert_allclose(r.command_target, -0.1)
+    r.next_command_time = r.d.time
+    r.step_targets(np.full(8, -2.0))
+    np.testing.assert_allclose(r.command_target, r.joint_ranges[:, 0])
+    assert not np.any(r.d.xfrc_applied) and not np.any(r.d.qfrc_applied)
     # IR validity and sample holding, independent of the scene geometry.
     for name, value in zip(["ir_left", "ir_right", "ir_ground"], [0.04, 0.3, -1]):
         r.d.sensor(name).data[0] = value

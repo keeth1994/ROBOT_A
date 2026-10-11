@@ -18,17 +18,26 @@ Use `--test --seconds 15` to save a report, or `python robot.py check all` for c
 
 Servo settings: `reference/b91_kinematics.json`. Masses: `reference/b91_mass.json`.
 Commented flat, slope and transition gait settings: `reference/b91_gait.toml`.
-Select one with `--gait-profile`; selection is manual and does not change with terrain.
+`--ramp` selects the full-course `course` profile by default. Select an explicit
+profile with `--gait-profile`; profiles do not switch at terrain transitions.
 Interactive runs also provide a separate gait-control window. Profile changes
 preserve gait phase and blend joint targets over 0.5 seconds.
-Run `python robot.py build` after changes. CAD edits additionally require export
+Gait parameters load at runtime. Run `python robot.py build` after servo/model
+changes. CAD edits additionally require export
 through `cad/ExportB91` in Fusion. No CAD edits are needed for servo settings.
 
 ## Results
 
 - Standing, 15 s: stable.
 - Flat, 15 s: 0.502 m forward, 0.0226 m sideways; no fall.
-- Course, 100 s: 0.495 m forward, 0.227 m sideways; no fall, course incomplete.
+- Original flat gait on course, 100 s: 0.495 m forward, 0.227 m sideways; course incomplete.
+- New course gait: completed in 63.406 s, 3.554 m forward, 0.0115 m sideways at
+  exit, maximum tilt 21.60 degrees. All four feet visit all five panels in order;
+  no fall, side-floor bypass or physics warnings. Nonfoot terrain contact occurs
+  in 0.335% of evaluated timesteps, so this is not a scrape-free traversal.
 
 No physics warnings in these tests. Reports are in `results/`.
 No trained policy is included.
+
+See [Ramp controller](RAMP_CONTROLLER.md) for the gait changes, robustness tests,
+recording command and the distinction between simulated success and physical deployment.

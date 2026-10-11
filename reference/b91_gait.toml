@@ -9,6 +9,8 @@ default_profile = "flat"
 # - heading_gain: strength of left/right stride correction
 # - pattern: "crawl" moves one leg at a time; "trot" moves diagonal pairs
 # - lateral_gain: lateral steering response in 1/m; 0 disables it
+# - strafe_gain: front/rear stride correction per metre of lateral error;
+#   corrects sideways drift separately from the left/right heading correction
 
 # Normal flat-ground gait. These are the previous single-profile values.
 [profiles.flat]
@@ -50,3 +52,21 @@ kd = 0.04
 heading_gain = 0.5
 pattern = "crawl"
 lateral_gain = 2.0
+
+# Full-course rocker gait. Negative pitch pre-tilts the curved feet; the swing
+# is capped at the existing -45 degree joint limit by the controller. The
+# resulting dwell gives a longer lifted recovery than the flat gait.
+# This is a SIMULATION profile: steering currently uses ideal base position.
+# Friction, torque, speed, mass, joint travel and terrain are unchanged.
+[profiles.course]
+period = 1.0
+duty = 0.6
+yaw_amplitude = 0.45
+pitch_lift = 0.65
+pitch_stance = -0.3
+kp = 1.6
+kd = 0.04
+heading_gain = 3.0
+pattern = "trot"
+lateral_gain = 0.0
+strafe_gain = 10.0
