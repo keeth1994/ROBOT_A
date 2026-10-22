@@ -1,9 +1,11 @@
-// ESP32 + M5Stack Servo2 + BMI270 bench test.
+// Controller ESP32: M5Stack Servo2 commands and BMI270 telemetry.
 // Install Adafruit PWM Servo Driver Library and SparkFun BMI270 Arduino Library.
 // WiFi and WebServer are included with the ESP32 board package.
 #include <Arduino.h>
 #include <Wire.h>
 #include <WiFi.h>
+#include <ESPmDNS.h>
+#include "wifi_config.h"
 #include <WebServer.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <SparkFun_BMI270_Arduino_Library.h>
@@ -20,13 +22,9 @@ constexpr uint16_t CENTER_US = 1500, LEFT_US = 1000, RIGHT_US = 2000;
 constexpr uint16_t MANUAL_MIN_US = 1400, MANUAL_MAX_US = 1600;
 constexpr uint32_t MOVE_TIME_MS = 1500, UPDATE_MS = 20;
 constexpr uint32_t WIFI_TIMEOUT_MS = 3000;
-constexpr char WIFI_SSID[] = "ROBOT-A-Test";
-constexpr char WIFI_PASSWORD[] = "robotatest";
-// Camera uses DHCP and announces its address every 5 s. Never a servo heartbeat.
-constexpr uint32_t CAMERA_TIMEOUT_MS = 15000;
-IPAddress cameraIp;
-bool cameraSeen = false, cameraReady = false;
-uint32_t lastCameraReport = 0;
+bool wifiWasConnected = false;
+IPAddress controllerIp;
+uint32_t lastReconnect = 0;
 static_assert(MOVE_TIME_MS >= UPDATE_MS, "Move time must be at least one frame.");
 static_assert(CHANNEL_COUNT > 0 && GROUP_SIZE > 0, "List at least one channel.");
 static_assert(MANUAL_MIN_US <= CENTER_US && CENTER_US <= MANUAL_MAX_US,
@@ -58,125 +56,6 @@ bool manualActive()
   return false;
 }
 
-const char PAGE[] PROGMEM = R"HTML(<!doctype html>
-  <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Robot A bench test</title>
-  <style>
-  body{font:17px system-ui,sans-serif;background:#101820;color:#edf3f7;max-width:620px;margin:auto;padding:24px}
-  h1{font-size:27px}button{font:inherit;border:0;border-radius:10px;padding:17px;margin:6px 0;width:100%;cursor:pointer;background:#6fe0bc;color:#101820;font-weight:650}
-  input[type=range]{width:100%;min-height:44px}.servo{border-top:1px solid #405362;padding:16px 0}.servo button{padding:10px}button:disabled{opacity:.4;cursor:default}#stop{background:#ff706f}section{background:#1c2935;border-radius:14px;padding:18px;margin:20px 0}pre{white-space:pre-wrap;font-size:15px}small{color:#c2cfd8}#connection{font-weight:600}
-  </style><h1>Robot A bench test</h1><p id="connection">Connecting...</p>
-  <section><p id="state">Reading controller status...</p>
-  <button class="start" data-mode="all" disabled>All servos together</button>
-  <button class="start" data-mode="groups" disabled>Four servos at a time</button>
-  <button id="stop">Stop / disable pulses</button>
-  <p id="channels"></p><small>Support the robot. Initial centering may jump. Stop disables signals; servo power stays on.</small></section>
-  <section><h2>TimerCamera-X</h2><p id="cameraState">Waiting for camera to join ROBOT-A-Test...</p>
-  <button id="videoStart" disabled>Show video</button><button id="videoStop" disabled>Hide video</button>
-  <p><a id="cameraLink" hidden target="_blank" rel="noopener" style="color:#6fe0bc">Open camera in a separate tab</a></p>
-  <img id="cameraFeed" hidden alt="TimerCamera-X video" style="width:100%;border-radius:10px">
-  <small>Keep this controller page visible during servo control. Video may freeze or lag if Wi-Fi is interrupted.</small></section>
-  <section><h2>Individual servos</h2><p>Enable a servo at centre, then drag its slider. Release the slider to apply the command.</p>
-  <small>Values are pulse widths in microseconds, not measured angles. Initial enabling can jump. Release disables pulses; power stays on. Automatic sweeps still use 1000–2000 µs.</small><div id="servos"></div></section>
-  <section><h2>BMI270</h2><pre id="imu">Waiting for readings...</pre><small>Sensor axes X / Y / Z. Acceleration includes gravity; gyro measures rotation speed.</small></section>
-  <p id="result" role="status"></p><small>Keep this page open during Wi-Fi tests or manual control. If its heartbeat is lost for 3 seconds, the test stops. No automatic restart.</small>
-  <script>
-  const el=id=>document.getElementById(id);
-  let busy=false, status=null, connected=false;
-  const rows=new Map();
-  let cameraBase='', videoShown=false;
-  function hideVideo(){
-    el('cameraFeed').removeAttribute('src');el('cameraFeed').hidden=true;
-    videoShown=false;el('videoStop').disabled=true;
-  }
-  function renderCamera(camera){
-    const base=camera.online&&camera.ready?camera.url:'';
-    if(base!==cameraBase)hideVideo();
-    cameraBase=base;
-    el('cameraLink').hidden=!cameraBase;el('cameraLink').href=cameraBase;
-    el('videoStart').disabled=!cameraBase;
-    el('cameraState').textContent=!camera.online?'Camera offline. Power on the TimerCamera-X and wait for it to join Wi-Fi.':!camera.ready?'Camera joined Wi-Fi but initialization failed. Check its Serial Monitor at 115200 baud.':videoShown?'Video requested. If frozen, hide it and show it again.':'Camera connected. Press Show video.';
-  }
-  el('videoStart').onclick=()=>{
-    if(!cameraBase)return;
-    el('cameraFeed').src=cameraBase.replace(/\/$/,'')+':81/stream?t='+Date.now();
-    el('cameraFeed').hidden=false;videoShown=true;el('videoStop').disabled=false;
-    el('cameraState').textContent='Video requested. If frozen, hide it and show it again.';
-  };
-  el('videoStop').onclick=()=>{hideVideo();el('cameraState').textContent='Video hidden.';};
-  el('cameraFeed').onerror=()=>{hideVideo();el('cameraState').textContent='Video unavailable. Close other video tabs and try Show video again.';};
-  async function request(path,body){
-    const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body||'',cache:'no-store',signal:AbortSignal.timeout(1500)});
-    const text=await r.text();if(!r.ok)throw Error(text);return text;
-  }
-  function controls(){
-    const blocked=!connected||!status||!status.servoReady||status.faulted||status.running||busy;
-    document.querySelectorAll('.start').forEach(b=>b.disabled=blocked||status.manualActive);
-    rows.forEach(row=>{
-      row.enable.disabled=blocked||row.active;
-      row.slider.disabled=blocked||!row.active;
-      row.release.disabled=blocked||!row.active;
-    });
-  }
-  async function command(path,body){
-    if(busy)return;
-    busy=true;controls();
-    try{el('result').textContent=await request(path,body);}
-    catch(e){el('result').textContent='Command not confirmed: '+e.message+' Use Stop or cut servo power if needed.';}
-    finally{busy=false;controls();}
-  }
-  function renderServos(s){
-    s.channels.split(',').map(c=>c.trim()).forEach((channel,i)=>{
-      let row=rows.get(channel);
-      if(!row){
-        const box=document.createElement('div');box.className='servo';
-        const label=document.createElement('label');label.htmlFor='servo-'+channel;
-        const detail=document.createElement('p');
-        const slider=document.createElement('input');slider.type='range';slider.id=label.htmlFor;slider.step=1;
-        const enable=document.createElement('button');enable.textContent='Enable at '+s.center+' µs';
-        const release=document.createElement('button');release.textContent='Release servo';
-        box.append(label,slider,detail,enable,release);el('servos').append(box);
-        row={label,slider,detail,enable,release,active:false};rows.set(channel,row);
-        const show=()=>label.textContent='Channel '+channel+': '+slider.value+' µs selected';
-        slider.oninput=show;
-        slider.onchange=()=>command('/servo','channel='+channel+'&pulse='+slider.value);
-        enable.onclick=()=>command('/servo','channel='+channel+'&pulse='+status.center);
-        release.onclick=()=>command('/release','channel='+channel);
-        row.show=show;
-      }
-      const active=s.manual[i]!==null;
-      row.slider.min=s.manualMin;row.slider.max=s.manualMax;
-      // Do not reset a slider under the user's finger on every status poll.
-      if(active!==row.active||!active)row.slider.value=active?s.manual[i]:s.center;
-      row.active=active;row.show();
-      row.detail.textContent=active?'Enabled — commanded '+s.manual[i]+' µs':'Pulses off';
-    });
-  }
-  async function poll(){
-    try{
-      await request('/heartbeat');
-      const r=await fetch('/status',{cache:'no-store',signal:AbortSignal.timeout(1500)});
-      if(!r.ok)throw Error('Status unavailable');
-      status=await r.json();connected=true;
-      el('connection').textContent='Connected to robot';
-      el('state').textContent=status.message+(status.running?' — test running':'');
-      el('channels').textContent='Channels: '+status.channels+(status.running?' | Active: '+status.active:'');
-      renderServos(status);
-      renderCamera(status.camera);
-      el('imu').textContent=!status.imuReady?'BMI270 not found. Check wiring and reset.':!status.imuValid?'IMU reading unavailable or stale.':'Acceleration [g]   '+status.accel.map(v=>v.toFixed(3)).join(' / ')+'\nGyro [deg/s]      '+status.gyro.map(v=>v.toFixed(2)).join(' / ');
-    }catch(e){
-      connected=false;el('connection').textContent='Connection lost — check Wi-Fi';el('imu').textContent='No live readings';
-      hideVideo();cameraBase='';el('videoStart').disabled=true;el('cameraLink').hidden=true;
-      el('cameraState').textContent='Controller connection lost. Video hidden.';
-    }finally{controls();setTimeout(poll,500);}
-  }
-  document.querySelectorAll('.start').forEach(b=>b.onclick=()=>command('/start','mode='+b.dataset.mode));
-  el('stop').onclick=async()=>{
-    try{el('result').textContent=await request('/stop');}
-    catch(e){el('result').textContent='Stop NOT confirmed. Use the physical power switch if needed.';}
-  };
-  poll();
-  </script></html>)HTML";
 
 bool allOff()
 {
@@ -237,7 +116,8 @@ bool startGroup()
 
 bool startTest(bool groups, bool fromWifi)
 {
-  if (!servoReady || faulted || running || manualActive())
+  if (!servoReady || faulted || running || manualActive() ||
+      (fromWifi && WiFi.status() != WL_CONNECTED))
     return false;
   grouped = groups;
   wifiRun = fromWifi;
@@ -251,6 +131,11 @@ bool startTest(bool groups, bool fromWifi)
 void updateMotion()
 {
   uint32_t now = millis();
+  if (((running && wifiRun) || manualActive()) && WiFi.status() != WL_CONNECTED)
+  {
+    stopTest("Wi-Fi disconnected. Outputs off.");
+    return;
+  }
   if (((running && wifiRun) || manualActive()) && now - lastHeartbeat > WIFI_TIMEOUT_MS)
   {
     stopTest("Wi-Fi heartbeat lost. Outputs off.");
@@ -401,17 +286,7 @@ void sendStatus()
   json += ",";
   json += fresh ? String(imu.data.gyroZ, 2) : "null";
   json += "]";
-  // No HTTP request to the camera here: an absent/slow camera must never block
-  // servo servicing.
-  bool cameraOnline = cameraSeen && millis() - lastCameraReport < CAMERA_TIMEOUT_MS;
-  json += ",\"camera\":{\"online\":";
-  json += cameraOnline ? "true" : "false";
-  json += ",\"ready\":";
-  json += cameraOnline && cameraReady ? "true" : "false";
-  json += ",\"url\":\"";
-  if (cameraOnline)
-    json += String("http://") + cameraIp.toString();
-  json += "\"}}";
+  json += "}";
   server.sendHeader("Cache-Control", "no-store");
   server.send(200, "application/json", json);
 }
@@ -452,7 +327,7 @@ void handleManual(bool release)
     server.send(400, "text/plain", "Channel is not configured in CHANNELS.");
     return;
   }
-  if (!servoReady || faulted || running)
+  if (!servoReady || faulted || running || WiFi.status() != WL_CONNECTED)
   {
     server.send(409, "text/plain", "Manual control unavailable. Stop the test or check controller status.");
     return;
@@ -478,26 +353,8 @@ void handleManual(bool release)
 
 void beginWifi()
 {
-  server.on("/", HTTP_GET, []()
-            { server.send_P(200, "text/html", PAGE); });
+  server.on("/", HTTP_GET, sendStatus); // API only; the PC serves the dashboard.
   server.on("/status", HTTP_GET, sendStatus);
-  server.on("/camera/register", HTTP_POST, []()
-            {
-      String ready = server.arg("ready");
-      IPAddress peer = server.client().remoteIP();
-      // Learn the actual DHCP address; do not accept a supplied URL or host.
-      if ((ready != "0" && ready != "1") || peer[0] != 192 ||
-          peer[1] != 168 || peer[2] != 4 || peer[3] < 2 || peer[3] > 254)
-      {
-        server.send(400, "text/plain", "Invalid camera registration.");
-        return;
-      }
-      cameraIp = peer;
-      cameraReady = ready == "1";
-      cameraSeen = true;
-      lastCameraReport = millis();
-      // Deliberately do not update lastHeartbeat: camera cannot keep servos on.
-      server.send(200, "text/plain", "Camera registered."); });
   server.on("/servo", HTTP_POST, []() { handleManual(false); });
   server.on("/release", HTTP_POST, []() { handleManual(true); });
   server.on("/heartbeat", HTTP_POST, []()
@@ -518,20 +375,45 @@ void beginWifi()
       server.send(ok ? 200 : 503, "text/plain", ok ? message : "Cannot confirm outputs off. Cut servo power."); });
   server.onNotFound([]()
                     { server.send(404, "text/plain", "Not found."); });
-  WiFi.mode(WIFI_AP);
-  IPAddress ip(192, 168, 4, 1);
-  if (!WiFi.softAPConfig(ip, ip, IPAddress(255, 255, 255, 0)) ||
-      !WiFi.softAP(WIFI_SSID, WIFI_PASSWORD, 1, false, 4))
-  {
-    Serial.println("Wi-Fi startup failed. USB serial control remains available.");
-    return;
-  }
-  server.begin();
-  Serial.print("Wi-Fi: ");
+  WiFi.setHostname(WIFI_HOSTNAME);
+  WiFi.mode(WIFI_STA);
+  WiFi.setAutoReconnect(true);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.setSleep(false);
+  Serial.print("Joining PC hotspot: ");
   Serial.println(WIFI_SSID);
-  Serial.print("Password: ");
-  Serial.println(WIFI_PASSWORD);
-  Serial.println("Open http://192.168.4.1");
+}
+
+void serviceWifi()
+{
+  bool connected = WiFi.status() == WL_CONNECTED;
+  if (wifiWasConnected && (!connected || WiFi.localIP() != controllerIp))
+  {
+    if ((running && wifiRun) || manualActive())
+      stopTest("Wi-Fi connection changed. Outputs off.");
+    server.stop();
+    MDNS.end();
+    wifiWasConnected = false;
+    Serial.println("Wi-Fi connection changed; waiting for PC hotspot.");
+  }
+  if (connected && !wifiWasConnected)
+  {
+    controllerIp = WiFi.localIP();
+    server.begin();
+    if (MDNS.begin(WIFI_HOSTNAME))
+      MDNS.addService("http", "tcp", 80);
+    else
+      Serial.println("mDNS unavailable; use the printed IP address.");
+    Serial.println("Servo API: http://robot-a-servo.local/status");
+    Serial.print("Servo API IP: http://"); Serial.println(controllerIp);
+    Serial.println("PC dashboard: http://127.0.0.1:8765/");
+    wifiWasConnected = true;
+  }
+  if (!connected && millis() - lastReconnect >= RECONNECT_INTERVAL_MS)
+  {
+    lastReconnect = millis();
+    WiFi.reconnect();
+  }
 }
 
 void setup()
@@ -586,7 +468,8 @@ void loop()
 {
   // Expire a lost heartbeat before accepting fresh requests after a long stall.
   updateMotion();
-  server.handleClient();
+  serviceWifi();
+  if (wifiWasConnected) server.handleClient();
   while (Serial.available())
   {
     char command = Serial.read();

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Robot test dashboard</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header>
+  <h1>Robot test dashboard</h1>
+  <span id="operator" class="badge">Connecting...</span>
+  <button id="stop" class="danger">Stop all servos</button>
+</header>
+<main>
+  <section>
+    <h2>Connections</h2>
+    <div class="connections">
+      <label for="servoAddress">Controller ESP32</label>
+      <input id="servoAddress" value="http://robot-a-servo.local" spellcheck="false">
+      <span id="servoOnline" class="badge">Offline</span>
+      <label for="cameraAddress">Camera ESP32</label>
+      <input id="cameraAddress" value="http://robot-a-camera.local" spellcheck="false">
+      <span id="cameraOnline" class="badge">Offline</span>
+    </div>
+    <p><button id="connect">Save addresses</button> <small>Use the IP from Serial Monitor if .local names fail.</small></p>
+  </section>
+  <p id="result" role="status" class="result">Ready. No movement starts automatically.</p>
+  <div class="workspace">
+    <section>
+      <div class="panel-head"><h2>Camera</h2><button id="videoToggle">Start video</button></div>
+      <div class="viewer">
+        <img id="feed" hidden alt="Live robot camera">
+        <p id="placeholder"><span id="videoMessage">Video is off.</span></p>
+      </div>
+      <p class="stats">PC receive rate: <strong id="receiveFps">—</strong> · Latest frame received: <strong id="frameAge">—</strong> ago</p>
+      <div class="form-row">
+        <label>Resolution<select id="resolution"><option value="qvga">320 × 240</option><option value="vga" selected>640 × 480</option><option value="svga">800 × 600</option></select></label>
+        <label>FPS target<select id="fps"><option>5</option><option selected>10</option><option>15</option></select></label>
+        <label>JPEG quality<select id="quality"><option value="12">High</option><option value="18">Balanced</option><option value="24">Smaller frames</option></select></label>
+        <button id="applyCamera">Apply</button>
+      </div>
+      <p id="cameraStats" class="subtle">Waiting for camera status.</p>
+    </section>
+    <div>
+      <section>
+        <div class="panel-head"><h2>BMI270</h2><span id="imuState" class="badge">No data</span></div>
+        <table>
+          <thead><tr><th>Reading</th><th>X / Y / Z</th></tr></thead>
+          <tbody>
+            <tr><th>Acceleration (g)</th><td id="accel">— / — / —</td></tr>
+            <tr><th>Gyro (°/s)</th><td id="gyro">— / — / —</td></tr>
+          </tbody>
+        </table>
+        <small>Acceleration includes gravity.</small>
+      </section>
+      <section>
+        <div class="panel-head"><h2>Servos</h2><span id="servoState" class="badge">Outputs off</span></div>
+        <p id="controllerMessage">Waiting for controller.</p>
+        <div class="actions"><button id="all">Sweep all</button><button id="groups">Sweep four at a time</button></div>
+        <div id="servos"></div>
+        <p class="subtle">Sliders: 1400–1600 µs. Sweeps: 1000–2000 µs. Enabling at center may jump. Stop disables pulses; servo power stays on.</p>
+      </section>
+    </div>
+  </div>
+  <p class="subtle">Keep this tab visible during servo control. Lost heartbeat disables Wi-Fi motion after 3 seconds.</p>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>
