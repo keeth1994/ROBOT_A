@@ -330,6 +330,10 @@ def main():
     ap.add_argument("--ramp", action="store_true")
     ap.add_argument("--seconds", type=float, help="simulation duration (default: 120 on course, 20 on flat)")
     ap.add_argument("--render")
+    ap.add_argument(
+        "--sensors", action="store_true",
+        help="show the onboard camera and ideal accelerometer/gyroscope readings",
+    )
     ap.add_argument("--video", help="save a headless MP4 evaluation at 2x playback speed")
     ap.add_argument("--params")
     ap.add_argument(
@@ -340,6 +344,8 @@ def main():
     args = ap.parse_args()
     if args.video and args.render:
         ap.error("Choose either --video or --render")
+    if args.sensors and (args.test or args.video or args.render):
+        ap.error("--sensors requires the interactive simulation")
     if args.seconds is None:
         args.seconds = 120 if args.ramp else 20
     print(
@@ -410,8 +416,13 @@ def main():
                 controls = GaitControlPanel(tuple(profile_parameters), selected_profile)
             except Exception as error:
                 print(f"Gait control window unavailable: {error}")
+        sensors = None
         next_control_poll = 0.0
         try:
+            if args.sensors:
+                from robot_b91.sensors import SensorOverlay
+
+                sensors = SensorOverlay(r, v)
             while v.is_running():
                 t = time.perf_counter()
                 if controls and t >= next_control_poll:
@@ -430,9 +441,13 @@ def main():
                             print(f"Course completed in {progress.completed_at:.2f} simulated seconds; simulation paused.")
                 if not args.ramp:
                     v.cam.lookat[:2] = r.d.qpos[:2]
+                if sensors:
+                    sensors.update(t)
                 v.sync()
                 time.sleep(max(0, r.m.opt.timestep - (time.perf_counter() - t)))
         finally:
+            if sensors:
+                sensors.close()
             if controls:
                 controls.close()
 
