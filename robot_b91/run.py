@@ -117,7 +117,11 @@ class GaitControlPanel:
 
 
 class Robot:
-    def __init__(self, params=None, ramp=False):
+    def __init__(self, params=None, ramp=False, feedback="sensors"):
+        if feedback not in ("sensors", "ideal"):
+            raise ValueError("feedback must be sensors or ideal")
+        self.feedback = feedback
+        self.navigation = None
         self.p = DEFAULT | (params or {})
         self.m = mujoco.MjModel.from_xml_path(
             str(ROOT / "models" / ("robot_b91_course.xml" if ramp else "robot_b91.xml"))
@@ -165,6 +169,16 @@ class Robot:
         self._transition_start_time = None
         self._transition_from = None
         self._sample_ir()
+        if self.navigation:
+            self.navigation.close()
+        if self.feedback == "sensors" and self.course:
+            from robot_b91.sim_navigation import SimNavigation
+            self.navigation = SimNavigation(self.m)
+
+    def close(self):
+        if self.navigation:
+            self.navigation.close()
+            self.navigation = None
 
     def set_gait_parameters(self, params, transition_seconds=0.5):
         """Change gait while preserving phase and blending away target jumps."""
@@ -181,15 +195,23 @@ class Robot:
         t = self.d.time - 2
         p = self.p
         self.target = np.tile([0.0, p["pitch_stance"]], 4)
+        sensor_errors = self.navigation.update(self.d) if self.navigation else None
+        if walk and t > 0 and self.navigation and not self.navigation.estimate.ready(self.d.time):
+            self.gait_time_origin += self.m.opt.timestep
+            self.step_targets(self.command_target)
+            return
         if walk and t > 0:
-            R = self.d.xmat[self.m.body("platform").id].reshape(3, 3)
-            heading = math.atan2(R[1, 0], R[0, 0])
-            # Optional ideal lateral position feedback for simulation, not an implemented sensor estimator.
-            lateral = self.d.qpos[1]
-            if self.course:
-                lateral = local_points(self.d.qpos[:3], self.course)[1]
-                heading -= math.radians(self.course["yaw_deg"])
-                heading = math.atan2(math.sin(heading), math.cos(heading))
+            if self.navigation:
+                heading, lateral = sensor_errors
+            else:
+                R = self.d.xmat[self.m.body("platform").id].reshape(3, 3)
+                heading = math.atan2(R[1, 0], R[0, 0])
+                # Optional ideal lateral position feedback for simulation, not an implemented sensor estimator.
+                lateral = self.d.qpos[1]
+                if self.course:
+                    lateral = local_points(self.d.qpos[:3], self.course)[1]
+                    heading -= math.radians(self.course["yaw_deg"])
+                    heading = math.atan2(math.sin(heading), math.cos(heading))
             self.target = rocker_targets(
                 p, t, self.d.time - self.gait_time_origin,
                 heading, lateral, self.joint_ranges,
@@ -249,84 +271,90 @@ class Robot:
 
 
 def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial_yaw_rad=0.0,
-             observer=None):
+             observer=None, feedback="sensors"):
     if not math.isfinite(seconds) or seconds <= 2:
         raise ValueError("Evaluation duration must exceed the 2-second settling period")
     terrain = json.loads((ROOT / "reference/b91_course.json").read_text())
     surfaces = terrain["required_surfaces"]
     obstacles = terrain["obstacle_geoms"]
-    r = Robot(p, ramp)
-    if initial_y_m or initial_yaw_rad:
-        r.d.qpos[1] = initial_y_m
-        r.d.qpos[3:7] = [math.cos(initial_yaw_rad / 2), 0, 0, math.sin(initial_yaw_rad / 2)]
-        mujoco.mj_forward(r.m, r.d)
-    progress = CourseProgress(r.m, terrain) if ramp else None
-    start = None
-    tilt = 0
-    sat = 0
-    n = 0
-    bad = 0
-    rampcontact = False
-    while r.d.time < seconds:
-        r.step(walk)
-        if r.d.time >= 2:
-            if start is None:
-                start = r.d.qpos[:3].copy()
-            tilt = max(tilt, r.tilt())
-            sat += int(np.count_nonzero(np.abs(r.torque) > 0.95 * r.limit))
-            n += 1
-            if progress:
-                progress.update(r.d, r.tilt())
-            for c in r.d.contact:
-                names = [
-                    mujoco.mj_id2name(r.m, mujoco.mjtObj.mjOBJ_GEOM, g) or ""
-                    for g in [c.geom1, c.geom2]
-                ]
-                if any(x in surfaces for x in names):
-                    rampcontact = True
-                if any(x in (["floor"] + obstacles) for x in names) and not any(
-                    "_tread_" in x for x in names
-                ):
-                    bad += 1
-                    break
-        if not np.isfinite(r.d.qpos).all():
-            raise RuntimeError("Non-finite physics state")
-        if observer:
-            observer(r, progress)
-        if progress and progress.completed_at is not None:
-            break
-    delta = r.d.qpos[:3] - start
-    result = dict(
-        revision="B9-1",
-        parameters=r.p,
-        duration_s=float(r.d.time),
-        requested_duration_s=seconds,
-        initial_y_m=initial_y_m,
-        initial_yaw_rad=initial_yaw_rad,
-        walk=walk,
-        ramp=ramp,
-        forward_m=float(delta[0]),
-        sideways_m=float(delta[1]),
-        final_height_m=float(r.d.qpos[2]),
-        max_tilt_deg=tilt,
-        fallen=bool(tilt > 45),
-        nonfoot_ground_fraction=bad / max(n, 1),
-        stall_saturation_fraction=sat / max(8 * n, 1),
-        ramp_contact=rampcontact,
-        total_mass_kg=float(sum(r.m.body_mass)),
-        torque_limits_Nm=r.limit.tolist(),
-        warnings=int(sum(w.number for w in r.d.warning)),
-        feedback_source="ideal simulator heading and lateral position; no hardware estimator",
-    )
-    if progress:
-        result.update(progress.report())
-    return result
+    r = Robot(p, ramp, feedback)
+    try:
+        if initial_y_m or initial_yaw_rad:
+            r.d.qpos[1] = initial_y_m
+            r.d.qpos[3:7] = [math.cos(initial_yaw_rad / 2), 0, 0, math.sin(initial_yaw_rad / 2)]
+            mujoco.mj_forward(r.m, r.d)
+        progress = CourseProgress(r.m, terrain) if ramp else None
+        start = None
+        tilt = 0
+        sat = 0
+        n = 0
+        bad = 0
+        rampcontact = False
+        while r.d.time < seconds:
+            r.step(walk)
+            if r.d.time >= 2:
+                if start is None:
+                    start = r.d.qpos[:3].copy()
+                tilt = max(tilt, r.tilt())
+                sat += int(np.count_nonzero(np.abs(r.torque) > 0.95 * r.limit))
+                n += 1
+                if progress:
+                    progress.update(r.d, r.tilt())
+                for c in r.d.contact:
+                    names = [
+                        mujoco.mj_id2name(r.m, mujoco.mjtObj.mjOBJ_GEOM, g) or ""
+                        for g in [c.geom1, c.geom2]
+                    ]
+                    if any(x in surfaces for x in names):
+                        rampcontact = True
+                    if any(x in (["floor"] + obstacles) for x in names) and not any(
+                        "_tread_" in x for x in names
+                    ):
+                        bad += 1
+                        break
+            if not np.isfinite(r.d.qpos).all():
+                raise RuntimeError("Non-finite physics state")
+            if observer:
+                observer(r, progress)
+            if progress and progress.completed_at is not None:
+                break
+        delta = r.d.qpos[:3] - start
+        result = dict(
+            revision="B9-1",
+            parameters=r.p,
+            duration_s=float(r.d.time),
+            requested_duration_s=seconds,
+            initial_y_m=initial_y_m,
+            initial_yaw_rad=initial_yaw_rad,
+            walk=walk,
+            ramp=ramp,
+            forward_m=float(delta[0]),
+            sideways_m=float(delta[1]),
+            final_height_m=float(r.d.qpos[2]),
+            max_tilt_deg=tilt,
+            fallen=bool(tilt > 45),
+            nonfoot_ground_fraction=bad / max(n, 1),
+            stall_saturation_fraction=sat / max(8 * n, 1),
+            ramp_contact=rampcontact,
+            total_mass_kg=float(sum(r.m.body_mass)),
+            torque_limits_Nm=r.limit.tolist(),
+            warnings=int(sum(w.number for w in r.d.warning)),
+            feedback_source="RGB camera + accelerometer/gyro" if r.navigation else "ideal simulator heading and lateral position",
+            navigation=r.navigation.estimate.report() if r.navigation else None,
+        )
+        if progress:
+            result.update(progress.report())
+        return result
+    finally:
+        r.close()
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--hold", action="store_true")
+    ap.add_argument("--feedback", choices=("sensors", "ideal"), default="sensors",
+                    help="ramp navigation source (default: camera and IMU)")
     ap.add_argument("--ramp", action="store_true")
     ap.add_argument("--seconds", type=float, help="simulation duration (default: 120 on course, 20 on flat)")
     ap.add_argument("--render")
@@ -374,15 +402,17 @@ def main():
             from robot_b91.recording import Recording
             recording = Recording(Path(args.video))
         try:
-            result = evaluate(p, args.seconds, not args.hold, args.ramp, observer=recording)
+            result = evaluate(p, args.seconds, not args.hold, args.ramp, observer=recording, feedback=args.feedback)
         finally:
             if recording:
                 recording.close()
         name = "b91_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
         (ROOT / "results" / f"{name}.json").write_text(json.dumps(result, indent=2))
         print(json.dumps(result, indent=2))
+        if args.ramp and not args.hold and not result["course_completed"]:
+            raise SystemExit(1)
         return
-    r = Robot(p, args.ramp)
+    r = Robot(p, args.ramp, args.feedback)
     course = json.loads((ROOT / "reference/b91_course.json").read_text())
     progress = CourseProgress(r.m, course) if args.ramp else None
     if args.render:
@@ -401,6 +431,7 @@ def main():
         renderer.update_scene(r.d, camera=cam, scene_option=opt)
         Image.fromarray(renderer.render()).save(args.render)
         renderer.close()
+        r.close()
         return
     from mujoco import viewer
 
@@ -450,6 +481,7 @@ def main():
                 sensors.close()
             if controls:
                 controls.close()
+            r.close()
 
 
 if __name__ == "__main__":

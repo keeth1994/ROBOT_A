@@ -1,0 +1,10 @@
+{
+  "width_m": 0.30,
+  "fovy_deg": 42.9470936,
+  "camera_x_m": 0.0626,
+  "camera_pitch_deg": 15.0,
+  "dark_min": 3,
+  "dark_max": 25,
+  "max_chroma": 0.28,
+  "max_blind_s": 8.0
+}

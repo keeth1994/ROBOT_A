@@ -402,13 +402,15 @@ def main():
         )
         E.SubElement(sensors, "rangefinder", name=s["name"], site=s["name"] + "_site")
     # TimerCamera-X: 66.5 degree diagonal FOV converted to vertical for 4:3.
+    navigation = json.loads((ref / "b91_navigation.json").read_text())
+    camera_pitch = np.radians(navigation["camera_pitch_deg"])
     E.SubElement(
         root,
         "camera",
         name="project_camera",
         pos=fmt(center("sensor camera") + [0.0076, 0, 0]),
-        xyaxes="0 -1 0 0 0 1",
-        fovy="42.9470936",
+        xyaxes=fmt([0, -1, 0, np.sin(camera_pitch), 0, np.cos(camera_pitch)]),
+        fovy=str(navigation["fovy_deg"]),
     )
     E.indent(xml)
     E.ElementTree(xml).write(
