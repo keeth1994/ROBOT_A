@@ -6,5 +6,6 @@ __pycache__/
 logs/
 .pytest_cache/
 .ruff_cache/
+.pio/
 
 dashboard/config.local.json

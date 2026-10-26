@@ -5,34 +5,183 @@
     "duty": 0.6,
     "yaw_amplitude": 0.45,
     "pitch_lift": 0.65,
-    "pitch_stance": 0.0,
+    "pitch_stance": -0.3,
     "kp": 1.6,
     "kd": 0.04,
-    "heading_gain": 0.8,
+    "heading_gain": 3.0,
     "pattern": "trot",
-    "lateral_gain": 5.0
+    "lateral_gain": 0.0,
+    "strafe_gain": 10.0
   },
-  "duration_s": 100.0,
+  "duration_s": 63.406000000031526,
+  "requested_duration_s": 120,
+  "initial_y_m": 0.0,
+  "initial_yaw_rad": 0.0,
   "walk": true,
   "ramp": true,
-  "forward_m": 0.8730527615569231,
-  "sideways_m": 0.20890210422043862,
-  "final_height_m": 0.09384309550062532,
-  "max_tilt_deg": 54.86457716046301,
-  "fallen": true,
-  "nonfoot_ground_fraction": 0.1893800253050896,
-  "stall_saturation_fraction": 0.12049253091710542,
+  "forward_m": 3.554159522482328,
+  "sideways_m": 0.011534557162167877,
+  "final_height_m": 0.04366208551837108,
+  "max_tilt_deg": 21.597402871463995,
+  "fallen": false,
+  "nonfoot_ground_fraction": 0.0033546117769671703,
+  "stall_saturation_fraction": 0.024495994007295466,
   "ramp_contact": true,
-  "total_mass_kg": 1.2099896242400003,
+  "total_mass_kg": 1.1629896242400002,
   "torque_limits_Nm": [
-    0.15205874947770598,
-    0.26833896966654,
-    0.15205874947770598,
-    0.26833896966654,
-    0.15205874947770598,
-    0.26833896966654,
-    0.15205874947770598,
-    0.26833896966654
+    0.2547004930555556,
+    0.22361580805544998,
+    0.4862463958333334,
+    0.22361580805544998,
+    0.2547004930555556,
+    0.22361580805544998,
+    0.4862463958333334,
+    0.22361580805544998
   ],
-  "warnings": 0
+  "warnings": 0,
+  "feedback_source": "ideal simulator heading and lateral position; no hardware estimator",
+  "course_completed": true,
+  "completion_time_s": 63.406000000031526,
+  "final_course_position_m": [
+    3.1541906586958235,
+    0.01156747037946464,
+    0.04366208551837108
+  ],
+  "max_course_lateral_error_m": 0.058276433424224894,
+  "left_course": false,
+  "floor_bypass": false,
+  "feet_per_surface": {
+    "first_climb": [
+      "FL",
+      "FR",
+      "RL",
+      "RR"
+    ],
+    "first_descent": [
+      "FL",
+      "FR",
+      "RL",
+      "RR"
+    ],
+    "second_climb": [
+      "FL",
+      "FR",
+      "RL",
+      "RR"
+    ],
+    "raised_platform": [
+      "FL",
+      "FR",
+      "RL",
+      "RR"
+    ],
+    "final_descent": [
+      "FL",
+      "FR",
+      "RL",
+      "RR"
+    ]
+  },
+  "contact_events": [
+    {
+      "surface": "first_climb",
+      "leg": "FL",
+      "time_s": 6.417999999999515
+    },
+    {
+      "surface": "first_climb",
+      "leg": "FR",
+      "time_s": 6.427999999999514
+    },
+    {
+      "surface": "first_climb",
+      "leg": "RR",
+      "time_s": 15.078000000001705
+    },
+    {
+      "surface": "first_climb",
+      "leg": "RL",
+      "time_s": 15.506000000001848
+    },
+    {
+      "surface": "first_descent",
+      "leg": "FL",
+      "time_s": 22.00799999999868
+    },
+    {
+      "surface": "first_descent",
+      "leg": "FR",
+      "time_s": 22.54999999999838
+    },
+    {
+      "surface": "first_descent",
+      "leg": "RR",
+      "time_s": 23.9579999999976
+    },
+    {
+      "surface": "first_descent",
+      "leg": "RL",
+      "time_s": 24.5019999999973
+    },
+    {
+      "surface": "second_climb",
+      "leg": "FL",
+      "time_s": 28.065999999995324
+    },
+    {
+      "surface": "second_climb",
+      "leg": "FR",
+      "time_s": 28.32399999999518
+    },
+    {
+      "surface": "second_climb",
+      "leg": "RR",
+      "time_s": 35.25599999999712
+    },
+    {
+      "surface": "second_climb",
+      "leg": "RL",
+      "time_s": 35.61599999999756
+    },
+    {
+      "surface": "raised_platform",
+      "leg": "FL",
+      "time_s": 43.366000000007034
+    },
+    {
+      "surface": "raised_platform",
+      "leg": "FR",
+      "time_s": 44.50800000000843
+    },
+    {
+      "surface": "raised_platform",
+      "leg": "RL",
+      "time_s": 46.500000000010864
+    },
+    {
+      "surface": "raised_platform",
+      "leg": "RR",
+      "time_s": 46.88400000001133
+    },
+    {
+      "surface": "final_descent",
+      "leg": "FR",
+      "time_s": 51.754000000017285
+    },
+    {
+      "surface": "final_descent",
+      "leg": "FL",
+      "time_s": 51.99600000001758
+    },
+    {
+      "surface": "final_descent",
+      "leg": "RL",
+      "time_s": 53.47800000001939
+    },
+    {
+      "surface": "final_descent",
+      "leg": "RR",
+      "time_s": 54.10800000002016
+    }
+  ]
 }

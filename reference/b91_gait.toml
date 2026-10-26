@@ -1,0 +1,72 @@
+# Select this profile when --gait-profile is omitted.
+default_profile = "flat"
+
+# Units shared by all profiles:
+# - period: seconds per complete gait cycle
+# - duty: fraction of the cycle spent in stance (0 < duty < 1)
+# - yaw_amplitude, pitch_lift, pitch_stance: radians
+# - kp: Nm/rad; kd: Nm*s/rad
+# - heading_gain: strength of left/right stride correction
+# - pattern: "crawl" moves one leg at a time; "trot" moves diagonal pairs
+# - lateral_gain: lateral steering response in 1/m; 0 disables it
+# - strafe_gain: front/rear stride correction per metre of lateral error;
+#   corrects sideways drift separately from the left/right heading correction
+
+# Normal flat-ground gait. These are the previous single-profile values.
+[profiles.flat]
+period = 1.0
+duty = 0.6
+yaw_amplitude = 0.45
+pitch_lift = 0.65
+pitch_stance = 0.0
+kp = 1.6
+kd = 0.04
+heading_gain = 0.8
+pattern = "trot"
+lateral_gain = 5.0
+
+# Conservative ramp gait: a slower crawl, longer ground contact, and a
+# shorter stride reduce speed demand and keep more feet supporting the body.
+[profiles.slope]
+period = 1.8
+duty = 0.8
+yaw_amplitude = 0.35
+pitch_lift = 0.55
+pitch_stance = 0.0
+kp = 1.6
+kd = 0.04
+heading_gain = 0.6
+pattern = "crawl"
+lateral_gain = 3.0
+
+# Very conservative gait for sharp crests and valleys. It uses the slowest,
+# shortest steps and the longest stance time of the three profiles.
+[profiles.transition]
+period = 2.2
+duty = 0.85
+yaw_amplitude = 0.25
+pitch_lift = 0.45
+pitch_stance = 0.0
+kp = 1.6
+kd = 0.04
+heading_gain = 0.5
+pattern = "crawl"
+lateral_gain = 2.0
+
+# Full-course rocker gait. Negative pitch pre-tilts the curved feet; the swing
+# is capped at the existing -45 degree joint limit by the controller. The
+# resulting dwell gives a longer lifted recovery than the flat gait.
+# This is a SIMULATION profile: steering currently uses ideal base position.
+# Friction, torque, speed, mass, joint travel and terrain are unchanged.
+[profiles.course]
+period = 1.0
+duty = 0.6
+yaw_amplitude = 0.45
+pitch_lift = 0.65
+pitch_stance = -0.3
+kp = 1.6
+kd = 0.04
+heading_gain = 3.0
+pattern = "trot"
+lateral_gain = 0.0
+strafe_gain = 10.0

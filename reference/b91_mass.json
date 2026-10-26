@@ -1,11 +1,10 @@
 {
   "fixed_mass_kg": {
-    "servo": 0.044,
-    "battery": 0.18,
+    "battery": 0.126,
     "ir": 0.0036,
     "camera": 0.014,
     "imu": 0.017,
-    "driver_board": 0.035,
+    "driver_board": 0.028,
     "esp32": 0.025,
     "regulator": 0.01,
     "bearing6": 0.008,
@@ -18,5 +17,5 @@
     "horn": 1150
   },
   "extra_wiring_fasteners_kg": 0.05,
-  "note": "Provisional allowances; replace with measured component masses. PLA uses solid CAD volume."
+  "note": "Servo masses are in b91_kinematics.json. Battery 126 g and Servo2 28 g use manufacturer values. Other allowances remain provisional; PLA uses solid CAD volume."
 }
