@@ -1,0 +1,17 @@
+{
+  "scope": "5.7mm straight driver envelope above 16 new mount bolts with matrix platform removed; new screw envelopes versus equipment; approximate 60deg forward camera cone. Connector plugs and flexible wiring not modelled.",
+  "issues": [],
+  "mounts_checked": 16,
+  "thread_engagement_mm": {
+    "M3x8_tab_mount": 2.4,
+    "M3x8_pillar": 2.4,
+    "M3x8_matrix_board": 2.4,
+    "M3x12_camera_ear": 2.4
+  },
+  "nut_allowance_mm": {
+    "across_flats": 5.8,
+    "thickness": 2.6,
+    "nominal_nut_AF": 5.5,
+    "nominal_nut_thickness": 2.4
+  }
+}

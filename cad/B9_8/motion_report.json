@@ -1,0 +1,15 @@
+{
+  "checks": 63196,
+  "completed_legs": [
+    "FL",
+    "FR",
+    "RL",
+    "RR"
+  ],
+  "issues": [],
+  "scope": "New/changed fixed parts and equipment only. Yaw -45..45 by15deg; pitch -45,-30,-15,0,15,25deg. Discrete CAD check, not continuous, dynamic, cable or strength validation.",
+  "candidate_sha256": "ab6cf27fb518fff827cae9f5fd4e7f3ef8213dae25a23d498fd3e4302a416de6",
+  "model_sha256": "b2802e6192afaadd44729a39412cf3853655df95f21b76369c18ba8cd6cb66d7",
+  "model": "cad/B9_8/Robot_B9_8.step",
+  "export_equivalence": "Candidate and final STEP differ only in FILE_NAME name and timestamp fields."
+}

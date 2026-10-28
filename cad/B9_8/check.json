@@ -1,0 +1,263 @@
+{
+  "source": "cad/B9_8/source/User_assembly_base.step",
+  "issues": [],
+  "parts": [
+    {
+      "name": "B9-8 chassis lightly reinforced posts",
+      "volume_mm3": 71204.45625783771
+    },
+    {
+      "name": "B9-8 bridge mounted centre deck support",
+      "volume_mm3": 3766.7708411083545
+    },
+    {
+      "name": "B9-8 bridge captive support nuts",
+      "volume_mm3": 8195.558036313718
+    },
+    {
+      "name": "B9-8 matrix pillar 1",
+      "volume_mm3": 1443.2218374509653
+    },
+    {
+      "name": "B9-8 matrix pillar 2",
+      "volume_mm3": 1443.221837450965
+    },
+    {
+      "name": "B9-8 matrix pillar 3",
+      "volume_mm3": 1443.221837450966
+    },
+    {
+      "name": "B9-8 matrix pillar 4",
+      "volume_mm3": 1443.221837450966
+    },
+    {
+      "name": "B9-8 matrix board platform 2p5mm solder clearance",
+      "volume_mm3": 110014.03437193675
+    },
+    {
+      "name": "B9-8 battery cradle 111p2x35x15 open lead end",
+      "volume_mm3": 16829.413525163458
+    },
+    {
+      "name": "B9-8 SERVO2 case cradle strap channels",
+      "volume_mm3": 9891.821580627618
+    },
+    {
+      "name": "B9-8 regulator underside clearance saddle",
+      "volume_mm3": 199.99999999999923
+    },
+    {
+      "name": "B9-8 ir_left M3 ear bracket accessible deck tabs",
+      "volume_mm3": 2223.595909187953
+    },
+    {
+      "name": "B9-8 ir_right M3 ear bracket accessible deck tabs",
+      "volume_mm3": 2223.5959091879527
+    },
+    {
+      "name": "B9-8 ir_ground M3 ear bracket accessible deck tabs",
+      "volume_mm3": 2666.0786402671533
+    },
+    {
+      "name": "B9-8 camera upright ear mount M3x12 -16",
+      "volume_mm3": 1682.1450161754522
+    },
+    {
+      "name": "B9-8 camera upright ear mount M3x12 16",
+      "volume_mm3": 1682.1450161754522
+    },
+    {
+      "name": "B9-8 lower equipment deck",
+      "volume_mm3": 47888.141814953495
+    }
+  ],
+  "matrix_chip_xy": [
+    0,
+    0
+  ],
+  "matrix_corner_holes": [
+    [
+      -44.1,
+      -18.5
+    ],
+    [
+      -44.1,
+      48
+    ],
+    [
+      46,
+      -18.5
+    ],
+    [
+      46,
+      48
+    ]
+  ],
+  "board_bounds_mm": [
+    [
+      -49.1,
+      -23.5,
+      81.1
+    ],
+    [
+      51,
+      53,
+      83.1
+    ]
+  ],
+  "camera_ear_spacing_mm": 32,
+  "camera_ear_depth_mm": 8,
+  "centre_support_wall_mm": 4.2,
+  "strengthened_post_wall_mm": 2.2,
+  "original_post_wall_mm": 1.8,
+  "solder_clearance_mm": 2.5,
+  "mount_tool_axes": [
+    [
+      62,
+      0,
+      43.6
+    ],
+    [
+      -62,
+      0,
+      43.6
+    ],
+    [
+      0,
+      62,
+      43.6
+    ],
+    [
+      0,
+      -62,
+      43.6
+    ],
+    [
+      0,
+      0,
+      43.6
+    ],
+    [
+      -70.8,
+      0,
+      43.6
+    ],
+    [
+      -70.8,
+      0,
+      75.6
+    ],
+    [
+      70.8,
+      0,
+      43.6
+    ],
+    [
+      70.8,
+      0,
+      75.6
+    ],
+    [
+      -10,
+      -29,
+      43.6
+    ],
+    [
+      -10,
+      -29,
+      75.6
+    ],
+    [
+      -10,
+      29,
+      43.6
+    ],
+    [
+      -10,
+      29,
+      75.6
+    ],
+    [
+      -65,
+      -12,
+      46.6
+    ],
+    [
+      -17,
+      -20,
+      46.6
+    ],
+    [
+      -65,
+      12,
+      46.6
+    ],
+    [
+      -17,
+      15,
+      46.6
+    ],
+    [
+      3,
+      -34,
+      46.6
+    ],
+    [
+      40,
+      -34,
+      46.6
+    ],
+    [
+      3,
+      34,
+      46.6
+    ],
+    [
+      40,
+      34,
+      46.6
+    ],
+    [
+      -14.5,
+      44,
+      46.6
+    ],
+    [
+      22.5,
+      44,
+      46.6
+    ],
+    [
+      -14.5,
+      -44,
+      46.6
+    ],
+    [
+      22.5,
+      -44,
+      46.6
+    ],
+    [
+      60,
+      -12,
+      46.6
+    ],
+    [
+      60,
+      12,
+      46.6
+    ],
+    [
+      69,
+      -16,
+      46.6
+    ],
+    [
+      69,
+      16,
+      46.6
+    ]
+  ],
+  "mount_tool_axes_note": "XYZ are screw-head bearing-plane access targets; upper pillar heads are recessed to z75.6.",
+  "source_revision": "User-cleaned B9-7-1 assembly"
+}

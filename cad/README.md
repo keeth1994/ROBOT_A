@@ -1,9 +1,7 @@
-# B9-1 CAD
+# B9-8 CAD
 
-Open [Robot_B9_1.f3d](B9_1/Robot_B9_1.f3d) in Fusion, or use the [STEP assembly](B9_1/Robot_B9_1.step). The saved assembly is the starting point for edits.
+Latest: [complete assembly](B9_8/Robot_B9_8.f3d), [STEP assembly](B9_8/Robot_B9_8.step), [revised components](B9_8/parts), and [changes and checks](B9_8/README.md).
 
-`B9_1/User_yaw_backup.f3d` preserves the source of the current edited fork. Component names inside the assembly retain their original identifiers for traceability.
+B9-8 adds a bridge-mounted centre support, slightly stronger chassis posts, two removable equipment levels, a centered matrix-board IMU, accessible sensor/camera fasteners, and battery/controller retention. The user-cleaned B9-7-1 chassis is the base; yaw and pitch parts are retained. Static and sampled clearance checks pass within the documented scope. Physical fit and wiring clearance remain to be checked. Simulation remains B9-1.
 
-For simulation export, register `ExportB91` in Fusion Scripts and Add-Ins. It reads the saved archive and writes `reference/b91_cad_meshes.json.gz`. Then run `robot.py build` to regenerate MuJoCo assets. The exporter does not capture unsaved active-tab changes.
-
-See [mechanical notes](B9_1/README.md) and [simulation notes](../docs/DESIGN_B91_SIM.md).
+The source, measured interfaces and validation scope are documented in [B9-8](B9_8/README.md). MuJoCo and its exporter remain tied to the preserved B9-1 assembly.
