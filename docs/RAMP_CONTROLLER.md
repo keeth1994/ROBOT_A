@@ -77,7 +77,7 @@ This is a small sensitivity test, not a guarantee over all disturbances or surfa
 This result establishes traversal in the supplied simulation, not physical
 autonomy. The [PC walking controller](../firmware/README.md) now reuses the Python
 gait for straight-ahead physical tests. The ESP32 executes complete calibrated
-joint frames and returns raw sensor data; gait and tilt monitoring run on the
+joint frames and returns raw sensor data; gait calculation runs on the
 PC. The separate USB walking firmware has been removed. Autonomous localization
 and physical walking validation remain unfinished. Nothing has been flashed
 or sent to hardware by this change.
@@ -88,8 +88,8 @@ heading relative to the start, with drift; the IMU alone does not supply the
 accurate lateral position used here. The simulated IR readings and camera are
 not consumed by this gait. An onboard solution still needs tested heading and
 cross-track estimates, potentially using the existing camera, or operator
-steering. The initial PC controller uses zero heading/lateral corrections and an IMU
-tilt stop. Autonomous lateral localization is not implemented, and camera/heading
+steering. The initial PC controller uses zero heading/lateral corrections and does not
+use IMU or camera data for walking. Autonomous lateral localization is not implemented, and camera/heading
 feedback has not been validated on the hardware.
 
 For hardware integration, call the gait at 50 Hz with measured/commanded path

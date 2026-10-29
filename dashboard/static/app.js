@@ -36,7 +36,7 @@ function renderControls() {
   const device = current?.servo, s = device?.data;
   const walking = !!current?.walking?.active || !!s?.externalActive;
   const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.calibratedAngles || !s?.servoReady || s?.faulted || s?.running || walking || !current?.operator_alive || commandBusy;
-  el('walk').disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 1 || !s?.imuValid;
+  el('walk').disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 1;
   el('all').disabled = el('groups').disabled = blocked || !!s?.manualActive;
   rows.forEach(row => {
     row.enable.disabled = blocked || row.active;

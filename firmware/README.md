@@ -1,6 +1,6 @@
 # PC-controlled walking
 
-The PC calculates the gait and monitors BMI270 data. The controller ESP32 runs
+The PC calculates the gait. BMI270 data is displayed only. The controller ESP32 runs
 `servo_camera/controller_esp32/controller_esp32.ino`, applies calibrated joint
 commands and stops when the command stream is lost.
 
@@ -16,14 +16,14 @@ commands and stops when the command stream is lost.
    .venv/bin/python dashboard/run.py
    ```
 
-3. Open http://127.0.0.1:8765/, check the connection and IMU readings, then
+3. Open http://127.0.0.1:8765/, check the connection, then
    press Stop to release manual controls before selecting **Walk forward (PC)**.
    Support the robot for its first test. Stop disables PWM.
 
 Walking uses the simulation's `flat` profile with zero heading/lateral correction.
-It does not perform camera navigation. IMU Z must point up; starting requires
-fresh readings and tilt below 30°. Running stops above 45° tilt, on browser
-heartbeat loss, or when the ESP32 receives no target frame for 300 ms. Restart
+Walking does not use IMU or camera input and has no IMU readiness, freshness
+or tilt checks. It stops on browser heartbeat loss or when the ESP32 receives
+no target frame for 300 ms. Restart
 requires an explicit button press. Physical walking has not been validated.
 
 Pitch uses the raised calibration frame: -90° to +45°, with +45° meaning foot

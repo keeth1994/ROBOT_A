@@ -16,35 +16,20 @@ class Walking:
         self.active = False
         self.session = self.sequence = 0
         self.started = self.last_frame = 0.0
-        self.tilt = None
         self.channels = {}
         self.message = 'Stopped. PC walking is not started automatically.'
 
     def state(self):
-        return dict(active=self.active, message=self.message, tilt_deg=self.tilt,
+        return dict(active=self.active, message=self.message,
                     profile='flat', mode='straight', controller='PC')
 
-    def sensor_check(self, status, starting=False):
+    def controller_check(self, status):
         if (not status.get('servoReady') or status.get('faulted') or
                 status.get('motionProtocol') != 1):
             raise DeviceError('Upload the PC-controlled ESP32 firmware and check servo status.', 409)
-        if (not status.get('imuValid') or status.get('imuAgeMs', 10000) > 100):
-            raise DeviceError('Fresh BMI270 readings are required; walking stopped.', 409)
-        try:
-            a, g = status['accel'], status['gyro']
-            if len(a) != 3 or len(g) != 3 or not all(math.isfinite(v) for v in (*a, *g)):
-                raise ValueError()
-            norm = math.sqrt(sum(v*v for v in a))
-            if not .5 <= norm <= 1.5:
-                raise ValueError()
-            self.tilt = math.degrees(math.acos(max(-1, min(1, a[2] / norm))))
-        except (KeyError, TypeError, ValueError):
-            raise DeviceError('Invalid IMU sample; walking stopped.', 409) from None
-        if self.tilt > (30 if starting else 45):
-            raise DeviceError('Body tilt too high. Support and level the robot; IMU Z must point up.', 409)
 
     def prepare(self, status):
-        self.sensor_check(status, starting=True)
+        self.controller_check(status)
         joints = status.get('joints', [])
         mapping = {j['name']: j['channel'] for j in joints}
         if (set(mapping) != set(JOINTS) or len(joints) != 8 or
@@ -66,7 +51,7 @@ class Walking:
     def frame(self, status, now):
         if not self.active:
             raise DeviceError('Walking is stopped.', 409)
-        self.sensor_check(status)
+        self.controller_check(status)
         if now - self.last_frame > .25:
             raise DeviceError('PC/network control overrun; restart walking explicitly.', 409)
         if not status.get('externalActive') or status.get('motionSession') != self.session:

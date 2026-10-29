@@ -61,7 +61,7 @@ in 82.330 simulated seconds,
 with non-foot terrain contact during 2.1% of evaluated timesteps.
 See [simulation notes](docs/DESIGN_B91_SIM.md) for validation details. Existing B9-1
 course records and video are historical and do not validate the revised model.
-The PC dashboard reuses the Python gait for straight-ahead walking and monitors
-IMU data. The controller ESP32 executes calibrated joint frames over Wi-Fi;
+The PC dashboard reuses the Python gait for straight-ahead walking without
+IMU or camera input. The controller ESP32 executes calibrated joint frames over Wi-Fi;
 physical walking tests and autonomous localization remain unfinished.
 See [PC walking setup](firmware/README.md).
