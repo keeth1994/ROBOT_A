@@ -36,8 +36,16 @@ link assignments and collision count. Legacy B9-1 assets remain available as his
   Output torque estimates: pitch 0.224 Nm, front yaw 0.255 Nm, rear yaw 0.486 Nm.
   Yaw uses a 1.5 speed ratio and 85% assumed gear efficiency. Torque falls with
   speed, with commands at 50 Hz. See `reference/b98_kinematics.json`.
-- Inherited joint limits remain +/-45 degrees. The B9-8 fixed-part CAD motion
-  report samples pitch only through +25 degrees; it does not certify the entire
+- Standard-model joint limits in the CAD frame: yaw -45 to +45 degrees,
+  pitch -135 to 0 degrees (foot-down maximum). Pitch calibration uses a raised zero 45 degrees
+  above CAD neutral: calibration -90/-45/0/+45 = CAD -135/-90/-45/0.
+  The ramp model uses pitch -45 to 0 degrees and yaw +/-45 degrees. The former
+  calibration +90 degree point was removed because it collides with the body.
+  Existing gait profiles retain their previous pitch commands; the reduced
+  physical upper stop may still affect dynamics. An explicit
+  `pitch_min = -2.356194490192345` in a non-ramp gait profile permits higher
+  lifting if `pitch_lift`/`pitch_stance` request it. The B9-8 fixed-part CAD motion
+  report samples pitch only through +25 degrees; it does not certify the expanded
   simulated range or moving-part clearance.
 - Rigid bodies and nominal friction 0.8; no supply limits, voltage sag, heat,
   backlash or calibrated sensor noise. No trained policy is included.

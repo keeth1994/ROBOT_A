@@ -30,7 +30,7 @@ A small gait control window opens, allowing you to switch between gait profiles.
 - [CAD workflow](cad/README.md)
 - [Simulation assumptions and results](docs/DESIGN_B91_SIM.md)
 - [Ramp controller, validation and physical transfer requirements](docs/RAMP_CONTROLLER.md)
-- [ESP32 firmware prototype and commissioning](firmware/README.md)
+- [PC walking controller and ESP32 command executor](firmware/README.md)
 - [Historical B9-1 course traversal (2x playback)](results/b91_course.mp4)
 - [Machine-readable current design](cad/current_design.json)
 
@@ -61,5 +61,7 @@ in 82.330 simulated seconds,
 with non-foot terrain contact during 2.1% of evaluated timesteps.
 See [simulation notes](docs/DESIGN_B91_SIM.md) for validation details. Existing B9-1
 course records and video are historical and do not validate the revised model.
-An ESP32 firmware prototype reuses the gait with IMU heading and operator lateral
-steering; physical calibration, robot testing and autonomous localization remain unfinished.
+The PC dashboard reuses the Python gait for straight-ahead walking and monitors
+IMU data. The controller ESP32 executes calibrated joint frames over Wi-Fi;
+physical walking tests and autonomous localization remain unfinished.
+See [PC walking setup](firmware/README.md).

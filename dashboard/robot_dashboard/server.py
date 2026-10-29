@@ -1,4 +1,3 @@
-"""Loopback-only dashboard HTTP server. All motion writes are explicit requests."""
 import hmac
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -81,6 +80,8 @@ class Handler(BaseHTTPRequestHandler):
                 result = app.servo_command('/heartbeat', {})
             elif path in ('/api/servo/start', '/api/servo/servo', '/api/servo/release', '/api/servo/stop'):
                 result = app.servo_command('/' + path.rsplit('/', 1)[1], values)
+            elif path == '/api/walk/start':
+                result = app.walk_command('start')
             elif path == '/api/config':
                 result = app.configure(values)
             elif path == '/api/video':

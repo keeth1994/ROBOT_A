@@ -10,16 +10,18 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <SparkFun_BMI270_Arduino_Library.h>
 #include <math.h>
+#include <esp_system.h>
+#include "measured_servos.h"
+#include "motion_stream.h"
 
 constexpr int SDA_PIN = 21, SCL_PIN = 22;
 constexpr uint8_t SERVO_ADDRESS = 0x40;
 constexpr uint8_t CHANNELS[] = {0, 1, 2, 3, 8, 9, 10, 11};
 constexpr size_t CHANNEL_COUNT = sizeof(CHANNELS) / sizeof(CHANNELS[0]);
 constexpr size_t GROUP_SIZE = 4;
-// Existing bench limits; not measured robot joint calibration.
-constexpr uint16_t CENTER_US = 1500, LEFT_US = 1000, RIGHT_US = 2000;
-// Small manual range for initial checks; expand only after checking joint travel.
-constexpr uint16_t MANUAL_MIN_US = 1400, MANUAL_MAX_US = 1600;
+
+static_assert(CHANNEL_COUNT == sizeof(calibrated::servos) / sizeof(calibrated::servos[0]),
+              "Calibration must cover every configured channel.");
 constexpr uint32_t MOVE_TIME_MS = 1500, UPDATE_MS = 20;
 constexpr uint32_t WIFI_TIMEOUT_MS = 3000;
 bool wifiWasConnected = false;
@@ -27,15 +29,16 @@ IPAddress controllerIp;
 uint32_t lastReconnect = 0;
 static_assert(MOVE_TIME_MS >= UPDATE_MS, "Move time must be at least one frame.");
 static_assert(CHANNEL_COUNT > 0 && GROUP_SIZE > 0, "List at least one channel.");
-static_assert(MANUAL_MIN_US <= CENTER_US && CENTER_US <= MANUAL_MAX_US,
-              "Manual limits must include centre.");
 
 Adafruit_PWMServoDriver pwm(SERVO_ADDRESS, Wire);
 BMI270 imu;
 WebServer server(80);
 bool servoReady = false, imuReady = false, imuValid = false;
 bool imuStreaming = true, faulted = false;
-uint32_t lastImuReport = 0, lastImuSuccess = 0, lastHeartbeat = 0;
+uint32_t lastImuReport = 0, lastImuSample = 0, lastImuSuccess = 0, lastHeartbeat = 0;
+MotionStream stream;
+bool &externalActive = stream.active;
+uint32_t &motionSession = stream.session;
 float usPerTick = 0;
 const char *message = "Outputs off. Ready for a test.";
 
@@ -47,9 +50,11 @@ uint8_t phase = 0;
 uint32_t phaseStarted = 0, lastServoUpdate = 0;
 // Zero means disabled; otherwise this is the last commanded pulse, not feedback.
 uint16_t manualPulse[CHANNEL_COUNT] = {};
+double manualAngle[CHANNEL_COUNT] = {};
 
 bool manualActive()
 {
+  if (externalActive) return false;
   for (size_t i = 0; i < CHANNEL_COUNT; ++i)
     if (manualPulse[i] != 0)
       return true;
@@ -72,6 +77,7 @@ bool allOff()
 
 void servoFault()
 {
+  stream.stop();
   running = false;
   wifiRun = false;
   faulted = true;
@@ -82,6 +88,7 @@ void servoFault()
 
 bool stopTest(const char *reason)
 {
+  stream.stop();
   running = false;
   wifiRun = false;
   // Preserve a latched fault's explanation until reset.
@@ -92,15 +99,20 @@ bool stopTest(const char *reason)
   return servoReady && !faulted;
 }
 
-bool writeGroup(uint16_t pulseUs)
+bool writeGroup(uint8_t motionPhase = 3, float progress = 1.0f)
 {
-  uint16_t ticks = static_cast<uint16_t>(pulseUs / usPerTick + 0.5f);
   for (size_t i = groupFirst; i < groupFirst + groupCount; ++i)
-    if (pwm.setPWM(CHANNELS[i], 0, ticks) != 0)
+  {
+    const auto &servo = calibrated::servos[i];
+    const int pulseUs = calibrated::pulse(servo, calibrated::sweepAngle(servo, motionPhase, progress));
+    if (pulseUs < 0) { servoFault(); return false; }
+    const uint16_t ticks = static_cast<uint16_t>(pulseUs / usPerTick + 0.5f);
+    if (pwm.setPWM(servo.channel, 0, ticks) != 0)
     {
       servoFault();
       return false;
     }
+  }
   return true;
 }
 
@@ -110,13 +122,13 @@ bool startGroup()
   groupCount = grouped && remaining > GROUP_SIZE ? GROUP_SIZE : remaining;
   phase = 0;
   phaseStarted = lastServoUpdate = millis();
-  // No shaft-position feedback: the first centre command can jump.
-  return writeGroup(CENTER_US);
+
+  return writeGroup();
 }
 
 bool startTest(bool groups, bool fromWifi)
 {
-  if (!servoReady || faulted || running || manualActive() ||
+  if (!servoReady || faulted || running || externalActive || manualActive() ||
       (fromWifi && WiFi.status() != WL_CONNECTED))
     return false;
   grouped = groups;
@@ -131,6 +143,11 @@ bool startTest(bool groups, bool fromWifi)
 void updateMotion()
 {
   uint32_t now = millis();
+  if (externalActive && (WiFi.status() != WL_CONNECTED || stream.expired(now)))
+  {
+    stopTest("PC target stream lost. Outputs off; restart explicitly.");
+    return;
+  }
   if (((running && wifiRun) || manualActive()) && WiFi.status() != WL_CONNECTED)
   {
     stopTest("Wi-Fi disconnected. Outputs off.");
@@ -151,9 +168,7 @@ void updateMotion()
   {
     float progress = elapsed >= MOVE_TIME_MS ? 1.0f : float(elapsed) / MOVE_TIME_MS;
     float eased = progress * progress * (3.0f - 2.0f * progress);
-    uint16_t from = phase == 1 ? CENTER_US : (phase == 2 ? LEFT_US : RIGHT_US);
-    uint16_t to = phase == 1 ? LEFT_US : (phase == 2 ? RIGHT_US : CENTER_US);
-    if (!writeGroup(uint16_t(from + (float(to) - from) * eased + 0.5f)))
+    if (!writeGroup(phase, eased))
       return;
     if (elapsed < MOVE_TIME_MS)
       return;
@@ -205,9 +220,9 @@ void beginImu()
 
 void serviceImu()
 {
-  if (!imuReady || millis() - lastImuReport < 500)
+  if (!imuReady || millis() - lastImuSample < 20)
     return;
-  lastImuReport = millis();
+  lastImuSample = millis();
   imuValid = imu.getSensorData() == BMI2_OK;
   if (imuValid)
     imuValid = isfinite(imu.data.accelX) && isfinite(imu.data.accelY) &&
@@ -215,8 +230,9 @@ void serviceImu()
                isfinite(imu.data.gyroY) && isfinite(imu.data.gyroZ);
   if (imuValid)
     lastImuSuccess = millis();
-  if (!imuStreaming)
+  if (!imuStreaming || millis() - lastImuReport < 500)
     return; // USB printing only; web readings stay live.
+  lastImuReport = millis();
   char line[160];
   int length = imuValid ? snprintf(line, sizeof(line),
                                    "IMU a[g] %.3f %.3f %.3f | gyro[deg/s] %.2f %.2f %.2f\n",
@@ -256,12 +272,24 @@ void sendStatus()
   json += running ? channelList(groupFirst, groupCount) : String("none");
   json += "\",\"manualActive\":";
   json += manualActive() ? "true" : "false";
-  json += ",\"manualMin\":";
-  json += String(MANUAL_MIN_US);
-  json += ",\"manualMax\":";
-  json += String(MANUAL_MAX_US);
-  json += ",\"center\":";
-  json += String(CENTER_US);
+  json += ",\"motionProtocol\":1,\"externalActive\":";
+  json += externalActive ? "true" : "false";
+  json += ",\"motionSession\":"; json += String(motionSession);
+  json += ",\"imuAgeMs\":"; json += String(millis() - lastImuSuccess);
+  json += ",\"calibratedAngles\":true,\"joints\":[";
+  for (size_t i = 0; i < CHANNEL_COUNT; ++i)
+  {
+    if (i) json += ",";
+    const auto &servo = calibrated::servos[i];
+    json += "{\"name\":\""; json += servo.name;
+    json += "\",\"channel\":"; json += String(servo.channel);
+    json += ",\"minAngle\":"; json += String(calibrated::minAngle(servo));
+    json += ",\"maxAngle\":45,\"restAngle\":"; json += String(calibrated::restAngle(servo));
+    json += ",\"angle\":"; json += manualPulse[i] ? String(manualAngle[i]) : String("null");
+    json += ",\"pulse\":"; json += manualPulse[i] ? String(manualPulse[i]) : String("null");
+    json += "}";
+  }
+  json += "]";
   json += ",\"manual\":[";
   for (size_t i = 0; i < CHANNEL_COUNT; ++i)
   {
@@ -310,35 +338,55 @@ bool readUnsignedArg(const char *name, uint16_t &value)
   return true;
 }
 
+bool readAngleArg(int16_t &value)
+{
+  String arg = server.arg("angle");
+  if (arg.length() == 0 || arg.length() > 4) return false;
+  size_t first = arg[0] == '-' ? 1 : 0;
+  if (first == arg.length()) return false;
+  for (size_t i = first; i < arg.length(); ++i)
+    if (arg[i] < '0' || arg[i] > '9') return false;
+  const long parsed = arg.toInt();
+  if (parsed < -90 || parsed > 45) return false;
+  value = static_cast<int16_t>(parsed);
+  return true;
+}
+
 void handleManual(bool release)
 {
-  uint16_t channel, pulse = 0;
+  uint16_t channel;
+  int16_t angle = 0;
   if (!readUnsignedArg("channel", channel) ||
-      (!release && (!readUnsignedArg("pulse", pulse) ||
-                    pulse < MANUAL_MIN_US || pulse > MANUAL_MAX_US)))
+      (!release && (server.hasArg("pulse") || !readAngleArg(angle))))
   {
-    server.send(400, "text/plain", "Invalid channel or pulse; use the manual limits.");
+    server.send(400, "text/plain", "Use a channel and integer angle in degrees, not a raw pulse.");
     return;
   }
   size_t index = 0;
   while (index < CHANNEL_COUNT && CHANNELS[index] != channel) ++index;
   if (index == CHANNEL_COUNT)
   {
-    server.send(400, "text/plain", "Channel is not configured in CHANNELS.");
+    server.send(400, "text/plain", "Channel is not configured.");
     return;
   }
-  if (!servoReady || faulted || running || WiFi.status() != WL_CONNECTED)
+  const auto &servo = calibrated::servos[index];
+  const int pulse = release ? 0 : calibrated::pulse(servo, angle);
+  if (pulse < 0)
+  {
+    server.send(400, "text/plain", "Angle is outside this joint's measured range. Pitch cannot pass foot-down.");
+    return;
+  }
+  if (!servoReady || faulted || running || externalActive || WiFi.status() != WL_CONNECTED)
   {
     server.send(409, "text/plain", "Manual control unavailable. Stop the test or check controller status.");
     return;
   }
-  // A newly enabled channel always starts at the explicitly labelled centre.
-  if (!release && manualPulse[index] == 0 && pulse != CENTER_US)
+  if (!release && manualPulse[index] == 0 && angle != calibrated::restAngle(servo))
   {
-    server.send(409, "text/plain", "Enable this servo at centre first.");
+    server.send(409, "text/plain", "Enable at the measured neutral/foot-down angle first.");
     return;
   }
-  uint16_t ticks = release ? 4096 : static_cast<uint16_t>(pulse / usPerTick + 0.5f);
+  const uint16_t ticks = release ? 4096 : static_cast<uint16_t>(pulse / usPerTick + 0.5f);
   if (pwm.setPWM(channel, 0, ticks) != 0)
   {
     servoFault();
@@ -346,15 +394,74 @@ void handleManual(bool release)
     return;
   }
   manualPulse[index] = release ? 0 : pulse;
+  manualAngle[index] = angle;
   lastHeartbeat = millis();
-  message = manualActive() ? "Manual control. Enabled servos hold their commands." : "Outputs off. Ready for a test.";
-  server.send(200, "text/plain", release ? "Servo pulses disabled; power stays on." : "Servo command applied.");
+  message = manualActive() ? "Calibrated manual control. Enabled servos hold their commands." : "Outputs off. Ready for a test.";
+  server.send(200, "text/plain", release ? "Servo pulses disabled; power stays on." : "Calibrated angle applied.");
+}
+
+
+bool readUint32(const char *name, uint32_t &value)
+{
+  String arg = server.arg(name);
+  if (arg.length() == 0 || arg.length() > 10) return false;
+  uint64_t number = 0;
+  for (size_t i = 0; i < arg.length(); ++i) {
+    if (arg[i] < '0' || arg[i] > '9') return false;
+    number = number * 10 + (arg[i] - '0');
+  }
+  if (number > UINT32_MAX) return false;
+  value = static_cast<uint32_t>(number);
+  return true;
+}
+
+void startExternal()
+{
+  if (!servoReady || faulted || running || externalActive || manualActive() ||
+      WiFi.status() != WL_CONNECTED) {
+    server.send(409, "text/plain", "Stop existing motion or fix controller status first."); return;
+  }
+  groupFirst = 0; groupCount = CHANNEL_COUNT;
+  if (!writeGroup()) { server.send(503, "text/plain", message); return; }
+  stream.begin(esp_random(), millis());
+  message = "PC joint stream active. Gait is calculated on the PC.";
+  server.send(200, "application/json", String("{\"session\":") + String(motionSession) + "}");
+}
+
+void receiveTargets()
+{
+  uint32_t session, sequence;
+  if (faulted || !readUint32("session", session) || !readUint32("sequence", sequence) ||
+      !stream.accepts(session, sequence)) {
+    server.send(409, "text/plain", "Inactive, stale or mismatched PC motion session."); return;
+  }
+  double angles[CHANNEL_COUNT];
+  int pulses[CHANNEL_COUNT];
+  for (size_t i = 0; i < CHANNEL_COUNT; ++i) {
+    String value = server.arg(String("a") + String(CHANNELS[i]));
+    char *end = nullptr;
+    angles[i] = strtod(value.c_str(), &end);
+    if (!value.length() || value.length() > 20 || !end || *end || !isfinite(angles[i]) ||
+        (pulses[i] = calibrated::pulse(calibrated::servos[i], angles[i])) < 0) {
+      server.send(400, "text/plain", "Complete frame with eight measured joint angles required."); return;
+    }
+  }
+  for (size_t i = 0; i < CHANNEL_COUNT; ++i) {
+    if (pwm.setPWM(CHANNELS[i], 0, static_cast<uint16_t>(pulses[i] / usPerTick + .5f)) != 0) {
+      servoFault(); server.send(503, "text/plain", message); return;
+    }
+    manualPulse[i] = pulses[i]; manualAngle[i] = angles[i];
+  }
+  stream.applied(sequence, millis());
+  server.send(200, "text/plain", "Targets applied");
 }
 
 void beginWifi()
 {
   server.on("/", HTTP_GET, sendStatus); // API only; the PC serves the dashboard.
   server.on("/status", HTTP_GET, sendStatus);
+  server.on("/motion/start", HTTP_POST, startExternal);
+  server.on("/targets", HTTP_POST, receiveTargets);
   server.on("/servo", HTTP_POST, []() { handleManual(false); });
   server.on("/release", HTTP_POST, []() { handleManual(true); });
   server.on("/heartbeat", HTTP_POST, []()
@@ -389,7 +496,7 @@ void serviceWifi()
   bool connected = WiFi.status() == WL_CONNECTED;
   if (wifiWasConnected && (!connected || WiFi.localIP() != controllerIp))
   {
-    if ((running && wifiRun) || manualActive())
+    if (externalActive || (running && wifiRun) || manualActive())
       stopTest("Wi-Fi connection changed. Outputs off.");
     server.stop();
     MDNS.end();
@@ -446,14 +553,15 @@ void setup()
       usPerTick = (pwm.readPrescale() + 1) * 1000000.0f / pwm.getOscillatorFrequency();
       for (size_t i = 0; i < CHANNEL_COUNT; ++i)
       {
-        if (CHANNELS[i] > 15)
+        if (CHANNELS[i] > 15 || calibrated::servos[i].channel != CHANNELS[i] ||
+            !calibrated::valid(calibrated::servos[i]))
           faulted = true;
         for (size_t j = 0; j < i; ++j)
           if (CHANNELS[i] == CHANNELS[j])
             faulted = true;
       }
       if (faulted)
-        message = "Invalid or duplicate servo channels. Fix sketch and reset.";
+        message = "Invalid calibration or duplicate channels. Re-export measured_servos.h and reset.";
     }
   }
   else

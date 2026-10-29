@@ -25,35 +25,48 @@ async function servoCommand(name, values = {}) {
   catch (error) { message(error.message + (name === 'stop' ? ' Stop is NOT confirmed; use the servo power switch if needed.' : ''), true); }
   finally { commandBusy = false; renderControls(); }
 }
+async function walkForward() {
+  if (commandBusy) return;
+  commandBusy = true; renderControls();
+  try { const result = await post('/api/walk/start'); message(result.message); }
+  catch (error) { message(error.message, true); }
+  finally { commandBusy = false; renderControls(); }
+}
 function renderControls() {
   const device = current?.servo, s = device?.data;
-  const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.servoReady || s?.faulted || s?.running || !current?.operator_alive || commandBusy;
+  const walking = !!current?.walking?.active || !!s?.externalActive;
+  const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.calibratedAngles || !s?.servoReady || s?.faulted || s?.running || walking || !current?.operator_alive || commandBusy;
+  el('walk').disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 1 || !s?.imuValid;
   el('all').disabled = el('groups').disabled = blocked || !!s?.manualActive;
   rows.forEach(row => {
     row.enable.disabled = blocked || row.active;
-    row.release.disabled = commandBusy || !device?.online || !row.active;
+    row.release.disabled = walking || commandBusy || !device?.online || !row.active;
     row.slider.disabled = blocked || !row.active;
   });
 }
 function renderServos(s) {
-  const channels = s.channels.split(',').map(Number).filter(n => Number.isInteger(n) && n >= 0 && n <= 15);
-  channels.forEach((channel, index) => {
+  if (!s.calibratedAngles || !Array.isArray(s.joints)) return;
+  s.joints.forEach(joint => {
+    const channel = joint.channel;
     let row = rows.get(channel);
     if (!row) {
       const box = document.createElement('div'); box.className = 'servo';
-      box.innerHTML = '<div class="servo-top"><label></label><span class="pulse"></span></div><input type="range" step="1"><div class="servo-buttons"><button class="enable">Enable at center</button><button class="release">Release</button></div>';
+      box.innerHTML = '<div class="servo-top"><label></label><span class="pulse"></span></div><input type="range" step="1"><div class="servo-buttons"><button class="enable"></button><button class="release">Release</button></div>';
       row = {box, slider:box.querySelector('input'), enable:box.querySelector('.enable'), release:box.querySelector('.release'), active:false};
       row.slider.id = 'channel-' + channel; box.querySelector('label').htmlFor = row.slider.id;
-      box.querySelector('label').textContent = 'Channel ' + channel;
-      row.slider.onchange = () => servoCommand('servo', {channel, pulse:Number(row.slider.value)});
-      row.enable.onclick = () => servoCommand('servo', {channel, pulse:current.servo.data.center});
+      box.querySelector('label').textContent = joint.name + ' · channel ' + String(channel).padStart(2, '0');
+      row.slider.onchange = () => servoCommand('servo', {channel, angle:Number(row.slider.value)});
+      row.enable.onclick = () => servoCommand('servo', {channel, angle:row.restAngle});
       row.release.onclick = () => servoCommand('release', {channel});
       rows.set(channel, row); el('servos').append(box);
     }
-    row.active = s.manual[index] !== null;
-    row.slider.min = s.manualMin; row.slider.max = s.manualMax;
-    if (document.activeElement !== row.slider) row.slider.value = row.active ? s.manual[index] : s.center;
-    row.box.querySelector('.pulse').textContent = row.active ? s.manual[index] + ' µs commanded' : 'Pulses off';
+    row.active = joint.angle !== null;
+    row.restAngle = joint.restAngle;
+    row.enable.textContent = joint.name.endsWith('_pitch') ? 'Enable foot down (+45°)' : 'Enable neutral (0°)';
+    row.slider.min = joint.minAngle; row.slider.max = joint.maxAngle;
+    if (document.activeElement !== row.slider) row.slider.value = row.active ? joint.angle : joint.restAngle;
+    const sweeping = s.running && s.active.split(',').map(Number).includes(channel);
+    row.box.querySelector('.pulse').textContent = row.active ? joint.angle + '° · ' + joint.pulse + ' µs commanded' : sweeping ? 'Calibrated sweep running' : 'Pulses off';
   });
 }
 function clearFeed() {
@@ -61,6 +74,7 @@ function clearFeed() {
 }
 function render(state) {
   current = state; token = state.token || token;
+  el('walkMessage').textContent = state.walking?.message || 'PC walking unavailable.';
   if (!addressesLoaded) {
     el('servoAddress').value = state.config.servo; el('cameraAddress').value = state.config.camera; addressesLoaded = true;
   }
@@ -69,8 +83,8 @@ function render(state) {
   badge('cameraOnline', state.camera.online ? 'Connected' : 'Offline', state.camera.online);
   const s = state.servo.data;
   if (state.servo.online && s) {
-    renderServos(s); el('controllerMessage').textContent = s.message;
-    badge('servoState', s.faulted ? 'Fault' : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
+    renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? s.message : 'Upload the calibrated controller firmware to enable these controls.';
+    badge('servoState', s.faulted ? 'Fault' : s.externalActive ? 'PC walking' : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
     const live = s.imuReady && s.imuValid;
     badge('imuState', live ? 'Live' : 'Unavailable', live);
     el('accel').textContent = live ? s.accel.map(n => n.toFixed(3)).join(' / ') : '— / — / —';
@@ -112,6 +126,7 @@ async function poll() {
   } finally { setTimeout(poll, 500); }
 }
 el('stop').onclick = () => servoCommand('stop');
+el('walk').onclick = walkForward;
 el('all').onclick = () => servoCommand('start', {mode:'all'});
 el('groups').onclick = () => servoCommand('start', {mode:'groups'});
 el('connect').onclick = async () => {

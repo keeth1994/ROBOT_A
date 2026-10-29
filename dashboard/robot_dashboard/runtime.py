@@ -1,4 +1,3 @@
-"""Latest-frame camera relay and the explicit browser-to-servo bridge."""
 import http.client
 import json
 from pathlib import Path
@@ -6,6 +5,7 @@ import threading
 import time
 
 from . import devices
+from .walking import Walking
 
 
 class CameraPipeline:
@@ -133,6 +133,7 @@ class Dashboard:
         self.cache = {name: {'online': False, 'data': None, 'error': 'Connecting...', 'at': 0}
                       for name in ('servo', 'camera')}
         self.camera = CameraPipeline(self.stream_url)
+        self.walking = Walking()
         self.threads = []
 
     @staticmethod
@@ -152,6 +153,59 @@ class Dashboard:
             thread = threading.Thread(target=self._poll, args=(name,), daemon=True)
             thread.start()
             self.threads.append(thread)
+        thread = threading.Thread(target=self._walk_loop, daemon=True)
+        thread.start()
+        self.threads.append(thread)
+
+    def _walk_loop(self):
+        while not self.stop_event.wait(.02):
+            with self.servo_lock:
+                if not self.walking.active:
+                    continue
+                with self.lock:
+                    alive = time.monotonic() - self.browser_heartbeat < 1.5
+                    url = self.config['servo']
+                try:
+                    if not alive:
+                        raise devices.DeviceError('Operator heartbeat lost; walking stopped.')
+                    status = devices.request(url, '/status', timeout=.15)
+                    frame = self.walking.frame(status, time.monotonic())
+                    devices.request(url, '/targets', frame, timeout=.15)
+                except (devices.DeviceError, ValueError, KeyError, TypeError) as error:
+                    self.walking.stop(str(error))
+                    try:
+                        devices.request(url, '/stop', {}, timeout=.15)
+                    except devices.DeviceError:
+                        pass
+
+    def walk_command(self, action):
+        with self.servo_lock:
+            with self.lock:
+                alive = time.monotonic() - self.browser_heartbeat < 1.5
+                url = self.config['servo']
+            if action != 'start':
+                raise ValueError('Unknown walking command.')
+            if not alive:
+                raise devices.DeviceError('Keep the dashboard visible to start walking.', 409)
+            if self.walking.active:
+                raise devices.DeviceError('Already walking.', 409)
+            try:
+                status = devices.request(url, '/status', timeout=.15)
+                self.walking.prepare(status)
+                if status.get('manualActive') or status.get('running') or status.get('externalActive'):
+                    raise devices.DeviceError('Press Stop to release existing servo control first.', 409)
+                result = devices.request(url, '/motion/start', {}, timeout=.15)
+                self.walking.begin(status, result['session'], time.monotonic())
+            except (devices.DeviceError, KeyError, ValueError, TypeError) as error:
+                self.walking.stop('Walking start failed. Outputs off requested.')
+                try:
+                    devices.request(url, '/stop', {}, timeout=.15)
+                except devices.DeviceError:
+                    pass
+                if isinstance(error, devices.DeviceError):
+                    raise
+                raise devices.DeviceError('Invalid ESP32 walking response; motion stopped.', 409) from error
+            return {'message': self.walking.message}
 
     def _poll(self, name):
         while not self.stop_event.is_set():
@@ -178,6 +232,7 @@ class Dashboard:
                 status[name] = {**entry, 'online': entry['online'] and now - entry['at'] < 2.5}
             status['operator_alive'] = now - self.browser_heartbeat < 1.5
         status['pipeline'] = self.camera.state()
+        status['walking'] = self.walking.state()
         return status
 
     def servo_command(self, path, values):
@@ -187,6 +242,10 @@ class Dashboard:
         with self.lock:
             generation = self.generation
         with self.servo_lock:
+            if path == '/stop':
+                self.walking.stop()
+            elif self.walking.active and path not in ('/heartbeat',):
+                raise devices.DeviceError('Stop walking before manual control or sweeps.', 409)
             with self.lock:
                 if generation != self.generation:
                     raise devices.DeviceError('Device address changed. Retry explicitly.', 409)
@@ -209,10 +268,12 @@ class Dashboard:
         config = self._validate_config(values)
         # Operator-requested address changes cancel current control before switching.
         with self.camera_settings_lock, self.servo_lock:
+            was_walking = self.walking.active
+            self.walking.stop('Device address changed. Walking stopped.')
             with self.lock:
                 active = time.monotonic() - self.browser_heartbeat < 1.5
                 data = self.cache['servo']['data'] or {}
-                active = active or data.get('running', False) or data.get('manualActive', False)
+                active = active or was_walking or data.get('running', False) or data.get('manualActive', False) or data.get('externalActive', False)
                 old_url = self.config['servo']
             if active:
                 devices.request(old_url, '/stop', {})
@@ -254,7 +315,7 @@ class Dashboard:
         self.stop_event.set()
         with self.lock:
             data = self.cache['servo']['data'] or {}
-            active = time.monotonic() - self.browser_heartbeat < 3 or data.get('running') or data.get('manualActive')
+            active = self.walking.active or time.monotonic() - self.browser_heartbeat < 3 or data.get('running') or data.get('manualActive') or data.get('externalActive')
         if active:
             try:
                 self.servo_command('/stop', {})

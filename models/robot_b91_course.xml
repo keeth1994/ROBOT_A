@@ -783,7 +783,7 @@
       <body name="FL_yaw" pos="0.052 0.052 0">
         <joint name="FL_yaw" axis="0 0 1" range="-0.785398163 0.785398163" damping=".001" armature=".000001" />
         <body name="FL_pitch" pos="0.038890873 0.038890873 0.035">
-          <joint name="FL_pitch" axis="-0.707106781 0.707106781 0" range="-0.785398163 0.785398163" damping=".001" armature=".000001" />
+          <joint name="FL_pitch" axis="-0.707106781 0.707106781 0" range="-0.785398163 0" damping=".001" armature=".000001" />
           <geom type="mesh" mesh="cad_5" rgba=".08 .09 .11 1" contype="0" conaffinity="0" group="1" mass="0" />
           <geom name="collision_5_0" type="mesh" mesh="collision_5_0" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
           <geom type="mesh" mesh="cad_7" rgba=".75 .8 .87 1" contype="0" conaffinity="0" group="1" mass="0" />
@@ -916,7 +916,7 @@
       <body name="RL_yaw" pos="-0.052 0.052 0">
         <joint name="RL_yaw" axis="0 0 1" range="-0.785398163 0.785398163" damping=".001" armature=".000001" />
         <body name="RL_pitch" pos="-0.038890873 0.038890873 0.035">
-          <joint name="RL_pitch" axis="-0.707106781 -0.707106781 0" range="-0.785398163 0.785398163" damping=".001" armature=".000001" />
+          <joint name="RL_pitch" axis="-0.707106781 -0.707106781 0" range="-0.785398163 0" damping=".001" armature=".000001" />
           <geom type="mesh" mesh="cad_13" rgba=".08 .09 .11 1" contype="0" conaffinity="0" group="1" mass="0" />
           <geom name="collision_13_0" type="mesh" mesh="collision_13_0" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
           <geom type="mesh" mesh="cad_15" rgba=".75 .8 .87 1" contype="0" conaffinity="0" group="1" mass="0" />
@@ -1049,7 +1049,7 @@
       <body name="FR_yaw" pos="0.052 -0.052 0">
         <joint name="FR_yaw" axis="0 0 1" range="-0.785398163 0.785398163" damping=".001" armature=".000001" />
         <body name="FR_pitch" pos="0.038890873 -0.038890873 0.035">
-          <joint name="FR_pitch" axis="0.707106781 0.707106781 0" range="-0.785398163 0.785398163" damping=".001" armature=".000001" />
+          <joint name="FR_pitch" axis="0.707106781 0.707106781 0" range="-0.785398163 0" damping=".001" armature=".000001" />
           <geom type="mesh" mesh="cad_21" rgba=".08 .09 .11 1" contype="0" conaffinity="0" group="1" mass="0" />
           <geom name="collision_21_0" type="mesh" mesh="collision_21_0" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
           <geom type="mesh" mesh="cad_23" rgba=".75 .8 .87 1" contype="0" conaffinity="0" group="1" mass="0" />
@@ -1182,7 +1182,7 @@
       <body name="RR_yaw" pos="-0.052 -0.052 0">
         <joint name="RR_yaw" axis="0 0 1" range="-0.785398163 0.785398163" damping=".001" armature=".000001" />
         <body name="RR_pitch" pos="-0.038890873 -0.038890873 0.035">
-          <joint name="RR_pitch" axis="0.707106781 -0.707106781 0" range="-0.785398163 0.785398163" damping=".001" armature=".000001" />
+          <joint name="RR_pitch" axis="0.707106781 -0.707106781 0" range="-0.785398163 0" damping=".001" armature=".000001" />
           <geom type="mesh" mesh="cad_29" rgba=".08 .09 .11 1" contype="0" conaffinity="0" group="1" mass="0" />
           <geom name="collision_29_0" type="mesh" mesh="collision_29_0" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
           <geom type="mesh" mesh="cad_31" rgba=".75 .8 .87 1" contype="0" conaffinity="0" group="1" mass="0" />

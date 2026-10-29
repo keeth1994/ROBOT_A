@@ -1,3 +1,0 @@
-platformio==6.1.18
-pyserial==3.5
-ziglang==0.14.1

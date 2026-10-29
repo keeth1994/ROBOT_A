@@ -65,14 +65,15 @@ def main():
     )
     assert r.d.sensor("imu_angular_velocity").data.shape == (3,)
     # Commands are held until the next 50 Hz update.
-    r.step_targets(np.full(8, 0.1))
+    held_target = np.tile([0.1, -0.05], 4)
+    r.step_targets(held_target)
     for _ in range(9):
         r.step_targets(np.full(8, -0.1))
-        np.testing.assert_allclose(r.command_target, 0.1)
+        np.testing.assert_allclose(r.command_target, held_target)
     r.step_targets(np.full(8, -0.1))
     np.testing.assert_allclose(r.command_target, -0.1)
     r.next_command_time = r.d.time
-    r.step_targets(np.full(8, -2.0))
+    r.step_targets(np.full(8, -99.0))
     np.testing.assert_allclose(r.command_target, r.joint_ranges[:, 0])
     assert not np.any(r.d.xfrc_applied) and not np.any(r.d.qfrc_applied)
     # IR validity and sample holding, independent of the scene geometry.

@@ -44,6 +44,9 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
             fore = 1 if leg.startswith("F") else -1
             target[2 * i] = yaw * ramp * (sign + correction + fore * strafe)
             target[2 * i + 1] = p["pitch_stance"] + lift * ramp
+    target[1::2] = np.clip(target[1::2], p.get("pitch_min", -math.pi / 4), 0)
     if joint_ranges is None:
         joint_ranges = np.tile([-math.pi / 4, math.pi / 4], (8, 1))
+        joint_ranges[1::2, 0] = -3 * math.pi / 4
+        joint_ranges[1::2, 1] = 0
     return np.clip(target, joint_ranges[:, 0], joint_ranges[:, 1])

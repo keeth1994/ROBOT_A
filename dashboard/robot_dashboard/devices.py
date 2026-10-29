@@ -58,7 +58,7 @@ def request(base, path, values=None, timeout=0.8):
             except (ValueError, AttributeError):
                 pass
             raise DeviceError(text[:300] or f'Device HTTP {response.status}', response.status)
-        if path == '/status' or path == '/settings':
+        if path in ('/status', '/settings', '/motion/start'):
             data = json.loads(text)
             if not isinstance(data, dict):
                 raise DeviceError('Device returned an invalid status.')

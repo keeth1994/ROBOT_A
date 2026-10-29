@@ -57,9 +57,12 @@
       <section>
         <div class="panel-head"><h2>Servos</h2><span id="servoState" class="badge">Outputs off</span></div>
         <p id="controllerMessage">Waiting for controller.</p>
+        <div class="actions"><button id="walk">Walk forward (PC)</button></div>
+        <p id="walkMessage">PC walking is stopped.</p>
+        <p class="subtle">Support the robot for the first test. The PC calculates straight-ahead steps and monitors IMU tilt. Stop turns outputs off. Keep this tab visible.</p>
         <div class="actions"><button id="all">Sweep all</button><button id="groups">Sweep four at a time</button></div>
         <div id="servos"></div>
-        <p class="subtle">Sliders: 1400–1600 µs. Sweeps: 1000–2000 µs. Enabling at center may jump. Stop disables pulses; servo power stays on.</p>
+        <p class="subtle">Measured angles: yaw −45° to +45°; pitch −90° to +45° (raised zero, +45° = foot down). Sweeps use −45° to +45°. Support the robot before enabling or sweeping; enabling can jump. Stop disables pulses; servo power stays on.</p>
       </section>
     </div>
   </div>

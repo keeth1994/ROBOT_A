@@ -79,10 +79,11 @@
     135
   ],
   "pitch_requested_range_deg": [
-    -45,
-    45
+    -135,
+    0
   ],
-  "clearance_status": "B9-8 sampled fixed-part clearance: yaw +/-45; pitch -45..+25. Simulation retains inherited +/-45 joint limits; full dynamic clearance not certified.",
+  "pitch_calibration_frame": "Raised zero: CAD angle = measured angle - 45 deg; samples -90/-45/0/+45; +45 is foot-down and maximum angle",
+  "clearance_status": "B9-8 sampled fixed-part clearance: yaw +/-45; pitch -45..+25. Standard simulation pitch limits are CAD -135..0 (raised calibration -90..+45); ramp uses CAD -45..0. Expanded travel and full dynamic clearance are not certified.",
   "pitch_servo_moves_with_foot": true,
   "gear_ratio_speed": 1.5,
   "gear_efficiency_assumed": 0.85,
