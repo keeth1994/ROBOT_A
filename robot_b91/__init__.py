@@ -1,4 +1,4 @@
-"""B9-1 CAD-derived simulation and walking controller."""
+"""B9-8 CAD-derived simulation and walking controller."""
 
 
 def servo_properties(config, joint):

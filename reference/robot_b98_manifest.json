@@ -1,0 +1,1600 @@
+{
+  "revision": "B9-8",
+  "source": "cad/B9_8/Robot_B9_8.step",
+  "source_sha256": "b2802e6192afaadd44729a39412cf3853655df95f21b76369c18ba8cd6cb66d7",
+  "cad_bodies": 225,
+  "collision_hulls": 829,
+  "total_mass_kg": 1.4481191730353191,
+  "neutral_bounds_m": [
+    0.26804877323528004,
+    0.26804877323528004,
+    0.1613
+  ],
+  "parts": [
+    {
+      "component": "B9-8 chassis lightly reinforced posts",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.08828494556070901,
+      "volume_m3": 7.119753674250727e-05
+    },
+    {
+      "component": "FL B9-4 yaw servo fixed HS-475HB dimensional envelope",
+      "link": "platform",
+      "kind": "servo",
+      "mass_kg": 0.04,
+      "volume_m3": 2.842455005600625e-05
+    },
+    {
+      "component": "FL B9-5 yaw driver M4 clearance trimmed 5.7mm",
+      "link": "FL_driver",
+      "kind": "PLA",
+      "mass_kg": 0.004217082394862484,
+      "volume_m3": 3.4008728990826484e-06
+    },
+    {
+      "component": "FL B9-7 yaw turret taller teeth diagonal ribs",
+      "link": "FL_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.01715074864796716,
+      "volume_m3": 1.3831248909650934e-05
+    },
+    {
+      "component": "FL B8 pitch servo",
+      "link": "FL_pitch",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.0304490244742588e-05
+    },
+    {
+      "component": "FL B8 pitch horn - measured cross draft",
+      "link": "FL_yaw",
+      "kind": "horn",
+      "mass_kg": 0.0010505550883151075,
+      "volume_m3": 9.135261637522674e-07
+    },
+    {
+      "component": "FL B9-7 rocker foot split wrap brace",
+      "link": "FL_pitch",
+      "kind": "PLA",
+      "mass_kg": 0.02088912868740711,
+      "volume_m3": 1.6846071522102508e-05
+    },
+    {
+      "component": "FL B8 rubber tread",
+      "link": "FL_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007634327244776193,
+      "volume_m3": 6.940297495251084e-07
+    },
+    {
+      "component": "FL B8 rubber tread (1)",
+      "link": "FL_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007487722389219713,
+      "volume_m3": 6.807020353836103e-07
+    },
+    {
+      "component": "RL B9-4 yaw servo fixed MG995 dimensional envelope",
+      "link": "platform",
+      "kind": "servo",
+      "mass_kg": 0.055,
+      "volume_m3": 3.020487505371202e-05
+    },
+    {
+      "component": "RL B9-5 yaw driver M4 clearance trimmed 5.7mm",
+      "link": "RL_driver",
+      "kind": "PLA",
+      "mass_kg": 0.004217082394862531,
+      "volume_m3": 3.4008728990826865e-06
+    },
+    {
+      "component": "RL B9-7 yaw turret taller teeth diagonal ribs",
+      "link": "RL_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.017149579001325414,
+      "volume_m3": 1.3830305646230173e-05
+    },
+    {
+      "component": "RL B8 pitch servo",
+      "link": "RL_pitch",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.030449024474271e-05
+    },
+    {
+      "component": "RL B8 pitch horn - measured cross draft",
+      "link": "RL_yaw",
+      "kind": "horn",
+      "mass_kg": 0.0010505550883151216,
+      "volume_m3": 9.135261637522797e-07
+    },
+    {
+      "component": "RL B9-7 rocker foot split wrap brace",
+      "link": "RL_pitch",
+      "kind": "PLA",
+      "mass_kg": 0.020893127259181788,
+      "volume_m3": 1.6849296176759507e-05
+    },
+    {
+      "component": "RL B8 rubber tread",
+      "link": "RL_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007634327244776298,
+      "volume_m3": 6.940297495251179e-07
+    },
+    {
+      "component": "RL B8 rubber tread (1)",
+      "link": "RL_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007487722560410801,
+      "volume_m3": 6.807020509464365e-07
+    },
+    {
+      "component": "FR B9-4 yaw servo fixed HS-475HB dimensional envelope",
+      "link": "platform",
+      "kind": "servo",
+      "mass_kg": 0.04,
+      "volume_m3": 2.842455005600625e-05
+    },
+    {
+      "component": "FR B9-5 yaw driver M4 clearance trimmed 5.7mm",
+      "link": "FR_driver",
+      "kind": "PLA",
+      "mass_kg": 0.004217082394862531,
+      "volume_m3": 3.4008728990826865e-06
+    },
+    {
+      "component": "FR B9-7 yaw turret taller teeth diagonal ribs",
+      "link": "FR_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.01715023340063294,
+      "volume_m3": 1.3830833387607212e-05
+    },
+    {
+      "component": "FR B8 pitch servo",
+      "link": "FR_pitch",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.0304490244742635e-05
+    },
+    {
+      "component": "FR B8 pitch horn - measured cross draft",
+      "link": "FR_yaw",
+      "kind": "horn",
+      "mass_kg": 0.001050555088315116,
+      "volume_m3": 9.135261637522747e-07
+    },
+    {
+      "component": "FR B9-7 rocker foot split wrap brace",
+      "link": "FR_pitch",
+      "kind": "PLA",
+      "mass_kg": 0.020893799831277957,
+      "volume_m3": 1.6849838573611257e-05
+    },
+    {
+      "component": "FR B8 rubber tread",
+      "link": "FR_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007634327244776298,
+      "volume_m3": 6.940297495251179e-07
+    },
+    {
+      "component": "FR B8 rubber tread (1)",
+      "link": "FR_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007487719072917569,
+      "volume_m3": 6.807017339015972e-07
+    },
+    {
+      "component": "RR B9-4 yaw servo fixed MG995 dimensional envelope",
+      "link": "platform",
+      "kind": "servo",
+      "mass_kg": 0.055,
+      "volume_m3": 3.0204875053712024e-05
+    },
+    {
+      "component": "RR B9-5 yaw driver M4 clearance trimmed 5.7mm",
+      "link": "RR_driver",
+      "kind": "PLA",
+      "mass_kg": 0.00421708239486249,
+      "volume_m3": 3.4008728990826534e-06
+    },
+    {
+      "component": "RR B9-7 yaw turret taller teeth diagonal ribs",
+      "link": "RR_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.017149665437809557,
+      "volume_m3": 1.3830375353072224e-05
+    },
+    {
+      "component": "RR B8 pitch servo",
+      "link": "RR_pitch",
+      "kind": "servo",
+      "mass_kg": 0.044,
+      "volume_m3": 3.030449024474271e-05
+    },
+    {
+      "component": "RR B8 pitch horn - measured cross draft",
+      "link": "RR_yaw",
+      "kind": "horn",
+      "mass_kg": 0.0010505550883150208,
+      "volume_m3": 9.135261637521919e-07
+    },
+    {
+      "component": "RR B9-7 rocker foot split wrap brace",
+      "link": "RR_pitch",
+      "kind": "PLA",
+      "mass_kg": 0.02088784354025396,
+      "volume_m3": 1.684503511310803e-05
+    },
+    {
+      "component": "RR B8 rubber tread",
+      "link": "RR_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007634327244776308,
+      "volume_m3": 6.940297495251189e-07
+    },
+    {
+      "component": "RR B8 rubber tread (1)",
+      "link": "RR_pitch",
+      "kind": "rubber",
+      "mass_kg": 0.0007487722389219356,
+      "volume_m3": 6.807020353835778e-07
+    },
+    {
+      "component": "B8 sensor ir_left - Sharp body and mounting ears",
+      "link": "platform",
+      "kind": "ir",
+      "mass_kg": 0.0036,
+      "volume_m3": 5.679182538457089e-06
+    },
+    {
+      "component": "B9-8 ir_left M3 ear bracket accessible deck tabs",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.002757258927393066,
+      "volume_m3": 2.2235959091879563e-06
+    },
+    {
+      "component": "B8 sensor ir_right - Sharp body and mounting ears",
+      "link": "platform",
+      "kind": "ir",
+      "mass_kg": 0.0036,
+      "volume_m3": 5.679182538457089e-06
+    },
+    {
+      "component": "B9-8 ir_right M3 ear bracket accessible deck tabs",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.002757258927393066,
+      "volume_m3": 2.2235959091879563e-06
+    },
+    {
+      "component": "B8 sensor ir_ground - Sharp body and mounting ears",
+      "link": "platform",
+      "kind": "ir",
+      "mass_kg": 0.0036,
+      "volume_m3": 5.67918253845711e-06
+    },
+    {
+      "component": "B9-8 ir_ground M3 ear bracket accessible deck tabs",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.003305937382587666,
+      "volume_m3": 2.666078534344892e-06
+    },
+    {
+      "component": "FL B9-5 circular horn M4 nominal interface",
+      "link": "FL_driver",
+      "kind": "horn",
+      "mass_kg": 0.0007383724483640262,
+      "volume_m3": 6.420629985774141e-07
+    },
+    {
+      "component": "FL B8 yaw bearing 6x19x6 -3",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250245e-06
+    },
+    {
+      "component": "FL B9-5 upper yaw bearing 6x19x6",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250245e-06
+    },
+    {
+      "component": "FL B8 pitch bearing 4x13x5",
+      "link": "FL_yaw",
+      "kind": "bearing4",
+      "mass_kg": 0.003,
+      "volume_m3": 6.008295949990642e-07
+    },
+    {
+      "component": "FL B8 pitch inner ring spacer",
+      "link": "FL_yaw",
+      "kind": "PLA",
+      "mass_kg": 1.5270653570563725e-05,
+      "volume_m3": 1.231504320206752e-08
+    },
+    {
+      "component": "FL B8 pitch steel axle 4mm - thread detail pending",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0015976883599096501,
+      "volume_m3": 2.048318410140577e-07
+    },
+    {
+      "component": "FL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012007167122019666,
+      "volume_m3": 1.5393804002589316e-07
+    },
+    {
+      "component": "FL B8 pitch inner clamp washer 33.5",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00015369173916184012,
+      "volume_m3": 1.9704069123312838e-08
+    },
+    {
+      "component": "FL B8 pitch M4 locknut envelope - outside access",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.001255606619045506,
+      "volume_m3": 1.609752075699367e-07
+    },
+    {
+      "component": "RL B9-5 circular horn M4 nominal interface",
+      "link": "RL_driver",
+      "kind": "horn",
+      "mass_kg": 0.0007383724483640266,
+      "volume_m3": 6.420629985774144e-07
+    },
+    {
+      "component": "RL B8 yaw bearing 6x19x6 -3",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250247e-06
+    },
+    {
+      "component": "RL B9-5 upper yaw bearing 6x19x6",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250247e-06
+    },
+    {
+      "component": "RL B8 pitch bearing 4x13x5",
+      "link": "RL_yaw",
+      "kind": "bearing4",
+      "mass_kg": 0.003,
+      "volume_m3": 6.008295949990669e-07
+    },
+    {
+      "component": "RL B8 pitch inner ring spacer",
+      "link": "RL_yaw",
+      "kind": "PLA",
+      "mass_kg": 1.5270653570562333e-05,
+      "volume_m3": 1.2315043202066398e-08
+    },
+    {
+      "component": "RL B8 pitch steel axle 4mm - thread detail pending",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0015976883599096462,
+      "volume_m3": 2.0483184101405722e-07
+    },
+    {
+      "component": "RL B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012007167122019685,
+      "volume_m3": 1.539380400258934e-07
+    },
+    {
+      "component": "RL B8 pitch inner clamp washer 33.5",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00015369173916182443,
+      "volume_m3": 1.9704069123310823e-08
+    },
+    {
+      "component": "RL B8 pitch M4 locknut envelope - outside access",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.001255606619045512,
+      "volume_m3": 1.6097520756993743e-07
+    },
+    {
+      "component": "FR B9-5 circular horn M4 nominal interface",
+      "link": "FR_driver",
+      "kind": "horn",
+      "mass_kg": 0.0007383724483640264,
+      "volume_m3": 6.420629985774143e-07
+    },
+    {
+      "component": "FR B8 yaw bearing 6x19x6 -3",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250245e-06
+    },
+    {
+      "component": "FR B9-5 upper yaw bearing 6x19x6",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250245e-06
+    },
+    {
+      "component": "FR B8 pitch bearing 4x13x5",
+      "link": "FR_yaw",
+      "kind": "bearing4",
+      "mass_kg": 0.003,
+      "volume_m3": 6.008295949990705e-07
+    },
+    {
+      "component": "FR B8 pitch inner ring spacer",
+      "link": "FR_yaw",
+      "kind": "PLA",
+      "mass_kg": 1.5270653570561526e-05,
+      "volume_m3": 1.2315043202065748e-08
+    },
+    {
+      "component": "FR B8 pitch steel axle 4mm - thread detail pending",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.001597688359909637,
+      "volume_m3": 2.04831841014056e-07
+    },
+    {
+      "component": "FR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012007167122019876,
+      "volume_m3": 1.5393804002589583e-07
+    },
+    {
+      "component": "FR B8 pitch inner clamp washer 33.5",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00015369173916183495,
+      "volume_m3": 1.9704069123312173e-08
+    },
+    {
+      "component": "FR B8 pitch M4 locknut envelope - outside access",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012556066190454991,
+      "volume_m3": 1.609752075699358e-07
+    },
+    {
+      "component": "RR B9-5 circular horn M4 nominal interface",
+      "link": "RR_driver",
+      "kind": "horn",
+      "mass_kg": 0.0007383724483640261,
+      "volume_m3": 6.42062998577414e-07
+    },
+    {
+      "component": "RR B8 yaw bearing 6x19x6 -3",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250247e-06
+    },
+    {
+      "component": "RR B9-5 upper yaw bearing 6x19x6",
+      "link": "platform",
+      "kind": "bearing6",
+      "mass_kg": 0.008,
+      "volume_m3": 1.5315264186250247e-06
+    },
+    {
+      "component": "RR B8 pitch bearing 4x13x5",
+      "link": "RR_yaw",
+      "kind": "bearing4",
+      "mass_kg": 0.003,
+      "volume_m3": 6.008295949990663e-07
+    },
+    {
+      "component": "RR B8 pitch inner ring spacer",
+      "link": "RR_yaw",
+      "kind": "PLA",
+      "mass_kg": 1.5270653570563007e-05,
+      "volume_m3": 1.2315043202066941e-08
+    },
+    {
+      "component": "RR B8 pitch steel axle 4mm - thread detail pending",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.001597688359909645,
+      "volume_m3": 2.0483184101405704e-07
+    },
+    {
+      "component": "RR B8 pitch M4 head envelope 7x4mm - verify hardware",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012007167122019765,
+      "volume_m3": 1.5393804002589443e-07
+    },
+    {
+      "component": "RR B8 pitch inner clamp washer 33.5",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00015369173916181492,
+      "volume_m3": 1.9704069123309605e-08
+    },
+    {
+      "component": "RR B8 pitch M4 locknut envelope - outside access",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012556066190454974,
+      "volume_m3": 1.6097520756993558e-07
+    },
+    {
+      "component": "FL B9-4 M3x12 bolt -59.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068943,
+      "volume_m3": 1.5609788497524285e-07
+    },
+    {
+      "component": "FL B9-4 M3 washer 1mm -59.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0002374478559436238,
+      "volume_m3": 3.04420328132851e-08
+    },
+    {
+      "component": "FL B9-4 M3 hex nut -59.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858514,
+      "volume_m3": 4.590884398536556e-08
+    },
+    {
+      "component": "FL B9-4 M3x12 bolt -59.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068947,
+      "volume_m3": 1.560978849752429e-07
+    },
+    {
+      "component": "FL B9-4 M3 washer 1mm -59.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362374,
+      "volume_m3": 3.0442032813285096e-08
+    },
+    {
+      "component": "FL B9-4 M3 hex nut -59.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858504,
+      "volume_m3": 4.5908843985365435e-08
+    },
+    {
+      "component": "FL B9-4 M3x12 bolt -11.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068943,
+      "volume_m3": 1.5609788497524285e-07
+    },
+    {
+      "component": "FL B9-4 M3 washer 1mm -11.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362368,
+      "volume_m3": 3.044203281328509e-08
+    },
+    {
+      "component": "FL B9-4 M3 hex nut -11.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858495,
+      "volume_m3": 4.5908843985365316e-08
+    },
+    {
+      "component": "FL B9-4 M3x12 bolt -11.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068945,
+      "volume_m3": 1.5609788497524287e-07
+    },
+    {
+      "component": "FL B9-4 M3 washer 1mm -11.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362368,
+      "volume_m3": 3.044203281328509e-08
+    },
+    {
+      "component": "FL B9-4 M3 hex nut -11.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858483,
+      "volume_m3": 4.5908843985365164e-08
+    },
+    {
+      "component": "RL B9-4 M3x12 bolt -58.3 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068945,
+      "volume_m3": 1.5609788497524287e-07
+    },
+    {
+      "component": "RL B9-4 M3 washer 1mm -58.3 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362374,
+      "volume_m3": 3.0442032813285096e-08
+    },
+    {
+      "component": "RL B9-4 M3 hex nut -58.3 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308585394,
+      "volume_m3": 4.590884398536589e-08
+    },
+    {
+      "component": "RL B9-4 M3x12 bolt -58.3 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068943,
+      "volume_m3": 1.5609788497524285e-07
+    },
+    {
+      "component": "RL B9-4 M3 washer 1mm -58.3 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362374,
+      "volume_m3": 3.0442032813285096e-08
+    },
+    {
+      "component": "RL B9-4 M3 hex nut -58.3 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308585394,
+      "volume_m3": 4.590884398536589e-08
+    },
+    {
+      "component": "RL B9-4 M3x12 bolt -10.299999999999997 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068945,
+      "volume_m3": 1.5609788497524287e-07
+    },
+    {
+      "component": "RL B9-4 M3 washer 1mm -10.299999999999997 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362366,
+      "volume_m3": 3.044203281328508e-08
+    },
+    {
+      "component": "RL B9-4 M3 hex nut -10.299999999999997 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308585025,
+      "volume_m3": 4.5908843985365416e-08
+    },
+    {
+      "component": "RL B9-4 M3x12 bolt -10.299999999999997 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068938,
+      "volume_m3": 1.560978849752428e-07
+    },
+    {
+      "component": "RL B9-4 M3 washer 1mm -10.299999999999997 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362368,
+      "volume_m3": 3.044203281328509e-08
+    },
+    {
+      "component": "RL B9-4 M3 hex nut -10.299999999999997 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858495,
+      "volume_m3": 4.5908843985365316e-08
+    },
+    {
+      "component": "FR B9-4 M3x12 bolt -59.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068947,
+      "volume_m3": 1.560978849752429e-07
+    },
+    {
+      "component": "FR B9-4 M3 washer 1mm -59.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362374,
+      "volume_m3": 3.0442032813285096e-08
+    },
+    {
+      "component": "FR B9-4 M3 hex nut -59.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308585334,
+      "volume_m3": 4.590884398536581e-08
+    },
+    {
+      "component": "FR B9-4 M3x12 bolt -59.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068943,
+      "volume_m3": 1.5609788497524285e-07
+    },
+    {
+      "component": "FR B9-4 M3 washer 1mm -59.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362374,
+      "volume_m3": 3.0442032813285096e-08
+    },
+    {
+      "component": "FR B9-4 M3 hex nut -59.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308585264,
+      "volume_m3": 4.590884398536572e-08
+    },
+    {
+      "component": "FR B9-4 M3x12 bolt -11.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068945,
+      "volume_m3": 1.5609788497524287e-07
+    },
+    {
+      "component": "FR B9-4 M3 washer 1mm -11.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362368,
+      "volume_m3": 3.044203281328509e-08
+    },
+    {
+      "component": "FR B9-4 M3 hex nut -11.5 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308585275,
+      "volume_m3": 4.590884398536573e-08
+    },
+    {
+      "component": "FR B9-4 M3x12 bolt -11.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068938,
+      "volume_m3": 1.560978849752428e-07
+    },
+    {
+      "component": "FR B9-4 M3 washer 1mm -11.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362374,
+      "volume_m3": 3.0442032813285096e-08
+    },
+    {
+      "component": "FR B9-4 M3 hex nut -11.5 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308584803,
+      "volume_m3": 4.590884398536513e-08
+    },
+    {
+      "component": "RR B9-4 M3x12 bolt -58.3 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068943,
+      "volume_m3": 1.5609788497524285e-07
+    },
+    {
+      "component": "RR B9-4 M3 washer 1mm -58.3 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0002374478559436238,
+      "volume_m3": 3.04420328132851e-08
+    },
+    {
+      "component": "RR B9-4 M3 hex nut -58.3 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858533,
+      "volume_m3": 4.5908843985365806e-08
+    },
+    {
+      "component": "RR B9-4 M3x12 bolt -58.3 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068945,
+      "volume_m3": 1.5609788497524287e-07
+    },
+    {
+      "component": "RR B9-4 M3 washer 1mm -58.3 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0002374478559436238,
+      "volume_m3": 3.04420328132851e-08
+    },
+    {
+      "component": "RR B9-4 M3 hex nut -58.3 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308585334,
+      "volume_m3": 4.590884398536581e-08
+    },
+    {
+      "component": "RR B9-4 M3x12 bolt -10.299999999999997 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068938,
+      "volume_m3": 1.560978849752428e-07
+    },
+    {
+      "component": "RR B9-4 M3 washer 1mm -10.299999999999997 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362374,
+      "volume_m3": 3.0442032813285096e-08
+    },
+    {
+      "component": "RR B9-4 M3 hex nut -10.299999999999997 -5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858495,
+      "volume_m3": 4.5908843985365316e-08
+    },
+    {
+      "component": "RR B9-4 M3x12 bolt -10.299999999999997 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068945,
+      "volume_m3": 1.5609788497524287e-07
+    },
+    {
+      "component": "RR B9-4 M3 washer 1mm -10.299999999999997 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00023744785594362368,
+      "volume_m3": 3.044203281328509e-08
+    },
+    {
+      "component": "RR B9-4 M3 hex nut -10.299999999999997 5.0",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308585166,
+      "volume_m3": 4.5908843985365594e-08
+    },
+    {
+      "component": "FL B9-5 inner ring spacing tube 9.5mm",
+      "link": "FL_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.0003053156820391235,
+      "volume_m3": 2.462223242250996e-07
+    },
+    {
+      "component": "FL B9-5 bottom inner ring spacer 2.5mm",
+      "link": "FL_yaw",
+      "kind": "PLA",
+      "mass_kg": 8.034623211555882e-05,
+      "volume_m3": 6.479534848028937e-08
+    },
+    {
+      "component": "FL B9-5 M6x45 bolt envelope head verify",
+      "link": "FL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.013976710096371971,
+      "volume_m3": 1.7918859097912782e-06
+    },
+    {
+      "component": "FL B9-5 M6 plain nut 10AFx5 envelope",
+      "link": "FL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0022748000533492903,
+      "volume_m3": 2.9164103248067825e-07
+    },
+    {
+      "component": "FL B9-5 M4x8 cog screw 0",
+      "link": "FL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "FL B9-5 M4x8 cog screw 1",
+      "link": "FL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "FL B9-5 M4x8 cog screw 2",
+      "link": "FL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380313,
+      "volume_m3": 2.5446900494077325e-07
+    },
+    {
+      "component": "FL B9-5 M4x8 cog screw 3",
+      "link": "FL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "RL B9-5 inner ring spacing tube 9.5mm",
+      "link": "RL_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.0003053156820391235,
+      "volume_m3": 2.462223242250996e-07
+    },
+    {
+      "component": "RL B9-5 bottom inner ring spacer 2.5mm",
+      "link": "RL_yaw",
+      "kind": "PLA",
+      "mass_kg": 8.034623211555882e-05,
+      "volume_m3": 6.479534848028937e-08
+    },
+    {
+      "component": "RL B9-5 M6x45 bolt envelope head verify",
+      "link": "RL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.013976710096371971,
+      "volume_m3": 1.7918859097912782e-06
+    },
+    {
+      "component": "RL B9-5 M6 plain nut 10AFx5 envelope",
+      "link": "RL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0022748000533492903,
+      "volume_m3": 2.9164103248067825e-07
+    },
+    {
+      "component": "RL B9-5 M4x8 cog screw 0",
+      "link": "RL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "RL B9-5 M4x8 cog screw 1",
+      "link": "RL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "RL B9-5 M4x8 cog screw 2",
+      "link": "RL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "RL B9-5 M4x8 cog screw 3",
+      "link": "RL_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380313,
+      "volume_m3": 2.5446900494077325e-07
+    },
+    {
+      "component": "FR B9-5 inner ring spacing tube 9.5mm",
+      "link": "FR_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.0003053156820391235,
+      "volume_m3": 2.462223242250996e-07
+    },
+    {
+      "component": "FR B9-5 bottom inner ring spacer 2.5mm",
+      "link": "FR_yaw",
+      "kind": "PLA",
+      "mass_kg": 8.034623211555882e-05,
+      "volume_m3": 6.479534848028937e-08
+    },
+    {
+      "component": "FR B9-5 M6x45 bolt envelope head verify",
+      "link": "FR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.013976710096371971,
+      "volume_m3": 1.7918859097912782e-06
+    },
+    {
+      "component": "FR B9-5 M6 plain nut 10AFx5 envelope",
+      "link": "FR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0022748000533492903,
+      "volume_m3": 2.9164103248067825e-07
+    },
+    {
+      "component": "FR B9-5 M4x8 cog screw 0",
+      "link": "FR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "FR B9-5 M4x8 cog screw 1",
+      "link": "FR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "FR B9-5 M4x8 cog screw 2",
+      "link": "FR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "FR B9-5 M4x8 cog screw 3",
+      "link": "FR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.001984858238538031,
+      "volume_m3": 2.544690049407732e-07
+    },
+    {
+      "component": "RR B9-5 inner ring spacing tube 9.5mm",
+      "link": "RR_yaw",
+      "kind": "PLA",
+      "mass_kg": 0.0003053156820391235,
+      "volume_m3": 2.462223242250996e-07
+    },
+    {
+      "component": "RR B9-5 bottom inner ring spacer 2.5mm",
+      "link": "RR_yaw",
+      "kind": "PLA",
+      "mass_kg": 8.034623211555882e-05,
+      "volume_m3": 6.479534848028937e-08
+    },
+    {
+      "component": "RR B9-5 M6x45 bolt envelope head verify",
+      "link": "RR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.013976710096371971,
+      "volume_m3": 1.7918859097912782e-06
+    },
+    {
+      "component": "RR B9-5 M6 plain nut 10AFx5 envelope",
+      "link": "RR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0022748000533492903,
+      "volume_m3": 2.9164103248067825e-07
+    },
+    {
+      "component": "RR B9-5 M4x8 cog screw 0",
+      "link": "RR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "RR B9-5 M4x8 cog screw 1",
+      "link": "RR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "RR B9-5 M4x8 cog screw 2",
+      "link": "RR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380313,
+      "volume_m3": 2.5446900494077325e-07
+    },
+    {
+      "component": "RR B9-5 M4x8 cog screw 3",
+      "link": "RR_yaw",
+      "kind": "steel",
+      "mass_kg": 0.0019848582385380317,
+      "volume_m3": 2.544690049407733e-07
+    },
+    {
+      "component": "B9-8 bridge captive support nuts",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.010162491965029047,
+      "volume_m3": 8.195558036313748e-06
+    },
+    {
+      "component": "B9-5 M3 platform nut (62, 0)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858459,
+      "volume_m3": 4.590884398536486e-08
+    },
+    {
+      "component": "B9-5 M3x8 platform bolt (62, 0)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0009970236985248904,
+      "volume_m3": 1.2782355109293466e-07
+    },
+    {
+      "component": "B9-5 M3 platform nut (-62, 0)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308584586,
+      "volume_m3": 4.590884398536485e-08
+    },
+    {
+      "component": "B9-5 M3x8 platform bolt (-62, 0)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0009970236985248906,
+      "volume_m3": 1.278235510929347e-07
+    },
+    {
+      "component": "B9-5 M3 platform nut (0, 62)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858459,
+      "volume_m3": 4.590884398536486e-08
+    },
+    {
+      "component": "B9-5 M3x8 platform bolt (0, 62)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0009970236985248908,
+      "volume_m3": 1.2782355109293471e-07
+    },
+    {
+      "component": "B9-5 M3 platform nut (0, -62)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308584597,
+      "volume_m3": 4.5908843985364866e-08
+    },
+    {
+      "component": "B9-5 M3x8 platform bolt (0, -62)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0009970236985248908,
+      "volume_m3": 1.2782355109293471e-07
+    },
+    {
+      "component": "FL B9-7 pitch brace M3x12 horizontal screw",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068648,
+      "volume_m3": 1.560978849752391e-07
+    },
+    {
+      "component": "FL B9-7 pitch brace M3 captive nut",
+      "link": "FL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0003580889830858045,
+      "volume_m3": 4.590884398535955e-08
+    },
+    {
+      "component": "FR B9-7 pitch brace M3x12 horizontal screw",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.001217563502806865,
+      "volume_m3": 1.5609788497523911e-07
+    },
+    {
+      "component": "FR B9-7 pitch brace M3 captive nut",
+      "link": "FR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308580206,
+      "volume_m3": 4.590884398535924e-08
+    },
+    {
+      "component": "RL B9-7 pitch brace M3x12 horizontal screw",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.001217563502806865,
+      "volume_m3": 1.5609788497523911e-07
+    },
+    {
+      "component": "RL B9-7 pitch brace M3 captive nut",
+      "link": "RL_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308580206,
+      "volume_m3": 4.590884398535924e-08
+    },
+    {
+      "component": "RR B9-7 pitch brace M3x12 horizontal screw",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.0012175635028068648,
+      "volume_m3": 1.560978849752391e-07
+    },
+    {
+      "component": "RR B9-7 pitch brace M3 captive nut",
+      "link": "RR_pitch",
+      "kind": "steel",
+      "mass_kg": 0.00035808898308580374,
+      "volume_m3": 4.5908843985359453e-08
+    },
+    {
+      "component": "B9-8 bridge mounted centre deck support",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.004670795842974508,
+      "volume_m3": 3.766770841108474e-06
+    },
+    {
+      "component": "B9-8 matrix pillar 1",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.0017895950784387461,
+      "volume_m3": 1.4432218374506018e-06
+    },
+    {
+      "component": "B9-8 matrix pillar 2",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.0017895950784387455,
+      "volume_m3": 1.4432218374506011e-06
+    },
+    {
+      "component": "B9-8 matrix pillar 3",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.0017895950784387474,
+      "volume_m3": 1.4432218374506028e-06
+    },
+    {
+      "component": "B9-8 matrix pillar 4",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.0017895950784387478,
+      "volume_m3": 1.443221837450603e-06
+    },
+    {
+      "component": "B9-8 matrix board platform 2p5mm solder clearance",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.13641740262120147,
+      "volume_m3": 0.00011001403437193666
+    },
+    {
+      "component": "B9-8 matrix board 76p5x100p1 envelope",
+      "link": "platform",
+      "kind": "matrix_board",
+      "mass_kg": 0.04,
+      "volume_m3": 1.5242666377849002e-05
+    },
+    {
+      "component": "B9-8 IMU chip centred XY",
+      "link": "platform",
+      "kind": "imu",
+      "mass_kg": 0.002,
+      "volume_m3": 3.1999999999999995e-08
+    },
+    {
+      "component": "B9-8 battery cradle 111p2x35x15 open lead end",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.020868472771202646,
+      "volume_m3": 1.6829413525163423e-05
+    },
+    {
+      "component": "B9-8 battery envelope",
+      "link": "platform",
+      "kind": "battery",
+      "mass_kg": 0.126,
+      "volume_m3": 5.838e-05
+    },
+    {
+      "component": "B9-8 SERVO2 case cradle strap channels",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.012265858759978229,
+      "volume_m3": 9.891821580627604e-06
+    },
+    {
+      "component": "B9-8 SERVO2 envelope 54p2x54p2x19p7",
+      "link": "platform",
+      "kind": "driver_board",
+      "mass_kg": 0.028,
+      "volume_m3": 5.7871508e-05
+    },
+    {
+      "component": "B9-8 regulator underside clearance saddle",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.000248,
+      "volume_m3": 2.0000000000000002e-07
+    },
+    {
+      "component": "B9-8 DFR0753 carrier wiring reservation",
+      "link": "platform",
+      "kind": "regulator",
+      "mass_kg": 0.01,
+      "volume_m3": 5.599999999999997e-06
+    },
+    {
+      "component": "B9-8 camera upright ear mount M3x12 -16",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.0020858598200575564,
+      "volume_m3": 1.6821450161754487e-06
+    },
+    {
+      "component": "B9-8 camera upright ear mount M3x12 16",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.0020858598200575564,
+      "volume_m3": 1.6821450161754487e-06
+    },
+    {
+      "component": "B9-8 camera envelope 48p3x24x15",
+      "link": "platform",
+      "kind": "camera",
+      "mass_kg": 0.014,
+      "volume_m3": 1.7388e-05
+    },
+    {
+      "component": "B9-8 camera ear envelope -16",
+      "link": "platform",
+      "kind": "camera_ear",
+      "mass_kg": 0,
+      "volume_m3": 4.363043877305504e-07
+    },
+    {
+      "component": "B9-8 camera ear envelope 16",
+      "link": "platform",
+      "kind": "camera_ear",
+      "mass_kg": 0,
+      "volume_m3": 4.363043877305505e-07
+    },
+    {
+      "component": "B9-8 lower equipment deck",
+      "link": "platform",
+      "kind": "PLA",
+      "mass_kg": 0.059381295850542144,
+      "volume_m3": 4.788814181495334e-05
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (-65, -12)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (-17, -20)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.001038191128657531,
+      "volume_m3": 1.3310142675096552e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (-65, 12)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (-17, 15)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.001038191128657531,
+      "volume_m3": 1.3310142675096552e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (3, -34)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (40, -34)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575314,
+      "volume_m3": 1.3310142675096557e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (3, 34)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (40, 34)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575314,
+      "volume_m3": 1.3310142675096557e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (-14.5, 44)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (22.5, 44)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575314,
+      "volume_m3": 1.3310142675096557e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (-14.5, -44)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (22.5, -44)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575314,
+      "volume_m3": 1.3310142675096557e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (60, -12)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (60, 12)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (69, -16)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575305,
+      "volume_m3": 1.3310142675096547e-07
+    },
+    {
+      "component": "B9-8 M3x8 mount bolt (69, 16)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575305,
+      "volume_m3": 1.3310142675096547e-07
+    },
+    {
+      "component": "B9-8 M3x8 pillar lower bolt (-70.8, 0)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575305,
+      "volume_m3": 1.3310142675096547e-07
+    },
+    {
+      "component": "B9-8 M3x8 pillar upper bolt (-70.8, 0)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575305,
+      "volume_m3": 1.3310142675096547e-07
+    },
+    {
+      "component": "B9-8 M3x8 pillar lower bolt (70.8, 0)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575307,
+      "volume_m3": 1.331014267509655e-07
+    },
+    {
+      "component": "B9-8 M3x8 pillar upper bolt (70.8, 0)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575305,
+      "volume_m3": 1.3310142675096547e-07
+    },
+    {
+      "component": "B9-8 M3x8 pillar lower bolt (-10, -29)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 pillar upper bolt (-10, -29)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 pillar lower bolt (-10, 29)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 pillar upper bolt (-10, 29)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 matrix bolt (-44.1, -18.5)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575314,
+      "volume_m3": 1.3310142675096557e-07
+    },
+    {
+      "component": "B9-8 M3x8 matrix bolt (-44.1, 48)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575316,
+      "volume_m3": 1.331014267509656e-07
+    },
+    {
+      "component": "B9-8 M3x8 matrix bolt (46, -18.5)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575314,
+      "volume_m3": 1.3310142675096557e-07
+    },
+    {
+      "component": "B9-8 M3x8 matrix bolt (46, 48)",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575314,
+      "volume_m3": 1.3310142675096557e-07
+    },
+    {
+      "component": "B9-8 M3x8 support foot bolt -10",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 support foot bolt 10",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x8 centre deck bolt",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0010381911286575312,
+      "volume_m3": 1.3310142675096555e-07
+    },
+    {
+      "component": "B9-8 M3x12 camera ear bolt -16",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012587309329395336,
+      "volume_m3": 1.6137576063327355e-07
+    },
+    {
+      "component": "B9-8 M3x12 camera ear bolt 16",
+      "link": "platform",
+      "kind": "steel",
+      "mass_kg": 0.0012587309329395338,
+      "volume_m3": 1.6137576063327357e-07
+    }
+  ],
+  "limitations": [
+    "Solid-material CAD mass plus provisional component allowances; not measured",
+    "CAD solid inertia scaled uniformly to provisional component masses; equipment internals approximated",
+    "Segmented convex CAD hulls after 0.5 mm vertex clustering; small holes/fasteners omitted",
+    "Estimated 5 V servo ratings, 85% yaw gear efficiency; no backlash, thermal or supply-current model",
+    "Yaw conservatively limited to +/-45 degrees; larger range not cleared",
+    "Rigid terrain and assumed 0.8 friction",
+    "Ideal IMU and IR rays; no calibrated sensor noise",
+    "No learned policy is validated for this model"
+  ]
+}

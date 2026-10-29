@@ -1,4 +1,4 @@
-"""Build B9-1 visuals, CAD-derived segmented collision hulls and explicit mass estimates."""
+"""Build B9-8 visuals, CAD-derived segmented collision hulls and explicit mass estimates."""
 
 from pathlib import Path
 from collections import defaultdict
@@ -16,64 +16,44 @@ LEGS = ["FL", "RL", "FR", "RR"]
 
 
 def classify(n):
+    # Match equipment envelopes specifically: their printed mounts are PLA.
     if "servo" in n.lower() and "SERVO2" not in n:
         return "servo"
-    if "battery" in n:
-        return "battery"
-    if "sensor ir_" in n:
-        return "ir"
-    if "sensor camera" in n:
-        return "camera"
-    if "IMU reservation" in n:
-        return "imu"
-    if "SERVO2" in n:
-        return "driver_board"
-    if "ESP32" in n:
-        return "esp32"
-    if "DFR0753" in n:
-        return "regulator"
-    if "rubber tread" in n:
-        return "rubber"
-    if "bearing 6x" in n:
-        return "bearing6"
-    if "bearing 4x" in n:
-        return "bearing4"
-    if any(k in n for k in ["steel axle", "M4", "washer"]):
-        return "steel"
-    if any(k in n for k in ["original yaw cross", "pitch horn"]):
-        return "horn"
+    for key, kind in [
+        ("battery envelope", "battery"), ("sensor ir_", "ir"),
+        ("camera envelope", "camera"), ("camera ear envelope", "camera_ear"),
+        ("IMU chip", "imu"), ("matrix board 76", "matrix_board"),
+        ("SERVO2 envelope", "driver_board"),
+        ("DFR0753 carrier wiring reservation", "regulator"),
+        ("rubber tread", "rubber"), ("bearing 6x", "bearing6"),
+        ("bearing 4x", "bearing4"), ("circular horn", "horn"),
+        ("pitch horn", "horn"),
+    ]:
+        if key in n:
+            return kind
+    # An M3/M4 mention in a printed part's name describes its interface.
+    if any(k in n for k in ["steel axle", "washer", " bolt", " screw", " nut", "pitch M4"]):
+        if not any(k in n for k in ["captive support nuts", "captive nut pocket"]):
+            return "steel"
     return "PLA"
 
 
 def group(n):
-    l = n[:2]
-    if l not in LEGS:
+    leg = n[:2]
+    if leg not in LEGS:
         return "platform"
-    if any(k in n for k in ["yaw driver", "original yaw cross"]):
-        return l + "_driver"
-    if any(
-        k in n
-        for k in [
-            "rocker foot",
-            "rubber tread",
-            "pitch servo",
-            "pitch steel axle",
-            "pitch M4",
-            "pitch inner clamp",
-        ]
-    ):
-        return l + "_pitch"
-    if any(
-        k in n
-        for k in [
-            "yaw turret",
-            "pitch horn",
-            "pitch bearing",
-            "pitch inner ring",
-            "yaw steel axle",
-        ]
-    ):
-        return l + "_yaw"
+    if any(k in n for k in ["yaw driver", "circular horn"]):
+        return leg + "_driver"
+    if any(k in n for k in [
+        "rocker foot", "rubber tread", "pitch servo", "pitch steel axle",
+        "pitch M4", "pitch inner clamp", "pitch brace",
+    ]):
+        return leg + "_pitch"
+    if any(k in n for k in [
+        "yaw turret", "pitch horn", "pitch bearing", "pitch inner ring",
+        "inner ring spacing tube", "bottom inner ring spacer", "M6", "cog screw",
+    ]):
+        return leg + "_yaw"
     return "platform"
 
 
@@ -126,22 +106,22 @@ def hulls(v, f, steps):
 
 def main():
     ref = ROOT / "reference"
-    source = ref / "b91_cad_meshes.json.gz"
+    source = ref / "b98_cad_meshes.json.gz"
     with gzip.open(source, "rt") as f:
         export = json.load(f)
     assert (
         hashlib.sha256((ROOT / export["source"]).read_bytes()).hexdigest()
         == export["source_sha256"]
-    ), "CAD archive changed; export it again"
+    ), "CAD STEP changed; run python cad/export_b98_sim.py again"
     records = export["bodies"]
-    cfg = json.loads((ref / "b91_kinematics.json").read_text())
-    masscfg = json.loads((ref / "b91_mass.json").read_text())
-    xml = E.Element("mujoco", model="B9-1 CAD transfer")
+    cfg = json.loads((ref / "b98_kinematics.json").read_text())
+    masscfg = json.loads((ref / "b98_mass.json").read_text())
+    xml = E.Element("mujoco", model="B9-8 CAD transfer")
     E.SubElement(
         xml,
         "compiler",
         angle="radian",
-        meshdir="robot_meshes_b91",
+        meshdir="robot_meshes_b98",
         inertiafromgeom="false",
         autolimits="true",
     )
@@ -203,7 +183,7 @@ def main():
         rots[l] = R
         y = np.array(k["yaw_center_mm"]) / 1000
         p = y + R @ np.array(k["pitch_local_mm"]) / 1000
-        d = y + R @ np.array([-0.025, 0, 0])
+        d = np.array(k["driver_center_mm"]) / 1000
         for suffix, origin, parent, axis, limits in [
             ("yaw", y, "platform", [0, 0, 1], [-45, 45]),
             ("pitch", p, l + "_yaw", R @ np.array([0, 1, 0]), [-45, 45]),
@@ -236,7 +216,7 @@ def main():
             polycoef=fmt([0, -1 / cfg["gear_ratio_speed"], 0, 0, 0]),
             solref=".004 1",
         )
-    folder = ROOT / "models/robot_meshes_b91"
+    folder = ROOT / "models/robot_meshes_b98"
     folder.mkdir(parents=True, exist_ok=True)
     groups = defaultdict(list)
     audit = []
@@ -262,7 +242,7 @@ def main():
             mass = servo_properties(
                 cfg, n[:2] + ("_pitch" if "pitch servo" in n else "_yaw")
             )[2]
-        groups[g].append((mass, np.array(r["com_m"]), np.ptp(v, axis=0)))
+        groups[g].append((mass, np.array(r["com_m"]), np.array(r["unit_inertia_m2"])))
         audit.append(
             dict(component=n, link=g, kind=kind, mass_kg=mass, volume_m3=r["volume_m3"])
         )
@@ -313,7 +293,7 @@ def main():
             if kind == "rubber"
             else ((0.016, 0.016, 0.020) if kind == "PLA" else (None, None, None))
         )
-        key = n[3:] if n[:2] in LEGS else n
+        key = hashlib.sha256(local.tobytes() + cf.tobytes()).hexdigest()
         if key not in hull_cache:
             hull_cache[key] = list(hulls(local, cf, steps))
         for j, h in enumerate(hull_cache[key]):
@@ -349,26 +329,18 @@ def main():
         (
             masscfg["extra_wiring_fasteners_kg"],
             np.array([0, 0, 0.025]),
-            np.array([0.14, 0.14, 0.05]),
+            np.diag([0.14**2 + 0.05**2, 0.14**2 + 0.05**2, 2 * 0.14**2]) / 12,
         )
     )
     for g, entries in groups.items():
         total = sum(m for m, c, s in entries)
         com = sum(m * c for m, c, s in entries) / total
         I = np.zeros((3, 3))
-        for m, c, s in entries:
+        for m, c, unit_inertia in entries:
             delta = c - com
-            I += np.diag(
-                m
-                / 12
-                * np.array(
-                    [
-                        s[1] ** 2 + s[2] ** 2,
-                        s[0] ** 2 + s[2] ** 2,
-                        s[0] ** 2 + s[1] ** 2,
-                    ]
-                )
-            ) + m * (np.dot(delta, delta) * np.eye(3) - np.outer(delta, delta))
+            I += m * unit_inertia + m * (
+                np.dot(delta, delta) * np.eye(3) - np.outer(delta, delta)
+            )
         E.SubElement(
             bodies[g],
             "inertial",
@@ -376,7 +348,7 @@ def main():
             pos=fmt(com - origins[g]),
             fullinertia=fmt([I[0, 0], I[1, 1], I[2, 2], I[0, 1], I[0, 2], I[1, 2]]),
         )
-    # Sensor locations follow the B9-1 component bounds; IR axes inherited from mounting orientation.
+    # Sensor locations follow B9-8 CAD; IR mounting orientations are retained.
     sensors = E.SubElement(xml, "sensor")
     sc = json.loads((ref / "b91_sensor_axes.json").read_text())
 
@@ -386,7 +358,7 @@ def main():
         return (v.min(0) + v.max(0)) / 2
 
     E.SubElement(
-        root, "site", name="imu_site", pos=fmt(center("IMU reservation")), size=".001"
+        root, "site", name="imu_site", pos=fmt(center("IMU chip")), size=".001"
     )
     E.SubElement(sensors, "accelerometer", name="imu_acceleration", site="imu_site")
     E.SubElement(sensors, "gyro", name="imu_angular_velocity", site="imu_site")
@@ -408,13 +380,13 @@ def main():
         root,
         "camera",
         name="project_camera",
-        pos=fmt(center("sensor camera") + [0.0076, 0, 0]),
+        pos=fmt(center("camera envelope") + [0.0075, 0, 0]),
         xyaxes=fmt([0, -1, 0, np.sin(camera_pitch), 0, np.cos(camera_pitch)]),
         fovy=str(navigation["fovy_deg"]),
     )
     E.indent(xml)
     E.ElementTree(xml).write(
-        ROOT / "models/robot_b91.xml", encoding="utf-8", xml_declaration=True
+        ROOT / "models/robot_b98.xml", encoding="utf-8", xml_declaration=True
     )
     terrain = build_course(
         asset, wb, json.loads((ref / "b91_course_settings.json").read_text())
@@ -422,10 +394,11 @@ def main():
     (ref / "b91_course.json").write_text(json.dumps(terrain, indent=2))
     E.indent(xml)
     E.ElementTree(xml).write(
-        ROOT / "models/robot_b91_course.xml", encoding="utf-8", xml_declaration=True
+        ROOT / "models/robot_b98_course.xml", encoding="utf-8", xml_declaration=True
     )
     manifest = dict(
-        revision="B9-1",
+        revision="B9-8",
+        source=export["source"],
         source_sha256=export["source_sha256"],
         cad_bodies=len(records),
         collision_hulls=collision_count,
@@ -435,7 +408,7 @@ def main():
         parts=audit,
         limitations=[
             "Solid-material CAD mass plus provisional component allowances; not measured",
-            "Bounding-box inertia approximation",
+            "CAD solid inertia scaled uniformly to provisional component masses; equipment internals approximated",
             "Segmented convex CAD hulls after 0.5 mm vertex clustering; small holes/fasteners omitted",
             "Estimated 5 V servo ratings, 85% yaw gear efficiency; no backlash, thermal or supply-current model",
             "Yaw conservatively limited to +/-45 degrees; larger range not cleared",
@@ -444,7 +417,7 @@ def main():
             "No learned policy is validated for this model",
         ],
     )
-    (ref / "robot_b91_manifest.json").write_text(json.dumps(manifest, indent=2))
+    (ref / "robot_b98_manifest.json").write_text(json.dumps(manifest, indent=2))
     print(json.dumps({k: v for k, v in manifest.items() if k != "parts"}, indent=2))
 
 

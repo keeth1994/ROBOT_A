@@ -1,11 +1,11 @@
 {
   "cad_revision": "B9-8",
-  "simulation_revision": "B9-1",
+  "simulation_revision": "B9-8",
   "fusion_launcher": null,
   "assembly": "cad/B9_8/Robot_B9_8.f3d",
   "step": "cad/B9_8/Robot_B9_8.step",
   "fit_report": "cad/B9_8/check.json",
-  "simulation_transferred": false,
+  "simulation_transferred": true,
   "sha256": {
     "cad/B9_1/Robot_B9_1.f3d": "42f93b8e3420fbde01c428dbe5be318b81ede1fbdafe319aa56953b3abe0ae33",
     "cad/B9_8/assembly.png": "735ba62bf11ae3e055f3426f48e549445e896df37ab110e4d87566de2d7ef426",
@@ -56,10 +56,10 @@
     "fit_report": "cad/B9_8/check.json"
   },
   "rebuild_note": "See cad/B9_8/README.md and cad/B98Builder.",
-  "simulation_model": "models/robot_b91.xml",
-  "simulation_course": "models/robot_b91_course.xml",
-  "simulation_manifest": "reference/robot_b91_manifest.json",
-  "simulation_status": "B9-1 geometry with updated servo assumptions and a reported 63.406 s course traversal. B9-8 CAD has not been transferred; see docs/RAMP_CONTROLLER.md for limitations.",
+  "simulation_model": "models/robot_b98.xml",
+  "simulation_course": "models/robot_b98_course.xml",
+  "simulation_manifest": "reference/robot_b98_manifest.json",
+  "simulation_status": "B9-8 STEP geometry, CAD-derived inertia and provisional 1.448 kg mass. Model/structure/nominal-course checks pass. Camera/IMU course traversal: 97.054 s, no fall or warnings; 12.8% non-foot terrain contact. See docs/DESIGN_B91_SIM.md.",
   "chassis": "cad/B9_8/parts/B9_8_chassis_lightly_reinforced_posts.f3d",
   "motion_report": "cad/B9_8/motion_report.json",
   "access_report": "cad/B9_8/access_report.json"

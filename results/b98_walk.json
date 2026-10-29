@@ -1,0 +1,43 @@
+{
+  "revision": "B9-8",
+  "parameters": {
+    "period": 1.0,
+    "duty": 0.6,
+    "yaw_amplitude": 0.45,
+    "pitch_lift": 0.65,
+    "pitch_stance": 0.0,
+    "kp": 1.6,
+    "kd": 0.04,
+    "heading_gain": 0.8,
+    "pattern": "trot",
+    "lateral_gain": 5.0
+  },
+  "duration_s": 15.000000000001679,
+  "requested_duration_s": 15.0,
+  "initial_y_m": 0.0,
+  "initial_yaw_rad": 0.0,
+  "walk": true,
+  "ramp": false,
+  "forward_m": 0.4623484430580898,
+  "sideways_m": 0.024822886810843964,
+  "final_height_m": 0.04509020382109404,
+  "max_tilt_deg": 0.4070907763397862,
+  "fallen": false,
+  "nonfoot_ground_fraction": 0.0,
+  "stall_saturation_fraction": 0.049069373942470386,
+  "ramp_contact": false,
+  "total_mass_kg": 1.4481191735599996,
+  "torque_limits_Nm": [
+    0.2547004930555556,
+    0.22361580805544998,
+    0.4862463958333334,
+    0.22361580805544998,
+    0.2547004930555556,
+    0.22361580805544998,
+    0.4862463958333334,
+    0.22361580805544998
+  ],
+  "warnings": 0,
+  "feedback_source": "ideal simulator heading and lateral position",
+  "navigation": null
+}

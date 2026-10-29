@@ -1,0 +1,22 @@
+{
+  "fixed_mass_kg": {
+    "battery": 0.126,
+    "ir": 0.0036,
+    "camera": 0.014,
+    "imu": 0.002,
+    "driver_board": 0.028,
+    "regulator": 0.01,
+    "bearing6": 0.008,
+    "bearing4": 0.003,
+    "matrix_board": 0.04,
+    "camera_ear": 0
+  },
+  "density_kg_m3": {
+    "PLA": 1240,
+    "rubber": 1100,
+    "steel": 7800,
+    "horn": 1150
+  },
+  "extra_wiring_fasteners_kg": 0.05,
+  "note": "Provisional solid-material masses, not measured. Servo masses: b98_kinematics.json. Battery 126 g, SERVO2 28 g retained. Matrix board including ESP32 40 g and IMU chip 2 g replace old separate electronics allowances. Camera 14 g includes its two zero-mass ear envelopes. Printed mounts use PLA density; explicit fasteners use steel density. Extra 50 g covers unmodeled wiring/straps/nuts; excludes explicit CAD fasteners."
+}

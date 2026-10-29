@@ -1,4 +1,4 @@
-"""B9-1 torque/speed-limited rocker gait experiment. No imposed base forces."""
+"""B9-8 torque/speed-limited rocker gait experiment. No imposed base forces."""
 
 import argparse, json, math, time
 import tomllib
@@ -67,7 +67,7 @@ class GaitControlPanel:
         self._closed = False
         self._pending_profile = None
         self.root = tk.Tk()
-        self.root.title("B9-1 gait controls")
+        self.root.title("B9-8 gait controls")
         self.root.resizable(False, False)
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
@@ -124,10 +124,10 @@ class Robot:
         self.navigation = None
         self.p = DEFAULT | (params or {})
         self.m = mujoco.MjModel.from_xml_path(
-            str(ROOT / "models" / ("robot_b91_course.xml" if ramp else "robot_b91.xml"))
+            str(ROOT / "models" / ("robot_b98_course.xml" if ramp else "robot_b98.xml"))
         )
         self.d = mujoco.MjData(self.m)
-        cfg = json.loads((ROOT / "reference/b91_kinematics.json").read_text())
+        cfg = json.loads((ROOT / "reference/b98_kinematics.json").read_text())
         self.names = [l + "_" + s for l in LEGS for s in ["yaw", "pitch"]]
         js = [self.m.joint(n).id for n in self.names]
         self.qa = self.m.jnt_qposadr[js]
@@ -320,7 +320,7 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
                 break
         delta = r.d.qpos[:3] - start
         result = dict(
-            revision="B9-1",
+            revision="B9-8",
             parameters=r.p,
             duration_s=float(r.d.time),
             requested_duration_s=seconds,
@@ -377,7 +377,7 @@ def main():
     if args.seconds is None:
         args.seconds = 120 if args.ramp else 20
     print(
-        "B9-1: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
+        "B9-8: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
     )
     pp = Path(args.params) if args.params else ROOT / "reference/b91_gait.toml"
     try:
@@ -406,7 +406,7 @@ def main():
         finally:
             if recording:
                 recording.close()
-        name = "b91_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
+        name = "b98_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
         (ROOT / "results" / f"{name}.json").write_text(json.dumps(result, indent=2))
         print(json.dumps(result, indent=2))
         if args.ramp and not args.hold and not result["course_completed"]:

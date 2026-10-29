@@ -70,8 +70,7 @@ def main(robust=False):
         print(f"{result['case']}: completed={result['course_completed']}, "
               f"time={result['duration_s']:.3f}s, tilt={result['max_tilt_deg']:.2f}deg, "
               f"nonfoot contact={result['nonfoot_ground_fraction']:.1%}", flush=True)
-    if robust:
-        (ROOT / "results/b91_course_validation.json").write_text(json.dumps(reports, indent=2))
+    (ROOT / "results/b98_course_validation.json").write_text(json.dumps(reports, indent=2))
     for result in reports:
         assert result["course_completed"], result
         assert not result["fallen"] and result["warnings"] == 0

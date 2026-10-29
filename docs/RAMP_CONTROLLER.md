@@ -1,5 +1,8 @@
 # Ramp traversal
 
+The results below describe the historical B9-1 model. The default simulation now
+uses B9-8; see [current simulation notes](DESIGN_B91_SIM.md) for its validation.
+
 The `course` profile traverses the existing up/down/up/platform/down course with
 the original CAD geometry, 1.163 kg estimated mass, 0.8 nominal friction, 5 V
 servo torque/speed limits, +/-45 degree joints and 50 Hz servo commands.

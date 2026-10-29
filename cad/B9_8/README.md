@@ -24,4 +24,4 @@ The motion report records both evaluated-candidate and final STEP hashes. Their 
 
 The Fusion source is [B98Builder](../B98Builder). Run build_b98.py within Fusion to create a candidate from [the preserved user assembly base](source/User_assembly_base.step). Then run validate_b98.py and access_b98.py on that active candidate. These scripts require Fusion's adsk API and are not ordinary terminal programs. Inspect the reports before replacing the final assembly.
 
-B9-8 has not been transferred to MuJoCo. The simulation remains B9-1; its mass and results do not describe this assembly.
+B9-8 is the default MuJoCo model. `python cad/export_b98_sim.py` exports this STEP assembly, and `python robot.py build` regenerates the simulation. See [simulation notes](../../docs/DESIGN_B91_SIM.md) for provisional masses and validation. Historical B9-1 results do not describe this assembly.

@@ -7,7 +7,9 @@ from robot_b91.paths import ROOT
 
 class SimNavigation:
     def __init__(self, model):
-        self.estimate = Navigation(**json.loads((ROOT / 'reference/b91_navigation.json').read_text()))
+        config = json.loads((ROOT / 'reference/b91_navigation.json').read_text())
+        config['camera_x_m'] = float(model.camera('project_camera').pos[0])
+        self.estimate = Navigation(**config)
         self.renderer = mujoco.Renderer(model, height=240, width=320)
         self.options = mujoco.MjvOption()
         self.options.geomgroup[3] = 0
