@@ -56,8 +56,9 @@ Edit `reference/b98_mass.json` and `reference/b98_kinematics.json` for B9-8 mass
 assumptions. Terrain, gait and sensor-axis settings retain their `b91_*` filenames.
 
 B9-8 provisional simulation mass is **1.448 kg**. Model, structure and nominal
-course checks pass; camera/IMU traversal completes in 97.054 simulated seconds,
-with non-foot terrain contact during 12.8% of evaluated timesteps.
+course checks pass; the ramp is **29 cm wide**. Camera/IMU traversal completes
+in 82.330 simulated seconds,
+with non-foot terrain contact during 2.1% of evaluated timesteps.
 See [simulation notes](docs/DESIGN_B91_SIM.md) for validation details. Existing B9-1
 course records and video are historical and do not validate the revised model.
 An ESP32 firmware prototype reuses the gait with IMU heading and operator lateral

@@ -59,7 +59,7 @@
   "simulation_model": "models/robot_b98.xml",
   "simulation_course": "models/robot_b98_course.xml",
   "simulation_manifest": "reference/robot_b98_manifest.json",
-  "simulation_status": "B9-8 STEP geometry, CAD-derived inertia and provisional 1.448 kg mass. Model/structure/nominal-course checks pass. Camera/IMU course traversal: 97.054 s, no fall or warnings; 12.8% non-foot terrain contact. See docs/DESIGN_B91_SIM.md.",
+  "simulation_status": "B9-8 STEP geometry, CAD-derived inertia and provisional 1.448 kg mass. Ramp width 29 cm. Model/structure/nominal-course checks pass. Camera/IMU course traversal: 82.330 s, no fall or warnings; 2.1% non-foot terrain contact. See docs/DESIGN_B91_SIM.md.",
   "chassis": "cad/B9_8/parts/B9_8_chassis_lightly_reinforced_posts.f3d",
   "motion_report": "cad/B9_8/motion_report.json",
   "access_report": "cad/B9_8/access_report.json"

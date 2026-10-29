@@ -1,6 +1,6 @@
 {
   "description": "Photo-inspired provisional course; positions, heights and tunnel width are adjustable, not measured from the photo.",
-  "width_m": 0.3,
+  "width_m": 0.29,
   "origin_xy_m": [
     0.4,
     0

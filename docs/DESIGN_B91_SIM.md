@@ -7,7 +7,9 @@ On headless Linux set `MUJOCO_GL=egl` for rendering and sensor feedback.
 ## Model
 
 The default flat and course models are `models/robot_b98.xml` and
-`models/robot_b98_course.xml`. They use all 225 solids from
+`models/robot_b98_course.xml`. The ramp is 0.29 m (29 cm) wide;
+`reference/b91_course_settings.json` and the camera navigator use that width.
+They use all 225 solids from
 `cad/B9_8/Robot_B9_8.step`: revised chassis, yaw turrets, braced rocker feet,
 two equipment levels, battery/controller mounts, matrix board and camera.
 `reference/robot_b98_manifest.json` records source SHA-256, component masses,
@@ -63,12 +65,12 @@ New evaluation reports use `results/b98_*`; the B9-1 video/reports are historica
 - Standing, 15 s with ideal feedback: stable, no physics warnings.
 - Flat, 15 s with ideal feedback: 0.462 m forward, 0.0248 m sideways, no fall or
   physics warnings. See `results/b98_walk.json`.
-- Ideal-feedback course, 82.354 s: complete, all feet on all five sections in
+- Historical 30 cm-wide ideal-feedback course, 82.354 s: complete, all feet on all five sections in
   order, no fall, bypass or warnings. Maximum tilt 21.72 degrees. See
   `results/b98_ramp.json`.
-- Camera/IMU course feedback, 97.054 s: complete, no fall, bypass or physics
-  warnings. Maximum tilt 21.56 degrees. Non-foot terrain contact occurs in
-  12.8% of evaluated timesteps, so this is not a scrape-free traversal. See
+- Current 29 cm-wide camera/IMU course feedback, 82.330 s: complete, no fall, bypass or physics
+  warnings. Maximum tilt 21.52 degrees. Non-foot terrain contact occurs in
+  2.1% of evaluated timesteps, so this is not a scrape-free traversal. See
   `results/b98_course_validation.json`.
 - `MUJOCO_GL=egl .venv/bin/python robot.py check all` passes model, structure and
   nominal full-course checks. Perturbed-condition robustness was not rerun.

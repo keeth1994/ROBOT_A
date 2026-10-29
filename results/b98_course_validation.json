@@ -15,19 +15,19 @@
       "lateral_gain": 0.0,
       "strafe_gain": 10.0
     },
-    "duration_s": 97.05399999995521,
+    "duration_s": 82.32999999998952,
     "requested_duration_s": 120,
     "initial_y_m": 0.0,
     "initial_yaw_rad": 0.0,
     "walk": true,
     "ramp": true,
-    "forward_m": 3.559154595451198,
-    "sideways_m": 0.0019034077689360507,
-    "final_height_m": 0.04335424947818169,
-    "max_tilt_deg": 21.560892618610932,
+    "forward_m": 3.5669252666527873,
+    "sideways_m": -0.041088718104256475,
+    "final_height_m": 0.04365423434300224,
+    "max_tilt_deg": 21.517553372707553,
     "fallen": false,
-    "nonfoot_ground_fraction": 0.1279666722773944,
-    "stall_saturation_fraction": 0.05428905066487123,
+    "nonfoot_ground_fraction": 0.02113728028680974,
+    "stall_saturation_fraction": 0.053306901359358665,
     "ramp_contact": true,
     "total_mass_kg": 1.4481191735599996,
     "torque_limits_Nm": [
@@ -43,23 +43,23 @@
     "warnings": 0,
     "feedback_source": "RGB camera + accelerometer/gyro",
     "navigation": {
-      "camera_frames": 960,
-      "accepted_frames": 866,
-      "last_seen_s": 89.32599999997322,
-      "heading_rad": -0.008154456582393525,
-      "lateral_m": 0.011120657748452747,
-      "roll_rad": -0.00023655660637650908,
-      "pitch_rad": -0.02006709629558097,
-      "max_blind_s": 7.725999999981994
+      "camera_frames": 816,
+      "accepted_frames": 733,
+      "last_seen_s": 74.43400000000793,
+      "heading_rad": -0.00842253894129249,
+      "lateral_m": 0.011148418311151365,
+      "roll_rad": -0.008360837009465777,
+      "pitch_rad": -0.01725626047505391,
+      "max_blind_s": 7.893999999981602
     },
     "course_completed": true,
-    "completion_time_s": 97.05399999995521,
+    "completion_time_s": 82.32999999998952,
     "final_course_position_m": [
-      3.1592051730083504,
-      0.0018917880515954,
-      0.04335424947818169
+      3.1669758442099396,
+      -0.041100337821597124,
+      0.04365423434300224
     ],
-    "max_course_lateral_error_m": 0.06020208936367344,
+    "max_course_lateral_error_m": 0.050155060657814124,
     "left_course": false,
     "floor_bypass": false,
     "feet_per_surface": {
@@ -98,102 +98,102 @@
       {
         "surface": "first_climb",
         "leg": "FR",
-        "time_s": 6.503999999999506
+        "time_s": 6.511999999999505
       },
       {
         "surface": "first_climb",
         "leg": "FL",
-        "time_s": 6.961999999999455
+        "time_s": 6.963999999999455
       },
       {
         "surface": "first_climb",
         "leg": "RR",
-        "time_s": 15.226000000001754
+        "time_s": 16.16400000000192
       },
       {
         "surface": "first_climb",
         "leg": "RL",
-        "time_s": 15.57400000000187
+        "time_s": 16.494000000001737
       },
       {
         "surface": "first_descent",
         "leg": "FL",
-        "time_s": 25.449999999996773
+        "time_s": 26.415999999996238
       },
       {
         "surface": "first_descent",
         "leg": "FR",
-        "time_s": 25.45399999999677
+        "time_s": 27.47399999999565
       },
       {
         "surface": "first_descent",
         "leg": "RL",
-        "time_s": 41.64400000000493
+        "time_s": 31.421999999993464
       },
       {
         "surface": "first_descent",
         "leg": "RR",
-        "time_s": 41.926000000005274
-      },
-      {
-        "surface": "second_climb",
-        "leg": "FL",
-        "time_s": 45.96400000001021
+        "time_s": 31.7199999999933
       },
       {
         "surface": "second_climb",
         "leg": "FR",
-        "time_s": 46.31600000001064
+        "time_s": 35.445999999997355
+      },
+      {
+        "surface": "second_climb",
+        "leg": "FL",
+        "time_s": 35.92399999999794
       },
       {
         "surface": "second_climb",
         "leg": "RR",
-        "time_s": 55.22000000002152
+        "time_s": 42.286000000005714
       },
       {
         "surface": "second_climb",
         "leg": "RL",
-        "time_s": 55.51200000002188
+        "time_s": 42.70000000000622
       },
       {
         "surface": "raised_platform",
         "leg": "FL",
-        "time_s": 68.46400000002184
+        "time_s": 55.46600000002182
       },
       {
         "surface": "raised_platform",
         "leg": "FR",
-        "time_s": 69.4660000000195
+        "time_s": 55.468000000021824
       },
       {
         "surface": "raised_platform",
         "leg": "RR",
-        "time_s": 79.97399999999502
+        "time_s": 65.0060000000299
       },
       {
         "surface": "raised_platform",
         "leg": "RL",
-        "time_s": 80.40399999999401
-      },
-      {
-        "surface": "final_descent",
-        "leg": "FR",
-        "time_s": 85.91199999998118
+        "time_s": 65.44800000002887
       },
       {
         "surface": "final_descent",
         "leg": "FL",
-        "time_s": 86.73799999997925
+        "time_s": 71.0160000000159
+      },
+      {
+        "surface": "final_descent",
+        "leg": "FR",
+        "time_s": 71.52400000001471
       },
       {
         "surface": "final_descent",
         "leg": "RR",
-        "time_s": 88.00799999997629
+        "time_s": 73.00200000001126
       },
       {
         "surface": "final_descent",
         "leg": "RL",
-        "time_s": 88.56799999997499
+        "time_s": 73.55600000000997
       }
     ]
   }
