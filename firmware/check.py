@@ -2,6 +2,7 @@
 import subprocess
 import sys
 import os
+import shutil
 from pathlib import Path
 import numpy as np
 
@@ -17,7 +18,9 @@ def main():
     exe = build / "control_test.exe"
     env = os.environ | {"ZIG_GLOBAL_CACHE_DIR": str(build / "global-cache"),
                         "ZIG_LOCAL_CACHE_DIR": str(build / "local-cache")}
-    subprocess.run([sys.executable, "-m", "ziglang", "c++", "-std=c++17", "-O2",
+    compiler = shutil.which('g++') or shutil.which('clang++')
+    command = [compiler] if compiler else [sys.executable, "-m", "ziglang", "c++"]
+    subprocess.run([*command, "-std=c++17", "-O2",
                     "-Wall", "-Wextra", "-Werror", "-I", str(ROOT / "firmware/include"),
                     str(ROOT / "firmware/tests/control_test.cpp"), "-o", str(exe)], check=True, env=env)
     subprocess.run([str(exe)], check=True)

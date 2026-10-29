@@ -6,6 +6,7 @@
 namespace b91 {
 constexpr double pi = 3.14159265358979323846;
 constexpr double jointLimit = pi / 4;
+constexpr double pitchCadMin = -3 * jointLimit, pitchCadMax = jointLimit;
 using Targets = std::array<double, 8>;
 inline double clamp(double x, double lo, double hi) { return x < lo ? lo : x > hi ? hi : x; }
 inline double wrap(double x) { return std::atan2(std::sin(x), std::cos(x)); }
@@ -49,16 +50,29 @@ inline Targets gait(double elapsed, double headingError, double lateralError) {
 }
 
 // Measure PWM at actual OUTPUT-joint angles; this includes yaw gearing and signs.
-struct ServoCalibration { int channel; int minus45us; int zeroUs; int plus45us; };
+// Pitch samples use raised-zero angles; +45 is CAD neutral, +90 is CAD +45.
+struct ServoCalibration {
+    int channel; int minus45us; int zeroUs; int plus45us;
+    int plus90us = 0; int minus90us = 0;
+};
 inline bool valid(const std::array<ServoCalibration, 8>& servos) {
     uint16_t used = 0;
-    for (const auto& s : servos) {
+    for (std::size_t i = 0; i < servos.size(); ++i) {
+        const auto& s = servos[i];
         if (s.channel < 0 || s.channel > 15 || (used & (1u << s.channel))) return false;
         used |= 1u << s.channel;
         for (int pulse : {s.minus45us, s.zeroUs, s.plus45us})
             if (pulse < 500 || pulse > 2500) return false;
         const int a = s.zeroUs - s.minus45us, b = s.plus45us - s.zeroUs;
         if (std::abs(a) < 20 || std::abs(b) < 20 || (a > 0) != (b > 0)) return false;
+        if (i % 2 == 1) {
+            const int c = s.plus90us - s.plus45us;
+            const int d = s.minus45us - s.minus90us;
+            if (s.plus90us < 500 || s.plus90us > 2500 || std::abs(c) < 20 ||
+                (c > 0) != (a > 0)) return false;
+            if (s.minus90us < 500 || s.minus90us > 2500 || std::abs(d) < 20 ||
+                (d > 0) != (a > 0)) return false;
+        }
     }
     return true;
 }
@@ -67,6 +81,20 @@ inline int pulse(const ServoCalibration& s, double angle) {
     const double fraction = clamp(angle / jointLimit, -1, 1);
     return static_cast<int>(std::lround(s.zeroUs + (fraction < 0
         ? -fraction * (s.minus45us - s.zeroUs) : fraction * (s.plus45us - s.zeroUs))));
+}
+
+// Input remains in the simulation's CAD frame. Only pitch calibration is offset.
+inline int jointPulse(const ServoCalibration& s, int jointIndex, double cadAngle) {
+    if (!std::isfinite(cadAngle)) return -1;
+    if (jointIndex % 2 == 0) return pulse(s, cadAngle);
+    if (s.plus90us < 500 || s.plus90us > 2500 ||
+        s.minus90us < 500 || s.minus90us > 2500) return -1;
+    const int points[] = {s.minus90us, s.minus45us, s.zeroUs, s.plus45us, s.plus90us};
+    // Raised calibration angle = CAD angle + 45 degrees. Each segment spans 45 degrees.
+    const double position = (clamp(cadAngle, pitchCadMin, pitchCadMax) - pitchCadMin) / jointLimit;
+    const int segment = position >= 3 ? 3 : static_cast<int>(position);
+    const double fraction = position - segment;
+    return static_cast<int>(std::lround(points[segment] + fraction * (points[segment + 1] - points[segment])));
 }
 
 // Wrap-safe watchdog. Expiry pauses; a new DRIVE alone cannot restart walking.

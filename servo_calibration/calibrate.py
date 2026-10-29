@@ -9,23 +9,33 @@ JOINTS = ('FL_yaw', 'FL_pitch', 'RL_yaw', 'RL_pitch',
           'FR_yaw', 'FR_pitch', 'RR_yaw', 'RR_pitch')
 
 
+def angles_for(joint):
+    # Pitch calibration zero is 45 degrees above CAD neutral.
+    return (-90, -45, 0, 45, 90) if joint.endswith('_pitch') else (-45, 0, 45)
+
+
 def export_table(data):
     rows, used = [], set()
     for joint in JOINTS:
         entry = data[joint]
         channel = entry['channel']
         points = entry['points']
-        values = [points[str(a)] for a in (-45, 0, 45)]
+        values = [points[str(a)] for a in angles_for(joint)]
         if channel not in (0, 1, 2, 3, 8, 9, 10, 11) or channel in used:
             raise ValueError('Each joint needs a distinct configured channel')
         if any(not 500 <= v <= 2500 for v in values):
             raise ValueError('Pulse outside electrical bounds')
-        a, b = values[1] - values[0], values[2] - values[1]
-        if abs(a) < 20 or abs(b) < 20 or (a > 0) != (b > 0):
+        differences = [b - a for a, b in zip(values, values[1:])]
+        if any(abs(d) < 20 or (d > 0) != (differences[0] > 0) for d in differences):
             raise ValueError(f'{joint}: measurements must be monotonic, >=20 us apart')
         used.add(channel)
-        rows.append(f'    {{{channel}, {values[0]}, {values[1]}, {values[2]}}}, // {joint}')
-    return ('// Measured output-joint angles: -45, 0, +45 degrees.\n'
+        # Preserve the C++ field order: channel, -45, 0, +45, +90, -90.
+        field_angles = (-45, 0, 45, 90, -90) if joint.endswith('_pitch') else (-45, 0, 45)
+        fields = (channel, *(points[str(a)] for a in field_angles))
+        rows.append('    {' + ', '.join(map(str, fields)) + f'}}, // {joint}')
+    return ('// Yaw: -45, 0, +45 degrees relative to CAD.\n'
+            '// Pitch fields: -45, 0, +45, +90, -90 degrees relative to raised zero.\n'
+            '// Pitch +45 = CAD neutral; -45 = horizontal outward.\n'
             'constexpr std::array<b91::ServoCalibration, 8> servos{{\n'
             + '\n'.join(rows) + '\n}};\n')
 
@@ -88,6 +98,7 @@ def main():
     channel = None
     print('Support robot; SELECT moves a servo to 1500 us. Other outputs switch off.')
     print('Commands: select JOINT CHANNEL | jog +/-US (max 10) | record ANGLE')
+    print('Yaw: -45/0/+45 CAD. Pitch: -90/-45/0/+45/+90 raised frame; +45 = CAD neutral.')
     print('          off | status | export | quit')
     print('Joints:', ', '.join(JOINTS))
     try:
@@ -122,8 +133,8 @@ def main():
                     print(reply)
                 elif command == 'record' and len(rest) == 1:
                     angle = int(rest[0])
-                    if joint is None or angle not in (-45, 0, 45):
-                        raise ValueError('Select a joint and measure -45, 0 or 45 degrees')
+                    if joint is None or angle not in angles_for(joint):
+                        raise ValueError('Measure yaw -45/0/+45 or pitch -90/-45/0/+45/+90 degrees')
                     status = connection.request('STATUS')
                     fields = dict(item.split('=') for item in status.split()[2:])
                     if int(fields['channel']) != channel or int(fields['pulse']) != pulse:

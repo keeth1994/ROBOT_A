@@ -21,11 +21,37 @@ int main(int argc, char**) {
     assert(b91::validRotation(rotation));
     rotation[0][0] = -1; assert(!b91::validRotation(rotation));
     assert(!b91::valid(s));
-    for (int i = 0; i < 8; ++i) s[i] = {i, 1000, 1500, 2000};
+    for (int i = 0; i < 8; ++i) s[i] = {i, 1000, 1500, 2000, 2400, 600};
     assert(b91::valid(s));
     assert(b91::pulse(s[0], -99) == 1000 && b91::pulse(s[0], 99) == 2000);
     assert(b91::pulse(s[0], 0) == 1500);
     assert(b91::pulse(s[0], std::numeric_limits<double>::quiet_NaN()) == -1);
+    // CAD pitch -135/-90/-45/0/+45 corresponds to raised -90/-45/0/+45/+90.
+    assert(b91::jointPulse(s[1], 1, -3*b91::pi/4) == 600);
+    assert(b91::jointPulse(s[1], 1, -5*b91::pi/8) == 800);
+    assert(b91::jointPulse(s[1], 1, -b91::pi/2) == 1000);
+    assert(b91::jointPulse(s[1], 1, -b91::pi/4) == 1500);
+    assert(b91::jointPulse(s[1], 1, 0) == 2000);
+    assert(b91::jointPulse(s[1], 1, b91::pi/4) == 2400);
+    assert(b91::jointPulse(s[1], 1, b91::pi/8) == 2200);
+    assert(b91::jointPulse(s[1], 1, -99) == 600);
+    assert(b91::jointPulse(s[1], 1, 99) == 2400);
+    assert(b91::jointPulse(s[0], 0, 0) == 1500); // Yaw is not offset.
+    s[1].plus90us = 0;
+    assert(!b91::valid(s) && b91::jointPulse(s[1], 1, 0) == -1);
+    s[1].plus90us = 1900; assert(!b91::valid(s));
+    s[1].plus90us = 2400;
+    s[1].minus90us = 0; assert(!b91::valid(s));
+    assert(b91::jointPulse(s[1], 1, 0) == -1);
+    s[1].minus90us = 1100; assert(!b91::valid(s));
+    s[1] = {1, 2400, 1800, 1200, 600, 2500};
+    assert(b91::valid(s));
+    assert(b91::jointPulse(s[1], 1, 0) == 1200);
+    assert(b91::jointPulse(s[1], 1, b91::pi/8) == 900);
+    assert(b91::jointPulse(s[1], 1, -3*b91::pi/8) == 2100);
+    assert(b91::jointPulse(s[1], 1, -5*b91::pi/8) == 2450);
+    assert(b91::jointPulse(s[1], 1, std::numeric_limits<double>::quiet_NaN()) == -1);
+    s[1] = {1, 1000, 1500, 2000, 2400, 600};
     s[0] = {0, 2000, 1400, 900};
     assert(b91::valid(s));
     assert(b91::pulse(s[0], -b91::jointLimit/2) == 1700);

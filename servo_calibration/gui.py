@@ -8,9 +8,10 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from calibrate import Connection, JOINTS, export_table
+from calibrate import Connection, JOINTS, angles_for, export_table
 
 CHANNELS = (0, 1, 2, 3, 8, 9, 10, 11)
+DEFAULT_CHANNELS = dict(zip(JOINTS, (8, 3, 1, 2, 0, 11, 9, 10)))
 LABELS = ('Foran venstre – sving', 'Foran venstre – løft',
           'Bak venstre – sving', 'Bak venstre – løft',
           'Foran høyre – sving', 'Foran høyre – løft',
@@ -82,7 +83,7 @@ class Session:
         self.active = (joint, channel, pulse + delta)
 
     def record(self, angle):
-        if self.active is None or angle not in (-45, 0, 45):
+        if self.active is None or angle not in angles_for(self.active[0]):
             raise ValueError('Aktiver et ledd først')
         self.status()
         joint, channel, pulse = self.active
@@ -106,7 +107,7 @@ class Session:
         try:
             table = export_table(self.data)
         except KeyError as exc:
-            raise ValueError('Mål alle tre vinkler for alle åtte ledd før eksport.') from exc
+            raise ValueError('Mål tre vinkler for yaw og fem for pitch (også −90° og +90°) før eksport.') from exc
         output = self.path.with_name('servo_table.h')
         output.write_text(table)
         return f'Eksportert til {output}'
@@ -127,8 +128,8 @@ class App:
         self.status_text = tk.StringVar(value='Ikke tilkoblet')
         self.pulse_text = tk.StringVar(value='Ingen servo aktiv')
         root.title('Servokalibrering – ROBOT A')
-        root.geometry('870x690')
-        root.minsize(800, 650)
+        root.geometry('1100x730')
+        root.minsize(1050, 700)
         root.protocol('WM_DELETE_WINDOW', self.close)
         outer = ttk.Frame(root, padding=18)
         outer.pack(fill='both', expand=True)
@@ -148,11 +149,12 @@ class App:
                                      font=('', 11, 'bold'), command=self.stop)
         self.stop_button.pack(side='right')
         ttk.Label(outer, textvariable=self.status_text, wraplength=800).pack(anchor='w', pady=10)
-        self.table = ttk.Treeview(outer, columns=('name', 'channel', '-45', '0', '45'),
+        self.table = ttk.Treeview(outer, columns=('name', 'channel', '-90', '-45', '0', '45', '90'),
                                   show='headings', height=8, selectmode='browse')
         for col, title, width in [('name', 'Ledd', 310), ('channel', 'Kanal', 65),
+                                  ('-90', '−90° pitch (µs)', 125),
                                   ('-45', '−45° (µs)', 110), ('0', '0° (µs)', 110),
-                                  ('45', '+45° (µs)', 110)]:
+                                  ('45', '+45° (µs)', 110), ('90', '+90° pitch (µs)', 125)]:
             self.table.heading(col, text=title)
             self.table.column(col, width=width, anchor='w' if col == 'name' else 'center')
         self.table.pack(fill='x')
@@ -177,15 +179,21 @@ class App:
             button.pack(side='left', padx=(0, 6))
             self.motion_buttons.append(button)
         ttk.Label(outer, text='Mål vinkelen fysisk. Knappene nedenfor lagrer dagens puls; '
-                  'de flytter ikke servoen.\n0° = CAD-nøytralstilling. ±45° gjelder '
-                  'leddets utgangsvinkel, også ved giring.', wraplength=800).pack(anchor='w')
+                  'de flytter ikke servoen.\nPitch: −90° = 45° over horisontalt, '
+                  '−45° = horisontalt ut, 0° = halvveis opp, '
+                  '+45° = fot ned (CAD), +90° = gammel nedre grense.\n'
+                  'Yaw: 0° = CAD-nøytralstilling. Mål etter eventuell giring.',
+                  wraplength=1020).pack(anchor='w')
         row = ttk.Frame(outer)
         row.pack(anchor='w', pady=10)
-        for angle in (-45, 0, 45):
+        self.endpoint_buttons = []
+        for angle in (-90, -45, 0, 45, 90):
             button = ttk.Button(row, text=f'Lagre {angle:+d}°',
                                 command=lambda a=angle: self.submit('record', a))
             button.pack(side='left', padx=(0, 8))
             self.motion_buttons.append(button)
+            if abs(angle) == 90:
+                self.endpoint_buttons.append(button)
         self.export_button = ttk.Button(row, text='Eksporter servo_table.h',
                                         command=lambda: self.submit('export'))
         self.export_button.pack(side='left', padx=15)
@@ -194,7 +202,7 @@ class App:
         ttk.Label(outer, text='Ved mekanisk stopp eller belastet servo: slå av strømmen. '
                   'PWM AV kan ikke garantere stopp ved I2C-feil.', wraplength=800).pack(anchor='w', pady=5)
         self.render()
-        self.table.selection_set(JOINTS[0])
+        self.table.selection_set(self.table.get_children()[0])
         self.refresh_ports()
         threading.Thread(target=self.worker, daemon=True).start()
         root.after(80, self.poll)
@@ -215,17 +223,22 @@ class App:
 
     def choose(self, _event=None):
         joint = self.selected()
-        self.channel.set(str(self.data.get(joint, {}).get('channel', CHANNELS[JOINTS.index(joint)])))
+        self.channel.set(str(self.data.get(joint, {}).get('channel', DEFAULT_CHANNELS[joint])))
 
     def render(self):
-        for joint, label in zip(JOINTS, LABELS):
+        rows = sorted(zip(JOINTS, LABELS), key=lambda row:
+                      self.data.get(row[0], {}).get('channel', DEFAULT_CHANNELS[row[0]]))
+        for index, (joint, label) in enumerate(rows):
             entry = self.data.get(joint, {})
-            values = (f'{joint} · {label}', entry.get('channel', '—'),
-                      *(entry.get('points', {}).get(str(a), '—') for a in (-45, 0, 45)))
+            channel = entry.get('channel', DEFAULT_CHANNELS[joint])
+            values = (f'{joint} · {label}', f'{channel:02d}',
+                      *(entry.get('points', {}).get(str(a), '—') if a in angles_for(joint)
+                        else '' for a in (-90, -45, 0, 45, 90)))
             if self.table.exists(joint):
                 self.table.item(joint, values=values)
             else:
                 self.table.insert('', 'end', iid=joint, values=values)
+            self.table.move(joint, '', index)
         self.connect_button.configure(text='Koble fra' if self.connected else 'Koble til',
                                       state='disabled' if self.busy else 'normal')
         for widget in (self.ports, self.refresh_button):
@@ -233,6 +246,9 @@ class App:
         self.activate.configure(state='normal' if self.connected and not self.busy else 'disabled')
         for widget in self.motion_buttons:
             widget.configure(state='normal' if self.active and not self.busy else 'disabled')
+        if self.active and not self.active[0].endswith('_pitch'):
+            for widget in self.endpoint_buttons:
+                widget.configure(state='disabled')
         for widget in (self.forget_button, self.export_button):
             widget.configure(state='disabled' if self.busy else 'normal')
         self.stop_button.configure(state='normal' if self.connected else 'disabled')

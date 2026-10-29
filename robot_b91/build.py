@@ -130,7 +130,7 @@ def main():
     with gzip.open(source, "rt") as f:
         export = json.load(f)
     assert (
-        hashlib.sha256((ROOT / export["source"]).read_bytes()).hexdigest()
+        hashlib.sha256((ROOT / export["source"].replace('\\', '/')).read_bytes()).hexdigest()
         == export["source_sha256"]
     ), "CAD archive changed; export it again"
     records = export["bodies"]
@@ -206,7 +206,7 @@ def main():
         d = y + R @ np.array([-0.025, 0, 0])
         for suffix, origin, parent, axis, limits in [
             ("yaw", y, "platform", [0, 0, 1], [-45, 45]),
-            ("pitch", p, l + "_yaw", R @ np.array([0, 1, 0]), [-45, 45]),
+            ("pitch", p, l + "_yaw", R @ np.array([0, 1, 0]), cfg["pitch_requested_range_deg"]),
             ("driver", d, "platform", [0, 0, 1], [-90, 90]),
         ]:
             n = l + "_" + suffix
@@ -416,6 +416,10 @@ def main():
     E.ElementTree(xml).write(
         ROOT / "models/robot_b91.xml", encoding="utf-8", xml_declaration=True
     )
+    # Keep the ramp model's original physical stops as well as its gait waveform.
+    for joint in xml.iter("joint"):
+        if joint.get("name", "").endswith("_pitch"):
+            joint.set("range", fmt(np.radians([-45, 45])))
     terrain = build_course(
         asset, wb, json.loads((ref / "b91_course_settings.json").read_text())
     )

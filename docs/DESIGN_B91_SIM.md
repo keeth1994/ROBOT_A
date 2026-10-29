@@ -11,7 +11,14 @@ Use `--test --seconds 15` to save a report, or `python robot.py check all` for c
 - Estimated output torque: pitch 0.224 Nm, front yaw 0.255 Nm, rear yaw 0.486 Nm.
   Yaw uses a 1.5 speed ratio and 85% gear efficiency. Torque falls with speed;
   commands update at 50 Hz. PD gains are experimental.
-- Joint limits: +/-45 degrees. Provisional mass: 1.163 kg; inertia uses CAD bounding boxes.
+- Joint limits in the standard model's CAD frame: yaw -45 to +45 degrees,
+  pitch -135 to +45 degrees. Pitch calibration uses a raised zero 45 degrees
+  above CAD neutral: calibration -90/-45/0/+45/+90 = CAD -135/-90/-45/0/+45.
+  The ramp model retains the original +/-45 degree physical stops on all joints.
+  Existing gait profiles retain their previous pitch commands (-45 to +45 degrees).
+  An explicit `pitch_min = -2.356194490192345` in a gait profile permits higher
+  lifting if `pitch_lift`/`pitch_stance` request it. Physical clearance of the
+  added travel has not been validated. Provisional mass: 1.163 kg; inertia uses CAD bounding boxes.
 - BMI270 acceleration/gyro, IR distance validity 4-30 cm at nominal 16.5 ms,
   TimerCamera-X projection at 4:3. Sensors are ideal; the gait uses simulator state.
 - Rigid bodies, assumed friction 0.8; no supply limits, voltage sag, heat or backlash.

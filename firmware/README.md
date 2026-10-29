@@ -5,8 +5,9 @@ Servo2 and BMI270. It is **compiled and host-tested, not tested on a physical
 robot**. The operator supplies lateral steering over USB. Autonomous camera/IR
 navigation and wireless control are not implemented.
 
-The default configuration cannot arm: servo channels and measured PWM values
-are deliberately unset. No firmware has been uploaded by this change.
+The default configuration cannot arm: measured PWM values are deliberately
+unset. Servo channels follow the user-supplied wiring below. No firmware has
+been uploaded by this change.
 
 ## Build and check
 
@@ -20,7 +21,7 @@ From the repository root in PowerShell:
 
 PlatformIO pins the ESP32 platform and SparkFun BMI270 library. Its downloads
 stay under `.tools/platformio`; build files stay in `firmware/.pio`. The native
-check uses Zig's C++ compiler and compares 1,003 firmware trajectories against
+check uses an available g++/clang++ compiler (or Zig as a fallback) and compares 1,003 firmware trajectories against
 `robot_b91/gait.py`, as well as testing output calibration and the watchdog.
 The existing simulation environment supplies NumPy for that comparison.
 
@@ -45,26 +46,51 @@ Keep the existing common ground and 3.3 V logic connections from the diagram.
 
 The [Servo2 documentation](https://docs.m5stack.com/en/module/Module13.2_Servo2)
 identifies a PCA9685 and two separately powered groups of eight outputs. A
-suggested channel arrangement distributes this robot's eight servos across both
-groups; it is not a claim about wiring already installed:
+user-supplied channel arrangement distributes this robot's eight servos across
+both groups:
 
-| Joint | Suggested Servo2 channel | Servo |
+| Joint | Servo2 channel | Servo |
 |---|---:|---|
-| FL yaw | 0 | HS-475HB |
-| FL pitch | 1 | Parallax |
-| RL yaw | 2 | MG995 |
-| RL pitch | 3 | Parallax |
-| FR yaw | 8 | HS-475HB |
-| FR pitch | 9 | Parallax |
-| RR yaw | 10 | MG995 |
-| RR pitch | 11 | Parallax |
+| FL yaw | 8 | HS-475HB |
+| FL pitch | 3 | Parallax |
+| RL yaw | 1 | MG995 |
+| RL pitch | 2 | Parallax |
+| FR yaw | 0 | HS-475HB |
+| FR pitch | 11 | Parallax |
+| RR yaw | 9 | MG995 |
+| RR pitch | 10 | Parallax |
 
-For each joint, measure the pulse width at **output-joint angles** -45, 0 and
-+45 degrees relative to the CAD neutral pose. Enter `{channel, minus45us, zeroUs,
-plus45us}` in the calibration array. Values can increase or decrease with joint
-angle; each side of zero has its own linear scale. This incorporates mounting
-direction and the yaw gearing, so do not multiply by 1.5 again. Never substitute
-unmeasured 1000/1500/2000 values just to pass validation.
+Yaw calibration uses **output-joint angles** -45, 0 and +45 degrees relative
+to CAD neutral: `{channel, minus45us, zeroUs, plus45us}`.
+
+Pitch uses the operator's raised zero, 45 degrees above CAD neutral. Measure
+five points and enter `{channel, minus45us, zeroUs, plus45us, plus90us, minus90us}`.
+Use the exporter to preserve this C++ field order (the last two are +90, -90):
+
+| Pitch calibration angle | CAD/simulation angle | Physical reference |
+|---:|---:|---|
+| -90° | -135° | Foot 45° above horizontal outward |
+| -45° | -90° | Foot horizontal outward |
+| 0° | -45° | Halfway between CAD pose and horizontal |
+| +45° | 0° | Original CAD pose, foot down |
+| +90° | +45° | Original lower travel endpoint |
+
+`servo_calibration/gui.py` records these points and exports the array. Existing
+three-point measurements remain usable; add the -90° and +90° points for each
+pitch joint (eight extra measurements in total). The previous `servo_table.h`
+must be exported again after all extra points are measured. Firmware validation
+rejects incomplete pitch calibration.
+Never extrapolate endpoint pulses or force a joint against a mechanical stop.
+The enlarged pitch envelope is -135° to +45° in the CAD frame, equivalent to
+-90° to +90° around raised zero (180° total). The walking
+waveform keeps its previous -45° to +45° limits; extending the envelope does
+not automatically change the gait or add a raise-legs operator command.
+
+Values can increase or decrease with joint angle; each measured interval has
+its own linear scale. Calibration incorporates mounting direction and yaw
+gearing, so do not multiply by 1.5 again. Never substitute unmeasured pulse
+values just to pass validation. New pitch travel requires physical clearance
+checks; it is not established by changing software limits.
 
 For an unloaded bench setup, `benchCalibration=true` permits `PULSE channel us`.
 It operates one channel at a time within `benchMinUs`/`benchMaxUs` and expires
@@ -121,7 +147,9 @@ gyro estimate; yaw integrates tilt-compensated gyro rates with a stationary
 bias correction. Yaw still drifts, so the operator must correct the route.
 IMU sampling uses the [SparkFun BMI270 library](https://github.com/sparkfun/SparkFun_BMI270_Arduino_Library).
 
-Servo updates are 50 Hz with the original +/-45 degree output limits. The
+Servo updates are 50 Hz; walking commands retain the original +/-45 degree
+limits in the CAD frame. Pitch PWM mapping supports the extended -135 to +45
+degree envelope with five measured calibration points. The
 [PCA9685 register driver](https://www.nxp.com/docs/en/data-sheet/PCA9685.pdf)
 checks I2C acknowledgements, configures the PWM prescaler, and disables its
 ALLCALL response. Gyro/accelerometer data staleness, excessive tilt and failed

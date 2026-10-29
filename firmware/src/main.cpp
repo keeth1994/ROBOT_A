@@ -66,7 +66,7 @@ void updateAttitude(uint32_t now) {
 
 bool writeTargets() {
     for (int i = 0; i < 8; ++i)
-        if (!servos.set(hw::servos[i].channel, b91::pulse(hw::servos[i], targets[i]))) return false;
+        if (!servos.set(hw::servos[i].channel, b91::jointPulse(hw::servos[i], i, targets[i]))) return false;
     return true;
 }
 

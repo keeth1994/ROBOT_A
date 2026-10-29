@@ -9,10 +9,13 @@ constexpr double pwmOscillatorHz = 25000000; // Measure if pulse timing differs.
 
 // Keep false until GPIOs, IMU axes, servo channels and PWM calibration are checked.
 constexpr bool calibrated = false;
-// FL yaw/pitch, RL yaw/pitch, FR yaw/pitch, RR yaw/pitch. No guessed PWM values.
+// User-supplied wiring: FL yaw/pitch, RL yaw/pitch, FR yaw/pitch, RR yaw/pitch.
+// Pulse values remain unset until each joint is measured.
+// Pitch needs five samples in raised frame (+45 = CAD neutral).
+// C++ field order: channel, -45, 0, +45, +90, -90.
 constexpr std::array<b91::ServoCalibration, 8> servos{{
-    {-1, 0, 0, 0}, {-1, 0, 0, 0}, {-1, 0, 0, 0}, {-1, 0, 0, 0},
-    {-1, 0, 0, 0}, {-1, 0, 0, 0}, {-1, 0, 0, 0}, {-1, 0, 0, 0}
+    {8, 0, 0, 0}, {3, 0, 0, 0}, {1, 0, 0, 0}, {2, 0, 0, 0},
+    {0, 0, 0, 0}, {11, 0, 0, 0}, {9, 0, 0, 0}, {10, 0, 0, 0}
 }};
 // Sensor-to-body rotation: body +X forward, +Y left, +Z up. Verify mounting.
 constexpr double imuRotation[3][3] = {{1,0,0}, {0,1,0}, {0,0,1}};

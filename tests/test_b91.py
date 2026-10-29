@@ -6,6 +6,7 @@ import mujoco
 from robot_b91.paths import ROOT
 from robot_b91.geometry import rz
 from robot_b91.run import GAIT_PROFILES, Robot, load_gait_parameters
+from robot_b91.gait import rocker_targets
 
 
 def main():
@@ -23,6 +24,9 @@ def main():
     )
     r = Robot()
     assert r.m.nu == 8 and r.m.nq == 19
+    np.testing.assert_allclose(r.joint_ranges[1::2],
+                               np.tile(np.radians(cfg['pitch_requested_range_deg']), (4, 1)))
+    np.testing.assert_allclose(r.joint_ranges[::2], np.tile([-np.pi/4, np.pi/4], (4, 1)))
     slope_gait, _ = load_gait_parameters(gait_path, "slope")
     r.set_gait_parameters(slope_gait)
     assert r.p["pattern"] == "crawl" and r.p["period"] == slope_gait["period"]
@@ -46,7 +50,7 @@ def main():
     r.step_targets(np.full(8, -0.1))
     np.testing.assert_allclose(r.command_target, -0.1)
     r.next_command_time = r.d.time
-    r.step_targets(np.full(8, -2.0))
+    r.step_targets(np.full(8, -99.0))
     np.testing.assert_allclose(r.command_target, r.joint_ranges[:, 0])
     assert not np.any(r.d.xfrc_applied) and not np.any(r.d.qfrc_applied)
     # IR validity and sample holding, independent of the scene geometry.
@@ -115,6 +119,14 @@ def main():
     assert np.isfinite(r.d.qpos).all() and not sum(w.number for w in r.d.warning)
     course = Robot(ramp=True)
     assert course.m.ngeom > r.m.ngeom
+    np.testing.assert_allclose(course.joint_ranges, np.tile([-np.pi/4, np.pi/4], (8, 1)))
+    # Extra reach is explicit; the ramp model still enforces its original stops.
+    raised = default_gait | {'pitch_stance': -2.0, 'pitch_min': -3*np.pi/4}
+    full_targets = rocker_targets(raised, 0, 0, joint_ranges=r.joint_ranges)
+    ramp_targets = rocker_targets(raised, 0, 0, joint_ranges=course.joint_ranges)
+    np.testing.assert_allclose(full_targets[1::2], -2.0)
+    np.testing.assert_allclose(ramp_targets[1::2], -np.pi/4)
+    course.close()
     print(
         "PASS: B9-1 source hash, 97 bodies, axes, mass, standing contacts, actuation, torque limits and course load."
     )
