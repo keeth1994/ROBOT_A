@@ -12,108 +12,15 @@ from robot_b91.progress import CourseProgress
 from robot_b91.gait import rocker_targets
 
 LEGS = ["FL", "RL", "FR", "RR"]
-GAIT_PROFILES = ("flat", "slope", "transition", "course")
-DEFAULT = dict(
-    period=1.8,
-    duty=0.75,
-    yaw_amplitude=0.22,
-    pitch_lift=0.65,
-    pitch_stance=0.0,
-    kp=1.6,
-    kd=0.04,
-    heading_gain=0.8,
-    pattern="crawl",
-)
 
 
-def read_gait_config(path):
+def load_gait_parameters(path=None):
+    """Load course parameters, or a custom TOML/JSON parameter file."""
+    path = Path(path) if path is not None else ROOT / "reference/b91_gait.toml"
     if path.suffix == ".toml":
-        with path.open("rb") as f:
-            return tomllib.load(f)
+        with path.open("rb") as stream:
+            return tomllib.load(stream)
     return json.loads(path.read_text())
-
-
-def load_gait_parameters(path, profile=None):
-    """Load one gait profile, retaining support for legacy flat JSON files."""
-    if not path.exists():
-        if profile not in (None, "flat"):
-            raise ValueError(f"Cannot select gait profile {profile!r}: {path} is missing")
-        return DEFAULT.copy(), "flat"
-
-    config = read_gait_config(path)
-
-    profiles = config.get("profiles")
-    if profiles is None:
-        if profile is not None:
-            raise ValueError(
-                "--gait-profile requires a configuration containing profiles"
-            )
-        return config, None
-
-    selected = profile or config.get("default_profile", "flat")
-    if selected not in profiles:
-        available = ", ".join(sorted(profiles))
-        raise ValueError(f"Unknown gait profile {selected!r}; choose from: {available}")
-    return profiles[selected], selected
-
-
-class GaitControlPanel:
-
-    def __init__(self, profiles, active_profile):
-        import tkinter as tk
-        from tkinter import ttk
-
-        self._tk = tk
-        self._closed = False
-        self._pending_profile = None
-        self.root = tk.Tk()
-        self.root.title("B9-8 gait controls")
-        self.root.resizable(False, False)
-        self.root.protocol("WM_DELETE_WINDOW", self.close)
-
-        frame = ttk.Frame(self.root, padding=12)
-        frame.grid()
-        ttk.Label(frame, text="Select gait profile").grid(
-            row=0, column=0, columnspan=len(profiles), pady=(0, 8)
-        )
-        for column, profile in enumerate(profiles):
-            ttk.Button(
-                frame,
-                text=profile.title(),
-                width=12,
-                command=lambda name=profile: self._select(name),
-            ).grid(row=1, column=column, padx=3)
-
-        self._active_text = tk.StringVar()
-        ttk.Label(frame, textvariable=self._active_text).grid(
-            row=2, column=0, columnspan=len(profiles), pady=(10, 0)
-        )
-        self.set_active(active_profile)
-
-    def _select(self, profile):
-        self._pending_profile = profile
-
-    def poll(self):
-        """Process UI events and return a newly requested profile, if any."""
-        if self._closed:
-            return None
-        try:
-            self.root.update_idletasks()
-            self.root.update()
-        except self._tk.TclError:
-            self._closed = True
-            return None
-        requested = self._pending_profile
-        self._pending_profile = None
-        return requested
-
-    def set_active(self, profile):
-        self._active_text.set(f"Active: {profile.title()}")
-
-    def close(self):
-        if not self._closed:
-            self._closed = True
-            self.root.destroy()
 
 
 class Robot:
@@ -122,7 +29,7 @@ class Robot:
             raise ValueError("feedback must be sensors or ideal")
         self.feedback = feedback
         self.navigation = None
-        self.p = DEFAULT | (params or {})
+        self.p = load_gait_parameters() | (params or {})
         self.m = mujoco.MjModel.from_xml_path(
             str(ROOT / "models" / ("robot_b98_course.xml" if ramp else "robot_b98.xml"))
         )
@@ -166,8 +73,6 @@ class Robot:
         self.next_ir_time = 0.0
         self.ir_distances_m = np.full(3, np.nan)
         self.gait_time_origin = 2.0
-        self._transition_start_time = None
-        self._transition_from = None
         self._sample_ir()
         if self.navigation:
             self.navigation.close()
@@ -179,17 +84,6 @@ class Robot:
         if self.navigation:
             self.navigation.close()
             self.navigation = None
-
-    def set_gait_parameters(self, params, transition_seconds=0.5):
-        """Change gait while preserving phase and blending away target jumps."""
-        if self.d.time > 2:
-            phase = (self.d.time - self.gait_time_origin) / self.p["period"]
-            self.gait_time_origin = self.d.time - phase * params["period"]
-        self._transition_from = self.target.copy()
-        self._transition_start_time = self.d.time
-        self._transition_seconds = transition_seconds
-        self.p = DEFAULT | params
-        self.m.geom_friction[:, 0] = self.p.get("friction", 0.8)
 
     def step(self, walk=True):
         t = self.d.time - 2
@@ -216,18 +110,6 @@ class Robot:
                 p, t, self.d.time - self.gait_time_origin,
                 heading, lateral, self.joint_ranges,
             )
-        if self._transition_start_time is not None:
-            progress = (self.d.time - self._transition_start_time) / max(
-                self._transition_seconds, self.m.opt.timestep
-            )
-            if progress >= 1:
-                self._transition_start_time = None
-                self._transition_from = None
-            else:
-                blend = progress * progress * (3 - 2 * progress)
-                self.target = self._transition_from + blend * (
-                    self.target - self._transition_from
-                )
         self.step_targets(self.target)
 
     def step_targets(self, target):
@@ -364,11 +246,6 @@ def main():
     )
     ap.add_argument("--video", help="save a headless MP4 evaluation at 2x playback speed")
     ap.add_argument("--params")
-    ap.add_argument(
-        "--gait-profile",
-        choices=GAIT_PROFILES,
-        help="select a gait (default: course with --ramp, otherwise configuration default)",
-    )
     args = ap.parse_args()
     if args.video and args.render:
         ap.error("Choose either --video or --render")
@@ -379,23 +256,10 @@ def main():
     print(
         "B9-8: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
     )
-    pp = Path(args.params) if args.params else ROOT / "reference/b91_gait.toml"
     try:
-        profile = args.gait_profile
-        if profile is None and args.ramp and args.params is None:
-            profile = "course"
-        p, selected_profile = load_gait_parameters(pp, profile)
-    except ValueError as error:
+        p = load_gait_parameters(args.params)
+    except (OSError, ValueError) as error:
         ap.error(str(error))
-    if selected_profile:
-        print(f"Gait profile: {selected_profile}")
-    profile_parameters = {}
-    if selected_profile and pp.exists():
-        profile_parameters = {
-            name: parameters
-            for name, parameters in read_gait_config(pp).get("profiles", {}).items()
-            if name in GAIT_PROFILES
-        }
     if args.test or args.video:
         recording = None
         if args.video:
@@ -407,6 +271,7 @@ def main():
             if recording:
                 recording.close()
         name = "b98_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
+        (ROOT / "results").mkdir(exist_ok=True)
         (ROOT / "results" / f"{name}.json").write_text(json.dumps(result, indent=2))
         print(json.dumps(result, indent=2))
         if args.ramp and not args.hold and not result["course_completed"]:
@@ -429,6 +294,7 @@ def main():
         opt = mujoco.MjvOption()
         opt.geomgroup[3] = 0
         renderer.update_scene(r.d, camera=cam, scene_option=opt)
+        Path(args.render).parent.mkdir(parents=True, exist_ok=True)
         Image.fromarray(renderer.render()).save(args.render)
         renderer.close()
         r.close()
@@ -441,14 +307,7 @@ def main():
         v.cam.azimuth = 100 if args.ramp else 135
         v.cam.elevation = -38
         v.opt.geomgroup[3] = 0
-        controls = None
-        if profile_parameters:
-            try:
-                controls = GaitControlPanel(tuple(profile_parameters), selected_profile)
-            except Exception as error:
-                print(f"Gait control window unavailable: {error}")
         sensors = None
-        next_control_poll = 0.0
         try:
             if args.sensors:
                 from robot_b91.sensors import SensorOverlay
@@ -456,14 +315,6 @@ def main():
                 sensors = SensorOverlay(r, v)
             while v.is_running():
                 t = time.perf_counter()
-                if controls and t >= next_control_poll:
-                    requested_profile = controls.poll()
-                    next_control_poll = t + 1 / 30
-                    if requested_profile and requested_profile != selected_profile:
-                        r.set_gait_parameters(profile_parameters[requested_profile])
-                        selected_profile = requested_profile
-                        controls.set_active(selected_profile)
-                        print(f"Gait profile: {selected_profile}")
                 if r.d.time < args.seconds and not (progress and progress.completed_at is not None):
                     r.step(not args.hold)
                     if progress:
@@ -479,8 +330,6 @@ def main():
         finally:
             if sensors:
                 sensors.close()
-            if controls:
-                controls.close()
             r.close()
 
 

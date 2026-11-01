@@ -10,6 +10,7 @@ class Recording:
     """10 samples per simulated second, played at 20 fps (2x speed)."""
 
     def __init__(self, path):
+        path.parent.mkdir(parents=True, exist_ok=True)
         self.writer = imageio.get_writer(str(path), fps=20, codec="libx264", quality=7)
         self.renderer = None
         self.next_frame = 0.0

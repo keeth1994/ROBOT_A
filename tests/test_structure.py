@@ -21,16 +21,17 @@ def main():
     if tasks.exists():
         for task in json.loads(tasks.read_text())["tasks"]:
             assert task["args"][1] in robot.COMMANDS or task["args"][1] == "check"
-    cfg = json.loads((ROOT / "cad/current_design.json").read_text())
-    for key in [
-        "assembly",
-        "step",
-        "fit_report",
-        "simulation_model",
-        "simulation_course",
-        "simulation_manifest",
-    ]:
-        assert (ROOT / cfg[key]).is_file(), key
+    for path in (
+        "cad/B9_8/Robot_B9_8.f3d",
+        "cad/B9_8/Robot_B9_8.step",
+        "cad/B9_8/source/User_assembly_base.step",
+        "models/robot_b98.xml",
+        "models/robot_b98_course.xml",
+        "reference/robot_b98_manifest.json",
+        "dashboard/walking.toml",
+        "servo_calibration/measurements.json",
+    ):
+        assert (ROOT / path).is_file(), path
     print("PASS: current command help, outside-repo launch, tasks and asset paths.")
 
 

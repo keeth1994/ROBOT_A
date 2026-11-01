@@ -11,8 +11,8 @@ JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in (
 
 class Walking:
     def __init__(self):
-        with (ROOT / 'reference/b91_gait.toml').open('rb') as stream:
-            self.params = tomllib.load(stream)['profiles']['flat']
+        with (ROOT / 'dashboard/walking.toml').open('rb') as stream:
+            self.params = tomllib.load(stream)
         self.active = False
         self.session = self.sequence = 0
         self.started = self.last_frame = 0.0

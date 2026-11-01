@@ -5,16 +5,14 @@ import numpy as np
 import mujoco
 from robot_b91.paths import ROOT
 from robot_b91.geometry import rz
-from robot_b91.run import GAIT_PROFILES, Robot, load_gait_parameters
+from robot_b91.run import Robot, load_gait_parameters
 
 
 def main():
     gait_path = ROOT / "reference/b91_gait.toml"
-    default_gait, default_profile = load_gait_parameters(gait_path)
-    assert default_profile == "flat" and default_gait["pattern"] == "trot"
-    for profile in GAIT_PROFILES:
-        gait, selected = load_gait_parameters(gait_path, profile)
-        assert selected == profile and 0 < gait["duty"] < 1
+    gait = load_gait_parameters(gait_path)
+    assert gait["pattern"] == "trot" and 0 < gait["duty"] < 1
+    assert gait["pitch_stance"] == -0.3
     manifest = json.loads((ROOT / "reference/robot_b98_manifest.json").read_text())
     cfg = json.loads((ROOT / "reference/b98_kinematics.json").read_text())
     assert (
@@ -29,11 +27,6 @@ def main():
     assert len(export["bodies"]) == manifest["cad_bodies"] == 225
     r = Robot()
     assert r.m.nu == 8 and r.m.nq == 19
-    slope_gait, _ = load_gait_parameters(gait_path, "slope")
-    r.set_gait_parameters(slope_gait)
-    assert r.p["pattern"] == "crawl" and r.p["period"] == slope_gait["period"]
-    r.set_gait_parameters(default_gait, transition_seconds=0)
-    r.reset()
     np.testing.assert_allclose(r.m.site("imu_site").pos, [0, 0, 0.0841], atol=1e-9)
     np.testing.assert_allclose(r.m.camera("project_camera").pos, [0.092, 0, 0.09215], atol=1e-9)
     for leg, k in cfg["legs"].items():

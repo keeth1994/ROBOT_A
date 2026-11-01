@@ -43,7 +43,7 @@ def check_scoring():
 
 def main(robust=False):
     check_scoring()
-    p, _ = load_gait_parameters(ROOT / "reference/b91_gait.toml", "course")
+    p = load_gait_parameters()
     # The portable command generator cannot ask for travel beyond +/-45 degrees.
     for t in np.linspace(0, 2, 101):
         targets = rocker_targets(p, t, t, heading_error_rad=0.4, lateral_error_m=-0.1)
@@ -70,6 +70,7 @@ def main(robust=False):
         print(f"{result['case']}: completed={result['course_completed']}, "
               f"time={result['duration_s']:.3f}s, tilt={result['max_tilt_deg']:.2f}deg, "
               f"nonfoot contact={result['nonfoot_ground_fraction']:.1%}", flush=True)
+    (ROOT / "results").mkdir(exist_ok=True)
     (ROOT / "results/b98_course_validation.json").write_text(json.dumps(reports, indent=2))
     for result in reports:
         assert result["course_completed"], result

@@ -1,67 +1,56 @@
-# Robot B9-8 CAD and simulation
+﻿# Robot B9-8
 
-The current Fusion assembly is B9-8, with a bridge-supported equipment deck, centered matrix-board IMU, and accessible equipment mounts. Yaw turrets and pitch rockers retain the previous user-edited geometry.
+- MuJoCo simulation
+- PC dashboard
+- Servo calibration
+- ESP32 firmware
 
-The B9-8 MuJoCo model uses four Parallax pitch servos, two HS-475HB front yaw servos and two MG995 rear yaw servos, modeled at 5 V. Visuals, collisions and inertias are generated from the B9-8 STEP assembly.
+## Setup
+
+- Python 3.12+ with Tkinter
+- Run commands from the repository root
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
+```
 
 ## Run
 
-From this folder in PowerShell:
-
-```powershell
-.\.venv\Scripts\python.exe robot.py walk
-.\.venv\Scripts\python.exe robot.py walk --gait-profile slope
-.\.venv\Scripts\python.exe robot.py walk --gait-profile transition
-.\.venv\Scripts\python.exe robot.py walk --ramp --seconds 100
-.\.venv\Scripts\python.exe robot.py walk --ramp --test
-.\.venv\Scripts\python.exe robot.py walk --ramp --video results/b98_course.mp4
-.\.venv\Scripts\python.exe robot.py walk --test --seconds 15
-.\.venv\Scripts\python.exe robot.py check all
-```
-
-`start.ps1` starts the course. `--ramp` automatically selects the `course` gait and pauses the simulation after a verified completion. Explicit `--gait-profile` selections still override this. Run `robot.py --help` for available commands. No RL training pipeline or trained policy is included.
-
-A small gait control window opens, allowing you to switch between gait profiles.
-
-## Current files
-
-- [Fusion assembly](cad/B9_8/Robot_B9_8.f3d)
-- [STEP assembly](cad/B9_8/Robot_B9_8.step)
-- [CAD workflow](cad/README.md)
-- [Simulation assumptions and results](docs/DESIGN_B91_SIM.md)
-- [Ramp controller, validation and physical transfer requirements](docs/RAMP_CONTROLLER.md)
-- [PC walking controller and ESP32 command executor](firmware/README.md)
-- [Historical B9-1 course traversal (2x playback)](results/b91_course.mp4)
-- [Machine-readable current design](cad/current_design.json)
-
-| Folder | Contents |
+| Task | Command |
 |---|---|
-| `robot_b91/` | B9-8 model builder and walking controller (legacy package name) |
-| `cad/` | Current assembly, source yaw and Fusion exporter |
-| `reference/` | Current CAD export, mass, kinematics, gait and terrain settings |
-| `models/` | MuJoCo models and visual meshes |
-| `tests/` | Model and entry-point checks |
-| `results/` | B9-8 reports (`b98_*`) and historical B9-1 reports/video (`b91_*`) |
+| Dashboard | `python dashboard/run.py` |
+| Servo calibration | `python servo_calibration/gui.py` |
+| Course simulation | `python robot.py walk --ramp` or `.\start.ps1` |
+| Simulation options | `python robot.py walk --help` |
+| Checks | `python robot.py check all` |
 
-See [B9-8 changes and clearance checks](cad/B9_8/README.md) for the current mechanical revision.
+- Dashboard: http://127.0.0.1:8765
+- Dashboard gait: `dashboard/walking.toml` (no camera/IMU feedback)
+- Simulation gait: `reference/b91_gait.toml`
+- Generated reports and recordings: `results/` (ignored by Git)
 
-## Setup and rebuild
+## Calibration and firmware
 
-Use Python 3.12 and install `requirements.txt` into `.venv`. The lock file records pinned dependencies.
+1. Upload `servo_calibration/esp32_calibration/esp32_calibration.ino`.
+2. Calibrate using the GUI; measurements save to `servo_calibration/measurements.json`.
+3. Export the controller header using the GUI or `python servo_calibration/export_controller.py`.
+4. Upload `firmware/servo_camera/controller_esp32/controller_esp32.ino` with its accompanying headers.
 
-Run `python robot.py build` to regenerate B9-8 models from the saved CAD mesh export.
-After editing the CAD assembly, install the optional `requirements-cad.txt` dependencies,
-run `python cad/export_b98_sim.py`, then rebuild. Fusion is not needed for this STEP export.
-Edit `reference/b98_mass.json` and `reference/b98_kinematics.json` for B9-8 mass/servo
-assumptions. Terrain, gait and sensor-axis settings retain their `b91_*` filenames.
+- Arduino libraries: Adafruit PWM Servo Driver and SparkFun BMI270
+- Camera firmware: `firmware/servo_camera/timer_camera/`
+- Wi-Fi: sketch `wifi_config.h` files configure connection to the PC's 2.4 GHz hotspot
+- Yaw angles: -45 to +45 degrees
+- Pitch angles: -90 to +45 degrees; +45 means foot down
+- Stop: disables PWM; servo power remains on
 
-B9-8 provisional simulation mass is **1.448 kg**. Model, structure and nominal
-course checks pass; the ramp is **29 cm wide**. Camera/IMU traversal completes
-in 82.330 simulated seconds,
-with non-foot terrain contact during 2.1% of evaluated timesteps.
-See [simulation notes](docs/DESIGN_B91_SIM.md) for validation details. Existing B9-1
-course records and video are historical and do not validate the revised model.
-The PC dashboard reuses the Python gait for straight-ahead walking without
-IMU or camera input. The controller ESP32 executes calibrated joint frames over Wi-Fi;
-physical walking tests and autonomous localization remain unfinished.
-See [PC walking setup](firmware/README.md).
+## CAD and rebuild
+
+- Current assembly and parts: `cad/B9_8/`
+- Rebuild simulation: `python robot.py build`
+- After STEP changes:
+  1. `python -m pip install -r requirements-cad.txt`
+  2. `python cad/export_b98_sim.py`
+  3. `python robot.py build`
+- Fusion CAD tools: `cad/B98Builder/` (build, validate and access scripts)
