@@ -12,5 +12,5 @@ struct MotionStream {
     return active && id == session && next > sequence;
   }
   void applied(uint32_t next, uint32_t now) { sequence = next; lastFrame = now; }
-  bool expired(uint32_t now) const { return active && uint32_t(now - lastFrame) > 300; }
+  bool expired(uint32_t now) const { return active && uint32_t(now - lastFrame) > 1000; }
 };

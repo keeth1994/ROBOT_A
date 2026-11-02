@@ -7,6 +7,8 @@ from .devices import DeviceError
 
 ROOT = Path(__file__).resolve().parents[2]
 JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch'))
+# Physical +yaw turns the rear legs clockwise; simulation +yaw is counterclockwise.
+YAW_DIRECTION = {'FL_yaw': 1, 'RL_yaw': -1, 'FR_yaw': 1, 'RR_yaw': -1}
 
 
 class Walking:
@@ -15,7 +17,7 @@ class Walking:
             self.params = tomllib.load(stream)
         self.active = False
         self.session = self.sequence = 0
-        self.started = self.last_frame = 0.0
+        self.started = self.last_frame = self.last_confirmed_frame = 0.0
         self.channels = {}
         self.message = 'Stopped. PC walking is not started automatically.'
 
@@ -44,7 +46,7 @@ class Walking:
         if not isinstance(session, int) or isinstance(session, bool) or session <= 0:
             raise DeviceError('Invalid ESP32 motion session.', 409)
         self.session, self.sequence = session, 0
-        self.started = self.last_frame = now
+        self.started = self.last_frame = self.last_confirmed_frame = now
         self.active = True
         self.message = 'Walking straight. Gait is calculated on this PC.'
 
@@ -52,7 +54,7 @@ class Walking:
         if not self.active:
             raise DeviceError('Walking is stopped.', 409)
         self.controller_check(status)
-        if now - self.last_frame > .25:
+        if now - self.last_confirmed_frame > 1.0:
             raise DeviceError('PC/network control overrun; restart walking explicitly.', 409)
         if not status.get('externalActive') or status.get('motionSession') != self.session:
             raise DeviceError('ESP32 motion session ended; restart explicitly.', 409)
@@ -61,7 +63,9 @@ class Walking:
         self.sequence += 1
         frame = {'session': self.session, 'sequence': self.sequence}
         for name, target in zip(JOINTS, targets):
-            angle = math.degrees(float(target)) + (45 if name.endswith('_pitch') else 0)
+            angle = math.degrees(float(target)) * YAW_DIRECTION.get(name, 1)
+            if name.endswith('_pitch'):
+                angle += 45
             frame[f'a{self.channels[name]}'] = f'{angle:.5f}'
         self.last_frame = now
         return frame

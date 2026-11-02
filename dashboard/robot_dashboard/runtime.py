@@ -171,7 +171,11 @@ class Dashboard:
                     status = devices.request(url, '/status', timeout=.15)
                     frame = self.walking.frame(status, time.monotonic())
                     devices.request(url, '/targets', frame, timeout=.15)
+                    self.walking.last_confirmed_frame = time.monotonic()
                 except (devices.DeviceError, ValueError, KeyError, TypeError) as error:
+                    if (isinstance(error, devices.DeviceConnectionError) and
+                            time.monotonic() - self.walking.last_confirmed_frame <= 1.0):
+                        continue
                     self.walking.stop(str(error))
                     try:
                         devices.request(url, '/stop', {}, timeout=.15)

@@ -143,7 +143,7 @@ bool startTest(bool groups, bool fromWifi)
 void updateMotion()
 {
   uint32_t now = millis();
-  if (externalActive && (WiFi.status() != WL_CONNECTED || stream.expired(now)))
+  if (externalActive && stream.expired(now))
   {
     stopTest("PC target stream lost. Outputs off; restart explicitly.");
     return;

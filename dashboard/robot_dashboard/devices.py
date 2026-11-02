@@ -11,6 +11,10 @@ class DeviceError(Exception):
         self.status = status
 
 
+class DeviceConnectionError(DeviceError):
+    """A transport failure for which delivery may be retried."""
+
+
 def origin(value):
     value = value.strip()
     if '://' not in value:
@@ -66,7 +70,9 @@ def request(base, path, values=None, timeout=0.8):
         return {'message': text}
     except DeviceError:
         raise
-    except (OSError, http.client.HTTPException, ValueError) as error:
+    except (OSError, http.client.HTTPException) as error:
+        raise DeviceConnectionError(str(error)) from error
+    except ValueError as error:
         raise DeviceError(str(error)) from error
     finally:
         conn.close()
