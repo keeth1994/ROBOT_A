@@ -1,11 +1,28 @@
 import http.client
+from copy import copy
+from io import BytesIO
 import json
 from pathlib import Path
 import threading
 import time
 
+import numpy as np
+from PIL import Image
+from robot_b91.navigation_debug import navigation_debug_image
+
 from . import devices
-from .walking import Walking
+from .walking import WALK_ACTIONS, Walking
+from .navigation import CourseNavigation
+
+
+def orient_camera_frame(jpeg):
+    """Use the same upright image for the dashboard and course navigation."""
+    with Image.open(BytesIO(jpeg)) as source:
+        upright = source.convert('RGB').transpose(Image.Transpose.ROTATE_180)
+    output = BytesIO()
+    upright.save(output, format='JPEG', quality=90)
+    upright.thumbnail((320, 240))
+    return output.getvalue(), np.array(upright)
 
 
 class CameraPipeline:
@@ -17,6 +34,7 @@ class CameraPipeline:
         self.generation = 0
         self.sequence = 0
         self.raw = None
+        self.rgb = None
         self.received_at = 0
         self.error = 'Video is off.'
         self.conn = self.response = None
@@ -33,6 +51,7 @@ class CameraPipeline:
             self.enabled = enabled
             self.generation += 1
             self.raw = None
+            self.rgb = None
             self.received_at = 0
             self.receive_times.clear()
             self.error = 'Connecting to camera...' if enabled else 'Video is off.'
@@ -72,11 +91,13 @@ class CameraPipeline:
                         continue
                     self.conn, self.response = conn, response
                 for jpeg in devices.mjpeg_frames(response):
+                    now = time.monotonic()
+                    jpeg, rgb = orient_camera_frame(jpeg)
                     with self.condition:
                         if generation != self.generation or not self.enabled or self.stop_event.is_set():
                             break
-                        now = time.monotonic()
                         self.raw = jpeg
+                        self.rgb = rgb
                         self.sequence += 1
                         self.received_at = now
                         self.receive_times = [t for t in self.receive_times if now - t < 2] + [now]
@@ -87,6 +108,7 @@ class CameraPipeline:
                     if generation == self.generation:
                         self.error = str(error)
                         self.raw = None
+                        self.rgb = None
                         self.condition.notify_all()
             finally:
                 if response:
@@ -116,6 +138,13 @@ class CameraPipeline:
                 return None
             return sequence, jpeg
 
+    def navigation_frame(self):
+        with self.condition:
+            if (not self.enabled or self.rgb is None or
+                    time.monotonic() - self.received_at >= 1.5):
+                return None
+            return self.sequence, self.received_at, self.rgb
+
 
 class Dashboard:
     def __init__(self, config_path=None):
@@ -134,6 +163,8 @@ class Dashboard:
                       for name in ('servo', 'camera')}
         self.camera = CameraPipeline(self.stream_url)
         self.walking = Walking()
+        self.debug_lock = threading.Lock()
+        self.debug_preview = CourseNavigation(time.monotonic(), use_imu=False)
         self.threads = []
 
     @staticmethod
@@ -169,7 +200,7 @@ class Dashboard:
                     if not alive:
                         raise devices.DeviceError('Operator heartbeat lost; walking stopped.')
                     status = devices.request(url, '/status', timeout=.15)
-                    frame = self.walking.frame(status, time.monotonic())
+                    frame = self.walking.frame(status, time.monotonic(), self.camera.navigation_frame())
                     devices.request(url, '/targets', frame, timeout=.15)
                     self.walking.last_confirmed_frame = time.monotonic()
                 except (devices.DeviceError, ValueError, KeyError, TypeError) as error:
@@ -187,7 +218,7 @@ class Dashboard:
             with self.lock:
                 alive = time.monotonic() - self.browser_heartbeat < 1.5
                 url = self.config['servo']
-            if action != 'start':
+            if action not in WALK_ACTIONS:
                 raise ValueError('Unknown walking command.')
             if not alive:
                 raise devices.DeviceError('Keep the dashboard visible to start walking.', 409)
@@ -199,7 +230,11 @@ class Dashboard:
                 if status.get('manualActive') or status.get('running') or status.get('externalActive'):
                     raise devices.DeviceError('Press Stop to release existing servo control first.', 409)
                 result = devices.request(url, '/motion/start', {}, timeout=.15)
-                self.walking.begin(status, result['session'], time.monotonic())
+                self.walking.begin(status, result['session'], time.monotonic(),
+                                   profile='flat' if action == 'start' else action)
+                if (self.walking.navigation and self.walking.navigation.use_camera and
+                        not self.camera.enabled):
+                    self.camera.enable(True)
             except (devices.DeviceError, KeyError, ValueError, TypeError) as error:
                 self.walking.stop('Walking start failed. Outputs off requested.')
                 try:
@@ -210,6 +245,11 @@ class Dashboard:
                     raise
                 raise devices.DeviceError('Invalid ESP32 walking response; motion stopped.', 409) from error
             return {'message': self.walking.message}
+
+    def set_walking_speed(self, speed):
+        with self.servo_lock:
+            self.walking.set_speed(speed)
+            return self.walking.state()
 
     def _poll(self, name):
         while not self.stop_event.is_set():
@@ -239,6 +279,37 @@ class Dashboard:
         status['walking'] = self.walking.state()
         return status
 
+    def navigation_debug_frame(self):
+        # Copy the actual decision under the control lock, then render outside it.
+        with self.servo_lock:
+            navigation = self.walking.navigation
+            live = self.walking.active and navigation is not None and navigation.use_camera
+            if live:
+                estimate = copy(navigation.estimate)
+                elapsed = time.monotonic() - navigation.started
+                use_imu = navigation.use_imu
+        if not live:
+            # Preview has its own estimator and never starts or alters walking.
+            with self.debug_lock:
+                now = time.monotonic()
+                self.debug_preview.update({}, now, self.camera.navigation_frame())
+                estimate = copy(self.debug_preview.estimate)
+                elapsed = now - self.debug_preview.started
+                use_imu = False
+        panel = navigation_debug_image(estimate, elapsed, use_imu=use_imu)
+        output = BytesIO()
+        Image.fromarray(panel).save(output, format='JPEG', quality=85)
+        return output.getvalue()
+
+    def operator_heartbeat(self):
+        # Receipt in the visible browser is independent of servo/network latency.
+        with self.lock:
+            self.browser_heartbeat = time.monotonic()
+            if self.walking.active:
+                # External motion has its own target-stream watchdog on the MCU.
+                return {'message': 'Operator heartbeat received.'}
+        return self.servo_command('/heartbeat', {})
+
     def servo_command(self, path, values):
         if path not in ('/heartbeat', '/start', '/servo', '/release', '/stop'):
             raise ValueError('Unknown servo command.')
@@ -265,7 +336,7 @@ class Dashboard:
             if path == '/heartbeat':
                 # This happens ONLY in response to a browser request, never a timer.
                 with self.lock:
-                    self.browser_heartbeat = arrival
+                    self.browser_heartbeat = max(self.browser_heartbeat, arrival)
             return result
 
     def configure(self, values):

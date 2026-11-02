@@ -9,6 +9,7 @@ logs/
 .pio/
 
 dashboard/config.local.json
+images/
 
 # Generated reports, recordings and CAD previews.
 results/

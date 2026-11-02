@@ -4,12 +4,12 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 
-def navigation_status(navigation, now):
+def navigation_status(navigation, now, use_imu=True):
     """Report readiness without calling ready(), which updates controller telemetry."""
     age = None if navigation.last_seen is None else max(0., now - navigation.last_seen)
-    if navigation.last_imu is None or now - navigation.last_imu > .05:
+    if use_imu and (navigation.last_imu is None or now - navigation.last_imu > .05):
         return "HOLD REQUIRED", (255, 100, 80), "No fresh IMU sample", age
-    if age is None or age > navigation.blind_timeout:
+    if age is None or age > (navigation.blind_timeout if use_imu else .5):
         return "HOLD REQUIRED", (255, 100, 80), "No valid camera measurement within timeout", age
     debug = navigation.debug
     if debug and debug["accepted"] and now - debug["timestamp"] <= .25:
@@ -18,12 +18,12 @@ def navigation_status(navigation, now):
     return "USING LAST MEASUREMENT", (255, 200, 70), reason, age
 
 
-def navigation_debug_image(navigation, now):
+def navigation_debug_image(navigation, now, use_imu=True):
     """Return a 640x318 RGB panel. Only accepted rows receive a green midpoint."""
     panel = Image.new("RGB", (640, 318), (15, 18, 23))
     draw = ImageDraw.Draw(panel)
     draw.text((6, 4), "RGB: red=left  blue=right  green=midpoint", fill="white")
-    draw.text((326, 4), "Mask: white=dark surface  cyan=used rows", fill="white")
+    draw.text((326, 4), "Mask: white=ramp surface  cyan=used rows", fill="white")
     debug = navigation.debug
     if debug and debug["mask"] is not None:
         rgb = Image.fromarray(debug["rgb"].astype(np.uint8)).convert("RGB")
@@ -55,11 +55,14 @@ def navigation_debug_image(navigation, now):
         panel.paste(mask.resize((320, 240)), (320, 22))
     else:
         draw.text((6, 60), "Waiting for a valid-size RGB frame", fill="white")
-    status, color, reason, age = navigation_status(navigation, now)
+    status, color, reason, age = navigation_status(navigation, now, use_imu=use_imu)
+    if debug and not debug['accepted']:
+        reason = debug['reason']
     age_text = "never" if age is None else f"{age:.2f}s"
     rows = len(debug["rows"]) if debug else 0
     used = sum(debug["inliers"]) if debug and debug["accepted"] else 0
-    draw.text((6, 266), f"{status} | camera age: {age_text} | used rows: {used}/{rows}", fill=color)
+    surface = 'ramp found' if debug and debug.get('surface_detected') else 'no ramp'
+    draw.text((6, 266), f"{status} | {surface} | age: {age_text} | rows: {used}/{rows}", fill=color)
     draw.text((6, 282), f"Heading: {math.degrees(navigation.heading):+.2f} deg | lateral: {navigation.lateral*1000:+.1f} mm", fill="white")
     draw.text((6, 298), reason, fill=color)
     return np.array(panel)

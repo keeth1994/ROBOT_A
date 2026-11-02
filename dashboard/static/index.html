@@ -41,6 +41,12 @@
         <button id="applyCamera">Apply</button>
       </div>
       <p id="cameraStats" class="subtle">Waiting for camera status.</p>
+      <details id="cameraDebug">
+        <summary>Camera debug</summary>
+        <p id="debugSource" class="subtle">Camera preview only; no walking starts.</p>
+        <img id="debugFeed" hidden alt="Ramp detection: annotated camera image and dark-surface mask">
+        <p class="subtle">Red: left edge. Blue: right edge. Green: accepted center. Orange: rejected candidates. The panel shows the detection result and rejection reason.</p>
+      </details>
     </section>
     <div>
       <section>
@@ -57,9 +63,16 @@
       <section>
         <div class="panel-head"><h2>Servos</h2><span id="servoState" class="badge">Outputs off</span></div>
         <p id="controllerMessage">Waiting for controller.</p>
-        <div class="actions"><button id="walk">Walk forward (PC)</button></div>
+        <div class="actions"><button id="walk">Walk forward (PC)</button><button id="walkCourse">Follow course (camera + IMU)</button><button id="walkCourseCamera">Course with camera only</button><button id="walkCourseImu">Course without camera (IMU)</button><button id="walkCourseOpen">Course without sensors</button></div>
         <p id="walkMessage">PC walking is stopped.</p>
-        <p class="subtle">Support the robot for the first test. The PC calculates straight-ahead steps without IMU or camera input. Stop turns outputs off. Keep this tab visible.</p>
+        <label for="walkSpeed">Walking speed: <output id="walkSpeedValue" for="walkSpeed">100%</output></label>
+        <input id="walkSpeed" type="range" min="25" max="200" step="5" value="100">
+        <p class="subtle">25% slower — 100% original — 200% faster. Applies to all walking modes; release to apply.</p>
+        <p id="navigationStats" class="stats"></p>
+        <p class="subtle">Camera only estimates heading and side offset from visible course edges, without tilt compensation. Steps pause after half a second without an accepted camera measurement.</p>
+        <p class="subtle">Course without sensors runs the course steps after a 2-second settling pause, with no camera or IMU corrections.</p>
+        <p class="subtle">Course without camera uses the same course steps on ordinary slopes. Keep still for the first 2 seconds. The IMU corrects heading relative to the starting direction; sideways drift is not measured.</p>
+        <p class="subtle">Follow course uses the simulation gait to follow the 29 cm dark course. Start aligned with the course and keep still for the first 2 seconds. Camera starts automatically. Brief camera occlusions use the IMU; longer losses pause steps. Stop turns outputs off. Keep this tab visible.</p>
         <div class="actions"><button id="all">Sweep all</button><button id="groups">Sweep four at a time</button></div>
         <div id="servos"></div>
         <p class="subtle">Measured angles: yaw −45° to +45°; pitch −90° to +45° (raised zero, +45° = foot down). Sweeps use −45° to +45°. Support the robot before enabling or sweeping; enabling can jump. Stop disables pulses; servo power stays on.</p>

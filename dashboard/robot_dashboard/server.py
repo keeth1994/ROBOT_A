@@ -7,6 +7,7 @@ import time
 from urllib.parse import urlsplit
 
 from .devices import DeviceError
+from .walking import WALK_ACTIONS
 
 STATIC = Path(__file__).resolve().parents[1] / 'static'
 
@@ -51,6 +52,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json({**self.server.app.state(), 'token': self.server.token})
             if path == '/api/video.mjpeg':
                 return self.stream()
+            if path == '/api/navigation-debug.jpg':
+                return self.send_bytes(self.server.app.navigation_debug_frame(), 'image/jpeg')
             files = {'/': ('index.html', 'text/html; charset=utf-8'),
                      '/app.js': ('app.js', 'text/javascript'), '/styles.css': ('styles.css', 'text/css')}
             if path not in files:
@@ -77,11 +80,13 @@ class Handler(BaseHTTPRequestHandler):
             path = urlsplit(self.path).path
             app = self.server.app
             if path == '/api/heartbeat':
-                result = app.servo_command('/heartbeat', {})
+                result = app.operator_heartbeat()
             elif path in ('/api/servo/start', '/api/servo/servo', '/api/servo/release', '/api/servo/stop'):
                 result = app.servo_command('/' + path.rsplit('/', 1)[1], values)
-            elif path == '/api/walk/start':
-                result = app.walk_command('start')
+            elif path == '/api/walk/speed':
+                result = app.set_walking_speed(values.get('speed'))
+            elif path in (f'/api/walk/{action}' for action in WALK_ACTIONS):
+                result = app.walk_command(path.rsplit('/', 1)[1])
             elif path == '/api/config':
                 result = app.configure(values)
             elif path == '/api/video':

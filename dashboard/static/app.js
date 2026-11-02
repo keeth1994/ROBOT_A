@@ -2,12 +2,21 @@
 const el = id => document.getElementById(id);
 let token = '', current = null, commandBusy = false, cameraBusy = false, cameraDirty = false;
 let addressesLoaded = false, showingVideo = false;
+let debugUrl = null;
+let speedBusy = false;
 const rows = new Map();
+const walkButtons = {walk:'start', walkCourse:'course', walkCourseCamera:'course_camera',
+  walkCourseImu:'course_imu', walkCourseOpen:'course_open'};
 
-async function post(path, body = {}) {
+function showSpeed(speed) {
+  el('walkSpeed').value = Math.round(speed * 100);
+  el('walkSpeedValue').textContent = el('walkSpeed').value + '%';
+}
+
+async function post(path, body = {}, timeout = 10000) {
   if (!token) throw Error('Dashboard is still connecting. Try again.');
   const response = await fetch(path, {method:'POST', headers:{'Content-Type':'application/json','X-Dashboard-Token':token},
-    body:JSON.stringify(body), signal:AbortSignal.timeout(10000)});
+    body:JSON.stringify(body), signal:AbortSignal.timeout(timeout)});
   const result = await response.json();
   if (!response.ok) throw Error(result.error || 'Command failed');
   return result;
@@ -25,10 +34,10 @@ async function servoCommand(name, values = {}) {
   catch (error) { message(error.message + (name === 'stop' ? ' Stop is NOT confirmed; use the servo power switch if needed.' : ''), true); }
   finally { commandBusy = false; renderControls(); }
 }
-async function walkForward() {
+async function walkForward(profile = 'start') {
   if (commandBusy) return;
   commandBusy = true; renderControls();
-  try { const result = await post('/api/walk/start'); message(result.message); }
+  try { const result = await post('/api/walk/' + profile); message(result.message); }
   catch (error) { message(error.message, true); }
   finally { commandBusy = false; renderControls(); }
 }
@@ -36,7 +45,9 @@ function renderControls() {
   const device = current?.servo, s = device?.data;
   const walking = !!current?.walking?.active || !!s?.externalActive;
   const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.calibratedAngles || !s?.servoReady || s?.faulted || s?.running || walking || !current?.operator_alive || commandBusy;
-  el('walk').disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 1;
+  Object.keys(walkButtons).forEach(id => {
+    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 1;
+  });
   el('all').disabled = el('groups').disabled = blocked || !!s?.manualActive;
   rows.forEach(row => {
     row.enable.disabled = blocked || row.active;
@@ -74,7 +85,17 @@ function clearFeed() {
 }
 function render(state) {
   current = state; token = state.token || token;
+  el('debugSource').textContent = state.walking?.active && ['course', 'course_camera'].includes(state.walking.profile)
+    ? 'Live walking perception: the actual frame and decision used by the controller.'
+    : 'Camera preview only; no walking starts.';
   el('walkMessage').textContent = state.walking?.message || 'PC walking unavailable.';
+  if (!speedBusy && document.activeElement !== el('walkSpeed')) {
+    showSpeed(state.walking?.speed ?? 1);
+  }
+  const nav = state.walking?.navigation;
+  el('navigationStats').textContent = nav
+    ? 'Heading: ' + (nav.heading_rad * 180 / Math.PI).toFixed(1) + '° · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm · Camera accepted: ' + nav.accepted_frames + '/' + nav.camera_frames + (['course', 'course_camera'].includes(state.walking.profile) ? ' · Ramp: ' + (nav.ramp_detected ? 'detected' : 'not detected') : '')
+    : '';
   if (!addressesLoaded) {
     el('servoAddress').value = state.config.servo; el('cameraAddress').value = state.config.camera; addressesLoaded = true;
   }
@@ -115,7 +136,6 @@ function render(state) {
 }
 async function poll() {
   try {
-    if (token && document.visibilityState === 'visible') await post('/api/heartbeat').catch(() => {});
     const response = await fetch('/api/state', {cache:'no-store', signal:AbortSignal.timeout(2000)});
     if (!response.ok) throw Error('Local server unavailable');
     render(await response.json());
@@ -125,8 +145,47 @@ async function poll() {
     el('frameAge').textContent = el('receiveFps').textContent = '—';
   } finally { setTimeout(poll, 500); }
 }
+async function heartbeat() {
+  try {
+    if (token && document.visibilityState === 'visible') await post('/api/heartbeat', {}, 1200);
+  } catch (error) {
+    badge('operator', 'Heartbeat not confirmed', false, true);
+  } finally { setTimeout(heartbeat, 250); }
+}
+async function debugPoll() {
+  try {
+    if (!el('cameraDebug').open || document.visibilityState !== 'visible') return;
+    const response = await fetch('/api/navigation-debug.jpg', {cache:'no-store', signal:AbortSignal.timeout(2000)});
+    if (!response.ok) throw Error('Camera debug unavailable');
+    const nextUrl = URL.createObjectURL(await response.blob());
+    el('debugFeed').src = nextUrl; el('debugFeed').hidden = false;
+    if (debugUrl) URL.revokeObjectURL(debugUrl);
+    debugUrl = nextUrl;
+  } catch (error) {
+    el('debugSource').textContent = error.message;
+    el('debugFeed').hidden = true;
+  } finally { setTimeout(debugPoll, 500); }
+}
+el('cameraDebug').ontoggle = async () => {
+  if (el('cameraDebug').open && token && !current?.pipeline.enabled) {
+    try { await post('/api/video', {enabled:true}); }
+    catch (error) { message(error.message, true); }
+  }
+};
 el('stop').onclick = () => servoCommand('stop');
-el('walk').onclick = walkForward;
+Object.entries(walkButtons).forEach(([id, profile]) => { el(id).onclick = () => walkForward(profile); });
+el('walkSpeed').oninput = () => { el('walkSpeedValue').textContent = el('walkSpeed').value + '%'; };
+el('walkSpeed').onchange = async () => {
+  speedBusy = true; el('walkSpeed').disabled = true;
+  try {
+    const result = await post('/api/walk/speed', {speed:Number(el('walkSpeed').value) / 100});
+    showSpeed(result.speed);
+    message('Walking speed set to ' + el('walkSpeed').value + '% (' + result.period_s.toFixed(2) + ' s per cycle).');
+  } catch (error) {
+    showSpeed(current?.walking?.speed ?? 1);
+    message(error.message, true);
+  } finally { speedBusy = false; el('walkSpeed').disabled = false; }
+};
 el('all').onclick = () => servoCommand('start', {mode:'all'});
 el('groups').onclick = () => servoCommand('start', {mode:'groups'});
 el('connect').onclick = async () => {
@@ -156,4 +215,4 @@ document.addEventListener('visibilitychange', () => { renderControls(); if (docu
 window.addEventListener('pagehide', () => {
   if (token) fetch('/api/servo/stop', {method:'POST', headers:{'Content-Type':'application/json','X-Dashboard-Token':token}, body:'{}', keepalive:true}).catch(() => {});
 });
-renderControls(); poll();
+renderControls(); poll(); heartbeat(); debugPoll();

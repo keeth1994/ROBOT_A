@@ -28,6 +28,9 @@ button.danger { color: #fff; background: #a52d2d; border-color: #cf6464; }
 [hidden] { display: none !important; }
 #placeholder { padding: 16px; color: #adb4bd; text-align: center; }
 .stats { font: 12px ui-monospace, monospace; }
+#debugFeed { display: block; width: 100%; height: auto; }
+#walkSpeed { width: 100%; }
+summary { cursor: pointer; }
 .form-row, .actions { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
 .form-row label { font-size: 12px; }
 .form-row select { display: block; margin-top: 4px; }
