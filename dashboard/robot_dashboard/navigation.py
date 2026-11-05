@@ -1,4 +1,4 @@
-"""Physical sensor adapter for the same navigation used by the simulator."""
+"""Camera navigation using orientation estimated on the ESP32."""
 import json
 import math
 
@@ -16,27 +16,29 @@ class CourseNavigation:
         self.started = started
         self.use_camera = use_camera
         self.use_imu = use_imu
+        self.imu_heading = 0.0
         self.camera_sequence = -1
         self.reason = 'Waiting for camera and IMU.'
 
     def update(self, status, now, camera_frame):
         elapsed = now - self.started
-        # Measured tilt tests: sensor X forward, Y left, Z up. No axis reversal.
-        # Keep gravity; a single flat reading cannot separate tilt from offset.
         if self.use_imu:
             try:
                 age = float(status.get('imuAgeMs', math.inf)) / 1000
-                accel = np.asarray(status.get('accel'), dtype=float)
-                gyro = np.asarray(status.get('gyro'), dtype=float)
-                valid = (status.get('imuReady') and status.get('imuValid') and
-                         0 <= age <= .05 and accel.shape == gyro.shape == (3,) and
-                         np.isfinite(accel).all() and np.isfinite(gyro).all())
+                attitude = np.asarray(status.get('orientation'), dtype=float)
+                valid = (status.get('orientationValid') and
+                         0 <= age <= .05 and attitude.shape == (3,) and np.isfinite(attitude).all())
             except (ValueError, TypeError):
                 valid = False
             if not valid:
-                self.reason = 'Holding steps: waiting for fresh IMU data.'
+                self.reason = 'Holding steps: waiting for fresh ESP32 orientation.'
                 return False
-            self.estimate.imu(max(0, elapsed - age), accel * 9.80665, np.radians(gyro))
+            roll, pitch, heading = map(float, attitude)
+            # Preserve visual heading corrections while following the local gyro estimate.
+            self.estimate.heading += heading - self.imu_heading
+            self.imu_heading = heading
+            self.estimate.roll, self.estimate.pitch = roll, pitch
+            self.estimate.last_imu = max(0, elapsed - age)
         if not self.use_camera:
             self.reason = 'Course gait with IMU heading; no camera or side-offset correction.'
             return True

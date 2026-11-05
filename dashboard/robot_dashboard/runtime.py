@@ -189,7 +189,7 @@ class Dashboard:
         self.threads.append(thread)
 
     def _walk_loop(self):
-        while not self.stop_event.wait(.02):
+        while not self.stop_event.wait(.1):
             with self.servo_lock:
                 if not self.walking.active:
                     continue
@@ -201,7 +201,7 @@ class Dashboard:
                         raise devices.DeviceError('Operator heartbeat lost; walking stopped.')
                     status = devices.request(url, '/status', timeout=.15)
                     frame = self.walking.frame(status, time.monotonic(), self.camera.navigation_frame())
-                    devices.request(url, '/targets', frame, timeout=.15)
+                    devices.request(url, '/motion/adjust', frame, timeout=.15)
                     self.walking.last_confirmed_frame = time.monotonic()
                 except (devices.DeviceError, ValueError, KeyError, TypeError) as error:
                     if (isinstance(error, devices.DeviceConnectionError) and
@@ -229,9 +229,10 @@ class Dashboard:
                 self.walking.prepare(status)
                 if status.get('manualActive') or status.get('running') or status.get('externalActive'):
                     raise devices.DeviceError('Press Stop to release existing servo control first.', 409)
-                result = devices.request(url, '/motion/start', {}, timeout=.15)
-                self.walking.begin(status, result['session'], time.monotonic(),
-                                   profile='flat' if action == 'start' else action)
+                profile = 'flat' if action == 'start' else action
+                settings = self.walking.start_settings(profile)
+                result = devices.request(url, '/motion/start', settings, timeout=.15)
+                self.walking.begin(status, result['session'], time.monotonic(), profile=profile)
                 if (self.walking.navigation and self.walking.navigation.use_camera and
                         not self.camera.enabled):
                     self.camera.enable(True)
@@ -306,7 +307,7 @@ class Dashboard:
         with self.lock:
             self.browser_heartbeat = time.monotonic()
             if self.walking.active:
-                # External motion has its own target-stream watchdog on the MCU.
+                # Local walking has its own navigation watchdog on the MCU.
                 return {'message': 'Operator heartbeat received.'}
         return self.servo_command('/heartbeat', {})
 

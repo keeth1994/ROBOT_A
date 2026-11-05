@@ -46,7 +46,7 @@ function renderControls() {
   const walking = !!current?.walking?.active || !!s?.externalActive;
   const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.calibratedAngles || !s?.servoReady || s?.faulted || s?.running || walking || !current?.operator_alive || commandBusy;
   Object.keys(walkButtons).forEach(id => {
-    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 1;
+    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2;
   });
   el('all').disabled = el('groups').disabled = blocked || !!s?.manualActive;
   rows.forEach(row => {
@@ -88,7 +88,7 @@ function render(state) {
   el('debugSource').textContent = state.walking?.active && ['course', 'course_camera'].includes(state.walking.profile)
     ? 'Live walking perception: the actual frame and decision used by the controller.'
     : 'Camera preview only; no walking starts.';
-  el('walkMessage').textContent = state.walking?.message || 'PC walking unavailable.';
+  el('walkMessage').textContent = state.walking?.message || 'ESP32 walking unavailable.';
   if (!speedBusy && document.activeElement !== el('walkSpeed')) {
     showSpeed(state.walking?.speed ?? 1);
   }
@@ -105,7 +105,7 @@ function render(state) {
   const s = state.servo.data;
   if (state.servo.online && s) {
     renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? s.message : 'Upload the calibrated controller firmware to enable these controls.';
-    badge('servoState', s.faulted ? 'Fault' : s.externalActive ? 'PC walking' : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
+    badge('servoState', s.faulted ? 'Fault' : s.externalActive ? 'ESP32 walking' : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
     const live = s.imuReady && s.imuValid;
     badge('imuState', live ? 'Live' : 'Unavailable', live);
     el('accel').textContent = live ? s.accel.map(n => n.toFixed(3)).join(' / ') : '— / — / —';

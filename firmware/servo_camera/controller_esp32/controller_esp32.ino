@@ -1,4 +1,4 @@
-// Controller ESP32: M5Stack Servo2 commands and BMI270 telemetry.
+// Controller ESP32: local gait, M5Stack Servo2 commands and BMI270 orientation.
 // Install Adafruit PWM Servo Driver Library and SparkFun BMI270 Arduino Library.
 // WiFi and WebServer are included with the ESP32 board package.
 #include <Arduino.h>
@@ -11,8 +11,12 @@
 #include <SparkFun_BMI270_Arduino_Library.h>
 #include <math.h>
 #include <esp_system.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/semphr.h>
 #include "measured_servos.h"
 #include "motion_stream.h"
+#include "imu_orientation.h"
 
 constexpr int SDA_PIN = 21, SCL_PIN = 22;
 constexpr uint8_t SERVO_ADDRESS = 0x40;
@@ -33,16 +37,35 @@ static_assert(CHANNEL_COUNT > 0 && GROUP_SIZE > 0, "List at least one channel.")
 Adafruit_PWMServoDriver pwm(SERVO_ADDRESS, Wire);
 BMI270 imu;
 WebServer server(80);
+SemaphoreHandle_t controlMutex;
+// Build replies under the control lock; send them after releasing it.
+// A slow HTTP client must never hold up the gait or its watchdog.
+int replyCode = 200;
+String replyType, replyBody;
+void respond(int code, const char *type, const String &body) {
+  replyCode = code; replyType = type; replyBody = body;
+}
+void handleControl(WebServer::THandlerFunction handler) {
+  xSemaphoreTake(controlMutex, portMAX_DELAY);
+  handler();
+  xSemaphoreGive(controlMutex);
+  server.send(replyCode, replyType, replyBody);
+}
+void onControl(const char *path, HTTPMethod method, WebServer::THandlerFunction handler) {
+  server.on(path, method, [handler]() { handleControl(handler); });
+}
 bool servoReady = false, imuReady = false, imuValid = false;
 bool imuStreaming = true, faulted = false;
-uint32_t lastImuReport = 0, lastImuSample = 0, lastImuSuccess = 0, lastHeartbeat = 0;
+uint32_t lastImuReport = 0, lastImuSuccess = 0, lastHeartbeat = 0;
 MotionStream stream;
+walking::Gait gait;
+ImuOrientation orientation;
 bool &externalActive = stream.active;
 uint32_t &motionSession = stream.session;
 float usPerTick = 0;
 const char *message = "Outputs off. Ready for a test.";
 
-// loop() advances phases without waiting: Stop remains available during motion.
+// The control task advances sweep phases without waiting.
 // Phases: centre hold, move left, move right, return centre, hold, gap.
 bool running = false, grouped = false, wifiRun = false;
 size_t groupFirst = 0, groupCount = 0;
@@ -140,12 +163,35 @@ bool startTest(bool groups, bool fromWifi)
   return startGroup();
 }
 
+bool writeGait()
+{
+  for (size_t i = 0; i < CHANNEL_COUNT; ++i) {
+    const auto &servo = calibrated::servos[i];
+    int joint = walking::jointIndex(servo.name);
+    if (joint < 0) { servoFault(); return false; }
+    double angle = walking::servoAngle(joint, gait.angles[joint]);
+    int pulse = calibrated::pulse(servo, angle);
+    if (pulse < 0 || pwm.setPWM(servo.channel, 0, static_cast<uint16_t>(pulse / usPerTick + .5f)) != 0) {
+      servoFault(); return false;
+    }
+    manualAngle[i] = angle; manualPulse[i] = pulse;
+  }
+  return true;
+}
+
 void updateMotion()
 {
   uint32_t now = millis();
-  if (externalActive && stream.expired(now))
+  if (externalActive)
   {
-    stopTest("PC target stream lost. Outputs off; restart explicitly.");
+    if (stream.expired(now) || WiFi.status() != WL_CONNECTED) {
+      gait.stop(now);
+      message = "Navigation connection lost. Returning to stance; restart explicitly.";
+    }
+    bool fresh = imuValid && orientation.initialized && now - lastImuSuccess <= 100;
+    gait.update(now, fresh, orientation.heading);
+    if (!writeGait()) return;
+    if (gait.stopped(now)) stopTest("Navigation connection lost. Outputs off; restart explicitly.");
     return;
   }
   if (((running && wifiRun) || manualActive()) && WiFi.status() != WL_CONNECTED)
@@ -220,16 +266,18 @@ void beginImu()
 
 void serviceImu()
 {
-  if (!imuReady || millis() - lastImuSample < 20)
+  if (!imuReady)
     return;
-  lastImuSample = millis();
   imuValid = imu.getSensorData() == BMI2_OK;
   if (imuValid)
     imuValid = isfinite(imu.data.accelX) && isfinite(imu.data.accelY) &&
                isfinite(imu.data.accelZ) && isfinite(imu.data.gyroX) &&
                isfinite(imu.data.gyroY) && isfinite(imu.data.gyroZ);
-  if (imuValid)
+  if (imuValid) {
     lastImuSuccess = millis();
+    orientation.update(lastImuSuccess, imu.data.accelX, imu.data.accelY, imu.data.accelZ,
+                       imu.data.gyroX, imu.data.gyroY, imu.data.gyroZ);
+  }
   if (!imuStreaming || millis() - lastImuReport < 500)
     return; // USB printing only; web readings stay live.
   lastImuReport = millis();
@@ -272,10 +320,18 @@ void sendStatus()
   json += running ? channelList(groupFirst, groupCount) : String("none");
   json += "\",\"manualActive\":";
   json += manualActive() ? "true" : "false";
-  json += ",\"motionProtocol\":1,\"externalActive\":";
+  json += ",\"motionProtocol\":2,\"externalActive\":";
   json += externalActive ? "true" : "false";
   json += ",\"motionSession\":"; json += String(motionSession);
+  json += ",\"gaitStopping\":"; json += externalActive && gait.stopping ? "true" : "false";
+  json += ",\"controllerTimeMs\":"; json += String(millis());
+  json += ",\"imuTimestampMs\":"; json += String(lastImuSuccess);
   json += ",\"imuAgeMs\":"; json += String(millis() - lastImuSuccess);
+  json += ",\"orientationValid\":"; json += fresh && orientation.initialized ? "true" : "false";
+  json += ",\"orientation\":[";
+  json += String(orientation.roll, 6); json += ",";
+  json += String(orientation.pitch, 6); json += ",";
+  json += String(orientation.heading, 6); json += "]";
   json += ",\"calibratedAngles\":true,\"joints\":[";
   for (size_t i = 0; i < CHANNEL_COUNT; ++i)
   {
@@ -316,7 +372,7 @@ void sendStatus()
   json += "]";
   json += "}";
   server.sendHeader("Cache-Control", "no-store");
-  server.send(200, "application/json", json);
+  respond(200, "application/json", json);
 }
 
 // Reject missing, negative, fractional, overflowing or partly numeric values.
@@ -359,45 +415,45 @@ void handleManual(bool release)
   if (!readUnsignedArg("channel", channel) ||
       (!release && (server.hasArg("pulse") || !readAngleArg(angle))))
   {
-    server.send(400, "text/plain", "Use a channel and integer angle in degrees, not a raw pulse.");
+    respond(400, "text/plain", "Use a channel and integer angle in degrees, not a raw pulse.");
     return;
   }
   size_t index = 0;
   while (index < CHANNEL_COUNT && CHANNELS[index] != channel) ++index;
   if (index == CHANNEL_COUNT)
   {
-    server.send(400, "text/plain", "Channel is not configured.");
+    respond(400, "text/plain", "Channel is not configured.");
     return;
   }
   const auto &servo = calibrated::servos[index];
   const int pulse = release ? 0 : calibrated::pulse(servo, angle);
   if (pulse < 0)
   {
-    server.send(400, "text/plain", "Angle is outside this joint's measured range. Pitch cannot pass foot-down.");
+    respond(400, "text/plain", "Angle is outside this joint's measured range. Pitch cannot pass foot-down.");
     return;
   }
   if (!servoReady || faulted || running || externalActive || WiFi.status() != WL_CONNECTED)
   {
-    server.send(409, "text/plain", "Manual control unavailable. Stop the test or check controller status.");
+    respond(409, "text/plain", "Manual control unavailable. Stop the test or check controller status.");
     return;
   }
   if (!release && manualPulse[index] == 0 && angle != calibrated::restAngle(servo))
   {
-    server.send(409, "text/plain", "Enable at the measured neutral/foot-down angle first.");
+    respond(409, "text/plain", "Enable at the measured neutral/foot-down angle first.");
     return;
   }
   const uint16_t ticks = release ? 4096 : static_cast<uint16_t>(pulse / usPerTick + 0.5f);
   if (pwm.setPWM(channel, 0, ticks) != 0)
   {
     servoFault();
-    server.send(503, "text/plain", message);
+    respond(503, "text/plain", message);
     return;
   }
   manualPulse[index] = release ? 0 : pulse;
   manualAngle[index] = angle;
   lastHeartbeat = millis();
   message = manualActive() ? "Calibrated manual control. Enabled servos hold their commands." : "Outputs off. Ready for a test.";
-  server.send(200, "text/plain", release ? "Servo pulses disabled; power stays on." : "Calibrated angle applied.");
+  respond(200, "text/plain", release ? "Servo pulses disabled; power stays on." : "Calibrated angle applied.");
 }
 
 
@@ -415,73 +471,103 @@ bool readUint32(const char *name, uint32_t &value)
   return true;
 }
 
+bool readNumber(const char *name, double &number, double low, double high)
+{
+  String value = server.arg(name);
+  char *end = nullptr;
+  number = strtod(value.c_str(), &end);
+  return value.length() > 0 && value.length() <= 24 && end != value.c_str() &&
+         end && !*end && isfinite(number) && number >= low && number <= high;
+}
+
 void startExternal()
 {
   if (!servoReady || faulted || running || externalActive || manualActive() ||
       WiFi.status() != WL_CONNECTED) {
-    server.send(409, "text/plain", "Stop existing motion or fix controller status first."); return;
+    respond(409, "text/plain", "Stop existing motion or fix controller status first."); return;
   }
-  groupFirst = 0; groupCount = CHANNEL_COUNT;
-  if (!writeGroup()) { server.send(503, "text/plain", message); return; }
-  stream.begin(esp_random(), millis());
-  message = "PC joint stream active. Gait is calculated on the PC.";
-  server.send(200, "application/json", String("{\"session\":") + String(motionSession) + "}");
+  String profile = server.arg("profile"), pattern = server.arg("pattern");
+  bool useImu = profile == "course" || profile == "course_imu";
+  walking::Parameters p;
+  if ((profile != "flat" && profile != "course" && profile != "course_camera" &&
+       profile != "course_imu" && profile != "course_open") ||
+      (pattern != "trot" && pattern != "crawl") ||
+      !readNumber("period", p.period, .2, 10) ||
+      !readNumber("duty", p.duty, .1, .9) ||
+      !readNumber("yaw_amplitude", p.yawAmplitude, 0, walking::pi / 4) ||
+      !readNumber("pitch_lift", p.pitchLift, 0, walking::pi / 2) ||
+      !readNumber("pitch_min", p.pitchMin, -walking::pi / 4, 0) ||
+      !readNumber("pitch_stance", p.pitchStance, p.pitchMin, 0) ||
+      !readNumber("heading_gain", p.headingGain, 0, 20) ||
+      !readNumber("lateral_gain", p.lateralGain, 0, 20) ||
+      !readNumber("strafe_gain", p.strafeGain, 0, 20)) {
+    respond(400, "text/plain", "Invalid walking profile or gait settings."); return;
+  }
+  if (useImu && (!imuReady || !imuValid || millis() - lastImuSuccess > 100)) {
+    respond(409, "text/plain", "Walking needs fresh IMU readings. Check the sensor."); return;
+  }
+  p.crawl = pattern == "crawl";
+  uint32_t now = millis();
+  gait.begin(now, p, useImu, profile == "flat" ? 0 : 2000);
+  orientation.reset(now);
+  if (!writeGait()) { respond(503, "text/plain", message); return; }
+  stream.begin(esp_random(), now);
+  lastServoUpdate = now;
+  message = "ESP32 gait active. Waiting for navigation adjustments.";
+  respond(200, "application/json", String("{\"session\":") + String(motionSession) + "}");
 }
 
-void receiveTargets()
+void receiveAdjustment()
 {
   uint32_t session, sequence;
-  if (faulted || !readUint32("session", session) || !readUint32("sequence", sequence) ||
+  if (faulted || gait.stopping || stream.expired(millis()) || !readUint32("session", session) || !readUint32("sequence", sequence) ||
       !stream.accepts(session, sequence)) {
-    server.send(409, "text/plain", "Inactive, stale or mismatched PC motion session."); return;
+    respond(409, "text/plain", "Inactive, stale or mismatched walking session."); return;
   }
-  double angles[CHANNEL_COUNT];
-  int pulses[CHANNEL_COUNT];
-  for (size_t i = 0; i < CHANNEL_COUNT; ++i) {
-    String value = server.arg(String("a") + String(CHANNELS[i]));
-    char *end = nullptr;
-    angles[i] = strtod(value.c_str(), &end);
-    if (!value.length() || value.length() > 20 || !end || *end || !isfinite(angles[i]) ||
-        (pulses[i] = calibrated::pulse(calibrated::servos[i], angles[i])) < 0) {
-      server.send(400, "text/plain", "Complete frame with eight measured joint angles required."); return;
-    }
+  double speed, heading, reference, lateral;
+  String ready = server.arg("ready");
+  if ((ready != "0" && ready != "1") ||
+      !readNumber("speed", speed, .25, 2) ||
+      !readNumber("heading", heading, -1000000, 1000000) ||
+      !readNumber("heading_reference", reference, -1000000, 1000000) ||
+      !readNumber("lateral", lateral, -.5, .5)) {
+    respond(400, "text/plain", "Use valid speed, heading, side offset and ready values."); return;
   }
-  for (size_t i = 0; i < CHANNEL_COUNT; ++i) {
-    if (pwm.setPWM(CHANNELS[i], 0, static_cast<uint16_t>(pulses[i] / usPerTick + .5f)) != 0) {
-      servoFault(); server.send(503, "text/plain", message); return;
-    }
-    manualPulse[i] = pulses[i]; manualAngle[i] = angles[i];
-  }
+  gait.speed = speed;
+  // The PC sends heading at a known IMU sample. Local gyro updates continue between requests.
+  gait.headingOffset = heading - (gait.useImu ? reference : 0);
+  gait.lateral = lateral;
+  gait.ready = ready == "1";
   stream.applied(sequence, millis());
-  server.send(200, "text/plain", "Targets applied");
+  message = gait.ready ? "Walking locally on ESP32." : "Holding steps: waiting for navigation.";
+  respond(200, "text/plain", "Adjustment accepted");
 }
 
 void beginWifi()
 {
-  server.on("/", HTTP_GET, sendStatus); // API only; the PC serves the dashboard.
-  server.on("/status", HTTP_GET, sendStatus);
-  server.on("/motion/start", HTTP_POST, startExternal);
-  server.on("/targets", HTTP_POST, receiveTargets);
-  server.on("/servo", HTTP_POST, []() { handleManual(false); });
-  server.on("/release", HTTP_POST, []() { handleManual(true); });
-  server.on("/heartbeat", HTTP_POST, []()
+  onControl("/", HTTP_GET, sendStatus); // API only; the PC serves the dashboard.
+  onControl("/status", HTTP_GET, sendStatus);
+  onControl("/motion/start", HTTP_POST, startExternal);
+  onControl("/motion/adjust", HTTP_POST, receiveAdjustment);
+  onControl("/servo", HTTP_POST, []() { handleManual(false); });
+  onControl("/release", HTTP_POST, []() { handleManual(true); });
+  onControl("/heartbeat", HTTP_POST, []()
             {
       lastHeartbeat = millis();
-      server.send(200, "text/plain", "OK"); });
-  server.on("/start", HTTP_POST, []()
+      respond(200, "text/plain", "OK"); });
+  onControl("/start", HTTP_POST, []()
             {
       String mode = server.arg("mode");
       if (mode != "all" && mode != "groups")
-        server.send(400, "text/plain", "Unknown test mode.");
+        respond(400, "text/plain", "Unknown test mode.");
       else if (!startTest(mode == "groups", true))
-        server.send(409, "text/plain", manualActive() ? "Release manual servos or press Stop first." : running ? "A test is already running." : message);
-      else server.send(200, "text/plain", "Test started."); });
-  server.on("/stop", HTTP_POST, []()
+        respond(409, "text/plain", manualActive() ? "Release manual servos or press Stop first." : running ? "A test is already running." : message);
+      else respond(200, "text/plain", "Test started."); });
+  onControl("/stop", HTTP_POST, []()
             {
       bool ok = stopTest("Stopped. Outputs off.");
-      server.send(ok ? 200 : 503, "text/plain", ok ? message : "Cannot confirm outputs off. Cut servo power."); });
-  server.onNotFound([]()
-                    { server.send(404, "text/plain", "Not found."); });
+      respond(ok ? 200 : 503, "text/plain", ok ? message : "Cannot confirm outputs off. Cut servo power."); });
+  server.onNotFound([]() { handleControl([]() { respond(404, "text/plain", "Not found."); }); });
   WiFi.setHostname(WIFI_HOSTNAME);
   WiFi.mode(WIFI_STA);
   WiFi.setAutoReconnect(true);
@@ -496,8 +582,11 @@ void serviceWifi()
   bool connected = WiFi.status() == WL_CONNECTED;
   if (wifiWasConnected && (!connected || WiFi.localIP() != controllerIp))
   {
-    if (externalActive || (running && wifiRun) || manualActive())
+    xSemaphoreTake(controlMutex, portMAX_DELAY);
+    if (externalActive) gait.stop(millis());
+    if ((running && wifiRun) || manualActive())
       stopTest("Wi-Fi connection changed. Outputs off.");
+    xSemaphoreGive(controlMutex);
     server.stop();
     MDNS.end();
     wifiWasConnected = false;
@@ -520,6 +609,18 @@ void serviceWifi()
   {
     lastReconnect = millis();
     WiFi.reconnect();
+  }
+}
+
+void controlTask(void *)
+{
+  TickType_t wake = xTaskGetTickCount();
+  for (;;) {
+    xSemaphoreTake(controlMutex, portMAX_DELAY);
+    serviceImu();
+    updateMotion();
+    xSemaphoreGive(controlMutex);
+    vTaskDelayUntil(&wake, pdMS_TO_TICKS(UPDATE_MS));
   }
 }
 
@@ -554,7 +655,7 @@ void setup()
       for (size_t i = 0; i < CHANNEL_COUNT; ++i)
       {
         if (CHANNELS[i] > 15 || calibrated::servos[i].channel != CHANNELS[i] ||
-            !calibrated::valid(calibrated::servos[i]))
+            !calibrated::valid(calibrated::servos[i]) || walking::jointIndex(calibrated::servos[i].name) < 0)
           faulted = true;
         for (size_t j = 0; j < i; ++j)
           if (CHANNELS[i] == CHANNELS[j])
@@ -566,7 +667,16 @@ void setup()
   }
   else
     message = "Servo2 not found. Check power, wiring and address; reset.";
+  controlMutex = xSemaphoreCreateMutex();
+  if (!controlMutex) {
+    stopTest("Could not start motion control. Reset the controller.");
+    while (true) delay(1000);
+  }
   beginImu();
+  if (xTaskCreate(controlTask, "motion", 4096, nullptr, 2, nullptr) != pdPASS) {
+    stopTest("Could not start motion control. Reset the controller.");
+    while (true) delay(1000);
+  }
   beginWifi(); // Show errors even if the sensor/controller is absent.
   Serial.println(message);
   Serial.println("Commands: t=all, g=groups of four, s/x=stop, i=toggle USB IMU printing.");
@@ -574,10 +684,9 @@ void setup()
 
 void loop()
 {
-  // Expire a lost heartbeat before accepting fresh requests after a long stall.
-  updateMotion();
   serviceWifi();
   if (wifiWasConnected) server.handleClient();
+  xSemaphoreTake(controlMutex, portMAX_DELAY);
   while (Serial.available())
   {
     char command = Serial.read();
@@ -591,7 +700,6 @@ void loop()
         Serial.println("Test rejected: busy, controller missing or faulted.");
     }
   }
-  updateMotion();
-  serviceImu();
+  xSemaphoreGive(controlMutex);
   delay(1);
 }

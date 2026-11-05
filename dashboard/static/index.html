@@ -63,15 +63,15 @@
       <section>
         <div class="panel-head"><h2>Servos</h2><span id="servoState" class="badge">Outputs off</span></div>
         <p id="controllerMessage">Waiting for controller.</p>
-        <div class="actions"><button id="walk">Walk forward (PC)</button><button id="walkCourse">Follow course (camera + IMU)</button><button id="walkCourseCamera">Course with camera only</button><button id="walkCourseImu">Course without camera (IMU)</button><button id="walkCourseOpen">Course without sensors</button></div>
-        <p id="walkMessage">PC walking is stopped.</p>
+        <div class="actions"><button id="walk">Walk forward (ESP32)</button><button id="walkCourse">Follow course (camera + IMU)</button><button id="walkCourseCamera">Course with camera only</button><button id="walkCourseImu">Course with IMU only</button><button id="walkCourseOpen">Course without sensors</button></div>
+        <p id="walkMessage">ESP32 walking is stopped.</p>
         <label for="walkSpeed">Walking speed: <output id="walkSpeedValue" for="walkSpeed">100%</output></label>
         <input id="walkSpeed" type="range" min="25" max="200" step="5" value="100">
         <p class="subtle">25% slower — 100% original — 200% faster. Applies to all walking modes; release to apply.</p>
         <p id="navigationStats" class="stats"></p>
-        <p class="subtle">Camera only estimates heading and side offset from visible course edges, without tilt compensation. Steps pause after half a second without an accepted camera measurement.</p>
+        <p class="subtle">Camera only estimates heading and side offset from visible course edges, without tilt compensation. Steps pause after 2 seconds without an accepted camera measurement.</p>
         <p class="subtle">Course without sensors runs the course steps after a 2-second settling pause, with no camera or IMU corrections.</p>
-        <p class="subtle">Course without camera uses the same course steps on ordinary slopes. Keep still for the first 2 seconds. The IMU corrects heading relative to the starting direction; sideways drift is not measured.</p>
+        <p class="subtle">Course with IMU only walks forward on flat ground or slopes; no ramp is required. Keep still for the first 2 seconds. The IMU corrects heading relative to the starting direction; sideways drift is not measured.</p>
         <p class="subtle">Follow course uses the simulation gait to follow the 29 cm dark course. Start aligned with the course and keep still for the first 2 seconds. Camera starts automatically. Brief camera occlusions use the IMU; longer losses pause steps. Stop turns outputs off. Keep this tab visible.</p>
         <div class="actions"><button id="all">Sweep all</button><button id="groups">Sweep four at a time</button></div>
         <div id="servos"></div>
