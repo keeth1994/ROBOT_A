@@ -47,10 +47,14 @@ class CourseNavigation:
                 self.camera_sequence = sequence
                 self.estimate.frame(received - self.started, rgb, use_imu=self.use_imu)
         ready = (self.estimate.ready(elapsed) if self.use_imu else
-                 self.estimate.last_seen is not None and elapsed - self.estimate.last_seen <= .5)
+                 self.estimate.last_seen is not None and
+                 elapsed - self.estimate.last_seen <= self.estimate.blind_timeout)
         if ready:
-            self.reason = ('Following course with camera and IMU.' if self.use_imu else
-                           'Following course with camera only; no tilt compensation.')
+            if self.estimate.debug and not self.estimate.debug['accepted']:
+                self.reason = 'Continuing briefly using the last valid ramp direction.'
+            else:
+                self.reason = ('Following course with camera and IMU.' if self.use_imu else
+                               'Following course with camera only. No tilt compensation.')
         else:
             detail = self.estimate.debug['reason'] if self.estimate.debug else 'Waiting for a visible dark course'
             self.reason = 'Holding steps: ' + detail + '.'

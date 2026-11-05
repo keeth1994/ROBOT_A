@@ -1,5 +1,6 @@
 {
   "camera_pitch_deg": 0.0,
   "dark_max": 115,
+  "max_blind_s": 10.0,
   "adaptive_surface": true
 }

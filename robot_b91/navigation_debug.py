@@ -9,7 +9,7 @@ def navigation_status(navigation, now, use_imu=True):
     age = None if navigation.last_seen is None else max(0., now - navigation.last_seen)
     if use_imu and (navigation.last_imu is None or now - navigation.last_imu > .05):
         return "HOLD REQUIRED", (255, 100, 80), "No fresh IMU sample", age
-    if age is None or age > (navigation.blind_timeout if use_imu else .5):
+    if age is None or age > navigation.blind_timeout:
         return "HOLD REQUIRED", (255, 100, 80), "No valid camera measurement within timeout", age
     debug = navigation.debug
     if debug and debug["accepted"] and now - debug["timestamp"] <= .25:
