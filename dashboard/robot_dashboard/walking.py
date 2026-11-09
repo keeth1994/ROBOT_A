@@ -57,7 +57,7 @@ class Walking:
             raise ValueError('Unknown walking profile.')
         with (ROOT / 'reference/b91_gait.toml').open('rb') as stream:
             self.params = tomllib.load(stream)
-        defaults = {'pitch_min': -math.pi / 4, 'lateral_gain': 0, 'strafe_gain': 0}
+        defaults = {'pitch_min': -125 * math.pi / 180, 'lateral_gain': 0, 'strafe_gain': 0}
         names = ('period', 'duty', 'yaw_amplitude', 'pitch_lift', 'pitch_stance',
                  'pitch_min', 'heading_gain', 'lateral_gain', 'strafe_gain', 'pattern')
         settings = defaults | self.params

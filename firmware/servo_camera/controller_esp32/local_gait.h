@@ -11,7 +11,8 @@ inline double clamp(double x, double low, double high) {
 
 struct Parameters {
   double period = 1, duty = .6, yawAmplitude = .45, pitchLift = .65;
-  double pitchStance = 0, pitchMin = -pi / 4;
+  // A 125-degree lift reaches calibrated -80 degrees from +45 foot-down.
+  double pitchStance = 0, pitchMin = -125 * pi / 180;
   double headingGain = .8, lateralGain = 5, strafeGain = 0;
   bool crawl = false;
 };
@@ -21,7 +22,8 @@ inline void targets(const Parameters &p, double elapsed, double gaitTime,
                     double heading, double lateral, double angles[8]) {
   const double trot[] = {0, .5, .5, 0}, crawl[] = {0, .5, .25, .75};
   double correction = clamp(p.headingGain * (heading + std::atan(p.lateralGain * lateral)), -.5, .5);
-  double strafe = clamp(p.strafeGain * lateral, -.5, .5);
+  // Limit sideways corrections to reduce overshoot.
+  double strafe = clamp(p.strafeGain * lateral, -.3, .3);
   for (int i = 0; i < 4; ++i) {
     double yaw = 0, lift = 0;
     if (elapsed > 0) {
@@ -30,7 +32,9 @@ inline void targets(const Parameters &p, double elapsed, double gaitTime,
       else {
         double v = (u - p.duty) / (1 - p.duty);
         yaw = p.yawAmplitude * (1 - 2 * v * v * (3 - 2 * v));
-        lift = -p.pitchLift * std::pow(std::sin(pi * v), 2);
+        // Lift early and hold clearance while the foot swings forward.
+        double height = clamp((v < .5 ? v : 1 - v) / .15, 0, 1);
+        lift = -p.pitchLift * height * height * (3 - 2 * height);
       }
       double ramp = clamp(elapsed / p.period, 0, 1);
       lift *= ramp;

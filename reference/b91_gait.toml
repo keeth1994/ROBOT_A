@@ -1,13 +1,13 @@
 # Walking gait for the physical robot and course simulation. Angles are radians.
-period = 1.0
+period = 1
 duty = 0.6
-yaw_amplitude = 0.45
-pitch_lift = 0.65
-pitch_stance = -0.3
-kp = 1.6
-kd = 0.04
+yaw_amplitude = 0.55
+pitch_lift = 0.7
+pitch_stance = -0.2
+kp = 2.3
+kd = 0.075
 heading_gain = 3.0
 pattern = "trot"
-lateral_gain = 0.0
-strafe_gain = 10.0
+lateral_gain = 2.0
+strafe_gain = 6.0
 friction = 1.19

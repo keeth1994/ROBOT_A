@@ -476,8 +476,11 @@ bool readNumber(const char *name, double &number, double low, double high)
   String value = server.arg(name);
   char *end = nullptr;
   number = strtod(value.c_str(), &end);
-  return value.length() > 0 && value.length() <= 24 && end != value.c_str() &&
-         end && !*end && isfinite(number) && number >= low && number <= high;
+  if (!(value.length() > 0 && value.length() <= 24 && end != value.c_str() &&
+        end && !*end && isfinite(number) && number >= low - 1e-12 && number <= high + 1e-12))
+    return false;
+  number = walking::clamp(number, low, high);
+  return true;
 }
 
 void startExternal()
@@ -495,8 +498,8 @@ void startExternal()
       !readNumber("period", p.period, .2, 10) ||
       !readNumber("duty", p.duty, .1, .9) ||
       !readNumber("yaw_amplitude", p.yawAmplitude, 0, walking::pi / 4) ||
-      !readNumber("pitch_lift", p.pitchLift, 0, walking::pi / 2) ||
-      !readNumber("pitch_min", p.pitchMin, -walking::pi / 4, 0) ||
+      !readNumber("pitch_lift", p.pitchLift, 0, 125 * walking::pi / 180) ||
+      !readNumber("pitch_min", p.pitchMin, -125 * walking::pi / 180, 0) ||
       !readNumber("pitch_stance", p.pitchStance, p.pitchMin, 0) ||
       !readNumber("heading_gain", p.headingGain, 0, 20) ||
       !readNumber("lateral_gain", p.lateralGain, 0, 20) ||
