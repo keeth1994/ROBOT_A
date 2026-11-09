@@ -22,11 +22,37 @@ def local_points(points, course):
     return p
 
 
+def rounded_panels(profile, names, distance):
+    starts, ends = profile[:-1].copy(), profile[1:].copy()
+    curves = {}
+    for i in range(1, len(profile) - 1):
+        if distance == 0:
+            break
+        incoming, outgoing = profile[i] - profile[i - 1], profile[i + 1] - profile[i]
+        before, after = np.linalg.norm(incoming), np.linalg.norm(outgoing)
+        cut = min(distance, before / 4, after / 4)
+        a = profile[i] - cut * incoming / before
+        b = profile[i] + cut * outgoing / after
+        ends[i - 1], starts[i] = a, b
+        t = np.linspace(0, 1, 17)[:, None]
+        curves[i] = (1 - t) ** 2 * a + 2 * (1 - t) * t * profile[i] + t ** 2 * b
+    panels = []
+    for i, name in enumerate(names):
+        panels.append((name, name, starts[i], ends[i]))
+        curve = curves.get(i + 1)
+        if curve is not None:
+            for j, (a, b) in enumerate(zip(curve[:-1], curve[1:])):
+                owner = name if j < (len(curve) - 1) // 2 else names[i + 1]
+                panels.append((f"corner_{i + 1}_{j}", owner, a, b))
+    return panels
+
+
 def build_course(asset, world, cfg):
     width = cfg["width_m"]
     thick = cfg["panel_thickness_m"]
     profile = np.asarray(cfg["profile_xz_m"], float)
     names = cfg["segment_names"]
+    rounding = cfg.get("corner_rounding_m", 0)
     obstacles = []
     segments = []
     bounds = []
@@ -36,6 +62,8 @@ def build_course(asset, world, cfg):
         or len(names) != len(profile) - 1
         or np.any(np.diff(profile[:, 0]) <= 0)
         or np.any(profile[:, 1] < 0)
+        or not math.isfinite(rounding)
+        or rounding < 0
     ):
         raise ValueError("Invalid ramp profile, names, width or thickness")
     if len(set(names)) != len(names):
@@ -63,33 +91,39 @@ def build_course(asset, world, cfg):
     def ramp_transform(v):
         return transform(v, cfg["origin_xy_m"], cfg["yaw_deg"])
 
-    for index, (name, ((x0, z0), (x1, z1))) in enumerate(
-        zip(names, zip(profile[:-1], profile[1:]))
-    ):
+    panels = rounded_panels(profile, names, rounding)
+    surface_geoms = {}
+    bottom_edges = []
+    for index, (name, owner, (x0, z0), (x1, z1)) in enumerate(panels):
         # Separate thin planks preserve the valley; no convex hull bridges its empty space.
         # 20 micrometre overlap prevents ray/contact cracks from float mesh rounding.
         slope = (z1 - z0) / (x1 - x0)
+        # Measure board thickness perpendicular to the surface, with square-cut ends.
+        normal_x, normal_z = -slope / math.hypot(1, slope), 1 / math.hypot(1, slope)
         left = x0 - (0.00002 if index else 0)
-        right = x1 + (0.00002 if index < len(names) - 1 else 0)
+        right = x1 + (0.00002 if index < len(panels) - 1 else 0)
         ends = [(left, z0 + slope * (left - x0)), (right, z1 + slope * (right - x1))]
         verts = [
-            [x, y, z + dz]
+            [x + normal_x * depth, y, z + normal_z * depth]
             for x, z in ends
             for y in [-width / 2, width / 2]
-            for dz in [-thick, 0]
+            for depth in [-thick, 0]
         ]
         prism(name, ramp_transform(verts), ".065 .07 .075 1")
+        surface_geoms[name] = owner
+        bottom_edges.append(np.array([[x0, z0], [x1, z1]]) - thick * np.array([normal_x, normal_z]))
         # Small exposed plywood edge, visual only, on each side of the black surface.
         for side in [-1, 1]:
             edge = [
-                [x, y, z + dz]
+                [x + normal_x * depth, y, z + normal_z * depth]
                 for x, z in [(x0, z0), (x1, z1)]
                 for y in [side * width / 2, side * (width / 2 + 0.001)]
-                for dz in [-thick, -0.001]
+                for depth in [-thick, -0.001]
             ]
             prism(
                 name + f"_plywood_{side}", ramp_transform(edge), ".66 .49 .28 1", False
             )
+    for name, (x0, z0), (x1, z1) in zip(names, profile[:-1], profile[1:]):
         segments.append(
             dict(
                 name=name,
@@ -103,12 +137,18 @@ def build_course(asset, world, cfg):
     for i, (x, z) in enumerate(profile[1:-1]):
         if z <= thick:
             continue
+        heights = []
+        for edge in bottom_edges:
+            left, right = max(x - 0.015, edge[0, 0]), min(x + 0.015, edge[1, 0])
+            if left <= right:
+                heights.extend(np.interp([left, right], edge[:, 0], edge[:, 1]))
+        support_top = min(heights)
         for side in [-1, 1]:
             v = [
                 [xx, yy, zz]
                 for xx in [x - 0.015, x + 0.015]
                 for yy in [side * 0.10 - 0.015, side * 0.10 + 0.015]
-                for zz in [0, z - thick]
+                for zz in [0, support_top]
             ]
             prism(f"ramp_support_{i}_{side}", ramp_transform(v), ".32 .34 .35 1")
     corridor = cfg["corridor"]
@@ -153,6 +193,9 @@ def build_course(asset, world, cfg):
         downhill_end_x=float(profile[-1, 0]),
         success_base_x=float(profile[-1, 0] + 0.15),
         required_surfaces=names,
+        surface_geoms=surface_geoms,
+        corner_rounding_m=rounding,
+        surface_profile_xz_m=[panels[0][2].tolist()] + [p[3].tolist() for p in panels],
         obstacle_geoms=obstacles,
         segments=segments,
         corridor=corridor,

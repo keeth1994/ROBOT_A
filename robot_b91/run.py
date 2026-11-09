@@ -157,7 +157,7 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
     if not math.isfinite(seconds) or seconds <= 2:
         raise ValueError("Evaluation duration must exceed the 2-second settling period")
     terrain = json.loads((ROOT / "reference/b91_course.json").read_text())
-    surfaces = terrain["required_surfaces"]
+    surfaces = terrain.get("surface_geoms", terrain["required_surfaces"])
     obstacles = terrain["obstacle_geoms"]
     r = Robot(p, ramp, feedback)
     try:

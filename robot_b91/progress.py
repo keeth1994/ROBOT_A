@@ -10,7 +10,8 @@ class CourseProgress:
     def __init__(self, model, course):
         self.course = course
         self.names = course["required_surfaces"]
-        self.surface_ids = {model.geom(name).id: name for name in self.names}
+        surfaces = course.get("surface_geoms", {name: name for name in self.names})
+        self.surface_ids = {model.geom(geom).id: name for geom, name in surfaces.items()}
         self.floor = model.geom("floor").id
         self.feet = {
             i: model.geom(i).name[:2]

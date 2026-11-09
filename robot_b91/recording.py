@@ -40,6 +40,7 @@ class Recording:
             draw.rectangle((0, 570, 960, 640), fill=(20, 25, 30))
             points = [(s["start_x_m"], s["start_height_m"]) for s in c["segments"]]
             points.append((c["segments"][-1]["end_x_m"], c["segments"][-1]["end_height_m"]))
+            points = c.get("surface_profile_xz_m", points)
             pixel = lambda x, z: (80 + x / c["downhill_end_x"] * 800, 627 - z * 200)
             draw.line([pixel(x, z) for x, z in points], fill="white", width=3)
             x, _, z = progress.local_position
