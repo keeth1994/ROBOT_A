@@ -55,19 +55,35 @@ inline double servoAngle(int joint, double radians) {
   return radians * 180 / pi + (joint % 2 ? 45 : 0);
 }
 
+inline void danceTargets(double danceTime, double angles[8]) {
+  double phase = std::fmod(danceTime, 3.4);
+  int diagonal = phase < 1.7 ? 0 : 1;
+  double step = std::fmod(phase, 1.7);
+  double lift = step < .7 ? step / .7 : step < .9 ? 1 :
+                step < 1.6 ? (1.6 - step) / .7 : 0;
+  lift = clamp(lift, 0, 1);
+  lift = lift * lift * (3 - 2 * lift);
+  for (int leg = 0; leg < 4; ++leg) {
+    angles[2 * leg] = 0;
+    angles[2 * leg + 1] = (leg == diagonal || leg == 3 - diagonal) ?
+                           -125 * pi / 180 * lift : 0;
+  }
+}
+
 struct Gait {
   Parameters params;
-  bool useImu = false, ready = false, stopping = false;
+  bool useImu = false, dance = false, ready = false, stopping = false;
   uint32_t started = 0, lastUpdate = 0, stopStarted = 0, settleMs = 0;
   double elapsed = 0, gaitTime = 0, speed = 1;
   double headingOffset = 0, lateral = 0;
   double angles[8] = {}, stopAngles[8] = {};
 
-  void begin(uint32_t now, const Parameters &p, bool imu, uint32_t settling) {
+  void begin(uint32_t now, const Parameters &p, bool imu, uint32_t settling, bool dancing = false) {
     *this = Gait();
-    params = p; useImu = imu; settleMs = settling;
+    params = p; useImu = imu; settleMs = settling; dance = dancing;
     started = lastUpdate = now;
-    targets(params, 0, 0, 0, 0, angles);
+    if (dance) danceTargets(0, angles);
+    else targets(params, 0, 0, 0, 0, angles);
   }
 
   void stop(uint32_t now) {
@@ -92,7 +108,8 @@ struct Gait {
     if (!ready || (useImu && !imuFresh) || uint32_t(now - started) < settleMs || dt > .1) return;
     elapsed += dt;
     gaitTime += dt * speed;
-    targets(params, elapsed, gaitTime, headingOffset + (useImu ? heading : 0), lateral, angles);
+    if (dance) danceTargets(gaitTime, angles);
+    else targets(params, elapsed, gaitTime, headingOffset + (useImu ? heading : 0), lateral, angles);
   }
 };
 }

@@ -15,7 +15,7 @@ CHANNELS = (0, 1, 2, 3, 8, 9, 10, 11)
 
 MIN_US, MAX_US = 500, 2500
 JOG_STEPS = (-50, -10, -5, -1, 1, 5, 10, 50)
-DEFAULT_CHANNELS = dict(zip(JOINTS, (8, 3, 1, 2, 0, 11, 9, 10)))
+DEFAULT_CHANNELS = dict(zip(JOINTS, (3, 1, 11, 9, 2, 0, 10, 8)))
 LABELS = ('Foran venstre – sving', 'Foran venstre – løft',
           'Bak venstre – sving', 'Bak venstre – løft',
           'Foran høyre – sving', 'Foran høyre – løft',

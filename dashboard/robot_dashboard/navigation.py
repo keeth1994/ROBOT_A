@@ -40,7 +40,7 @@ class CourseNavigation:
             self.estimate.roll, self.estimate.pitch = roll, pitch
             self.estimate.last_imu = max(0, elapsed - age)
         if not self.use_camera:
-            self.reason = 'Course gait with IMU heading; no camera or side-offset correction.'
+            self.reason = 'Walking with IMU heading; no camera or side-offset correction.'
             return True
         if camera_frame is not None:
             sequence, received, rgb = camera_frame

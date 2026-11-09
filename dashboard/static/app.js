@@ -5,8 +5,8 @@ let addressesLoaded = false, showingVideo = false;
 let debugUrl = null;
 let speedBusy = false;
 const rows = new Map();
-const walkButtons = {walk:'start', walkCourse:'course', walkCourseCamera:'course_camera',
-  walkCourseImu:'course_imu', walkCourseOpen:'course_open'};
+const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
+  walkCourseImu:'course_imu', dance:'dance'};
 
 function showSpeed(speed) {
   el('walkSpeed').value = Math.round(speed * 100);
@@ -34,7 +34,7 @@ async function servoCommand(name, values = {}) {
   catch (error) { message(error.message + (name === 'stop' ? ' Stop is NOT confirmed; use the servo power switch if needed.' : ''), true); }
   finally { commandBusy = false; renderControls(); }
 }
-async function walkForward(profile = 'start') {
+async function walkForward(profile = 'walk') {
   if (commandBusy) return;
   commandBusy = true; renderControls();
   try { const result = await post('/api/walk/' + profile); message(result.message); }
@@ -105,7 +105,7 @@ function render(state) {
   const s = state.servo.data;
   if (state.servo.online && s) {
     renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? s.message : 'Upload the calibrated controller firmware to enable these controls.';
-    badge('servoState', s.faulted ? 'Fault' : s.externalActive ? 'ESP32 walking' : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
+    badge('servoState', s.faulted ? 'Fault' : s.externalActive ? (state.walking?.profile === 'dance' ? 'Dancing' : 'ESP32 walking') : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
     const live = s.imuReady && s.imuValid;
     badge('imuState', live ? 'Live' : 'Unavailable', live);
     el('accel').textContent = live ? s.accel.map(n => n.toFixed(3)).join(' / ') : '— / — / —';
@@ -180,7 +180,7 @@ el('walkSpeed').onchange = async () => {
   try {
     const result = await post('/api/walk/speed', {speed:Number(el('walkSpeed').value) / 100});
     showSpeed(result.speed);
-    message('Walking speed set to ' + el('walkSpeed').value + '% (' + result.period_s.toFixed(2) + ' s per cycle).');
+    message('Motion speed set to ' + el('walkSpeed').value + '% (' + result.period_s.toFixed(2) + ' s per cycle).');
   } catch (error) {
     showSpeed(current?.walking?.speed ?? 1);
     message(error.message, true);

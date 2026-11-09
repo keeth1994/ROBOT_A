@@ -489,8 +489,8 @@ void startExternal()
   String profile = server.arg("profile"), pattern = server.arg("pattern");
   bool useImu = profile == "course" || profile == "course_imu";
   walking::Parameters p;
-  if ((profile != "flat" && profile != "course" && profile != "course_camera" &&
-       profile != "course_imu" && profile != "course_open") ||
+  if ((profile != "walk" && profile != "course" && profile != "course_camera" &&
+       profile != "course_imu" && profile != "dance") ||
       (pattern != "trot" && pattern != "crawl") ||
       !readNumber("period", p.period, .2, 10) ||
       !readNumber("duty", p.duty, .1, .9) ||
@@ -507,8 +507,10 @@ void startExternal()
     respond(409, "text/plain", "Walking needs fresh IMU readings. Check the sensor."); return;
   }
   p.crawl = pattern == "crawl";
+  if (profile == "dance") p.pitchStance = 0;
   uint32_t now = millis();
-  gait.begin(now, p, useImu, profile == "flat" ? 0 : 2000);
+  gait.begin(now, p, useImu, profile == "walk" || profile == "dance" ? 0 : 2000,
+             profile == "dance");
   orientation.reset(now);
   if (!writeGait()) { respond(503, "text/plain", message); return; }
   stream.begin(esp_random(), now);

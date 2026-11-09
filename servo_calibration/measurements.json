@@ -1,6 +1,6 @@
 {
   "FR_yaw": {
-    "channel": 0,
+    "channel": 2,
     "points": {
       "0": 1415,
       "45": 1705,
@@ -8,7 +8,7 @@
     }
   },
   "RL_yaw": {
-    "channel": 1,
+    "channel": 11,
     "points": {
       "0": 1490,
       "45": 1840,
@@ -16,7 +16,7 @@
     }
   },
   "RL_pitch": {
-    "channel": 2,
+    "channel": 9,
     "points": {
       "0": 1460,
       "-45": 940,
@@ -25,7 +25,7 @@
     }
   },
   "FL_pitch": {
-    "channel": 3,
+    "channel": 1,
     "points": {
       "0": 1500,
       "-45": 950,
@@ -34,7 +34,7 @@
     }
   },
   "FL_yaw": {
-    "channel": 8,
+    "channel": 3,
     "points": {
       "0": 1500,
       "45": 1790,
@@ -42,7 +42,7 @@
     }
   },
   "RR_yaw": {
-    "channel": 9,
+    "channel": 10,
     "points": {
       "0": 1500,
       "-45": 1180,
@@ -50,7 +50,7 @@
     }
   },
   "RR_pitch": {
-    "channel": 10,
+    "channel": 8,
     "points": {
       "-45": 960,
       "0": 1480,
@@ -59,7 +59,7 @@
     }
   },
   "FR_pitch": {
-    "channel": 11,
+    "channel": 0,
     "points": {
       "0": 1540,
       "-45": 1050,

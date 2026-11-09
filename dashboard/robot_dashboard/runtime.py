@@ -229,7 +229,7 @@ class Dashboard:
                 self.walking.prepare(status)
                 if status.get('manualActive') or status.get('running') or status.get('externalActive'):
                     raise devices.DeviceError('Press Stop to release existing servo control first.', 409)
-                profile = 'flat' if action == 'start' else action
+                profile = action
                 settings = self.walking.start_settings(profile)
                 result = devices.request(url, '/motion/start', settings, timeout=.15)
                 self.walking.begin(status, result['session'], time.monotonic(), profile=profile)
