@@ -11,21 +11,21 @@
   "success_base_x": 3.15,
   "required_surfaces": [
     "first_climb",
+    "raised_platform",
     "first_descent",
     "second_climb",
-    "raised_platform",
     "final_descent"
   ],
   "obstacle_geoms": [
     "first_climb",
+    "raised_platform",
     "first_descent",
     "second_climb",
-    "raised_platform",
     "final_descent",
     "ramp_support_0_-1",
     "ramp_support_0_1",
-    "ramp_support_2_-1",
-    "ramp_support_2_1",
+    "ramp_support_1_-1",
+    "ramp_support_1_1",
     "ramp_support_3_-1",
     "ramp_support_3_1",
     "corridor_wall_-1_0",
@@ -43,40 +43,40 @@
       "start_x_m": 0.0,
       "end_x_m": 0.6,
       "start_height_m": 0.0,
-      "end_height_m": 0.16,
-      "angle_deg": 14.931417178137554
-    },
-    {
-      "name": "first_descent",
-      "start_x_m": 0.6,
-      "end_x_m": 1.2,
-      "start_height_m": 0.16,
-      "end_height_m": 0.0,
-      "angle_deg": -14.931417178137554
-    },
-    {
-      "name": "second_climb",
-      "start_x_m": 1.2,
-      "end_x_m": 1.8,
-      "start_height_m": 0.0,
-      "end_height_m": 0.2,
-      "angle_deg": 18.43494882292201
+      "end_height_m": 0.25468488972576286,
+      "angle_deg": 23.000000000000004
     },
     {
       "name": "raised_platform",
+      "start_x_m": 0.6,
+      "end_x_m": 1.2,
+      "start_height_m": 0.25468488972576286,
+      "end_height_m": 0.25468488972576286,
+      "angle_deg": 0.0
+    },
+    {
+      "name": "first_descent",
+      "start_x_m": 1.2,
+      "end_x_m": 1.8,
+      "start_height_m": 0.25468488972576286,
+      "end_height_m": 0.0,
+      "angle_deg": -23.0
+    },
+    {
+      "name": "second_climb",
       "start_x_m": 1.8,
       "end_x_m": 2.4,
-      "start_height_m": 0.2,
-      "end_height_m": 0.2,
-      "angle_deg": 0.0
+      "start_height_m": 0.0,
+      "end_height_m": 0.19495181773974374,
+      "angle_deg": 18.0
     },
     {
       "name": "final_descent",
       "start_x_m": 2.4,
       "end_x_m": 3.0,
-      "start_height_m": 0.2,
+      "start_height_m": 0.19495181773974374,
       "end_height_m": 0.0,
-      "angle_deg": -18.43494882292201
+      "angle_deg": -17.999999999999993
     }
   ],
   "corridor": {

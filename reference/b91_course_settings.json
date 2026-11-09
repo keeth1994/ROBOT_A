@@ -9,24 +9,24 @@
   "panel_thickness_m": 0.006,
   "profile_xz_m": [
     [
-      0,
+      0.0,
       0
     ],
     [
       0.6,
-      0.16
+      0.25468488972576286
     ],
     [
       1.2,
-      0
+      0.25468488972576286
     ],
     [
       1.8,
-      0.2
+      0
     ],
     [
       2.4,
-      0.2
+      0.19495181773974374
     ],
     [
       3.0,
@@ -35,9 +35,9 @@
   ],
   "segment_names": [
     "first_climb",
+    "raised_platform",
     "first_descent",
     "second_climb",
-    "raised_platform",
     "final_descent"
   ],
   "corridor": {

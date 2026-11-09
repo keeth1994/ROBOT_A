@@ -10,3 +10,4 @@ heading_gain = 3.0
 pattern = "trot"
 lateral_gain = 0.0
 strafe_gain = 10.0
+friction = 1.19

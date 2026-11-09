@@ -1063,27 +1063,27 @@
     <mesh name="cad_222" file="cad_222.obj" inertia="shell" maxhullvert="64" />
     <mesh name="cad_223" file="cad_223.obj" inertia="shell" maxhullvert="64" />
     <mesh name="cad_224" file="cad_224.obj" inertia="shell" maxhullvert="64" />
-    <mesh name="first_climb_mesh" vertex="0.4 -0.145 -0.006 0.4 -0.145 0 0.4 0.145 -0.006 0.4 0.145 0 1.00002 -0.145 0.154005333 1.00002 -0.145 0.160005333 1.00002 0.145 0.154005333 1.00002 0.145 0.160005333" />
-    <mesh name="first_climb_plywood_-1_mesh" vertex="0.4 -0.145 -0.006 0.4 -0.145 -0.001 0.4 -0.146 -0.006 0.4 -0.146 -0.001 1 -0.145 0.154 1 -0.145 0.159 1 -0.146 0.154 1 -0.146 0.159" />
-    <mesh name="first_climb_plywood_1_mesh" vertex="0.4 0.145 -0.006 0.4 0.145 -0.001 0.4 0.146 -0.006 0.4 0.146 -0.001 1 0.145 0.154 1 0.145 0.159 1 0.146 0.154 1 0.146 0.159" />
-    <mesh name="first_descent_mesh" vertex="0.99998 -0.145 0.154005333 0.99998 -0.145 0.160005333 0.99998 0.145 0.154005333 0.99998 0.145 0.160005333 1.60002 -0.145 -0.00600533333 1.60002 -0.145 -5.33333333e-06 1.60002 0.145 -0.00600533333 1.60002 0.145 -5.33333333e-06" />
-    <mesh name="first_descent_plywood_-1_mesh" vertex="1 -0.145 0.154 1 -0.145 0.159 1 -0.146 0.154 1 -0.146 0.159 1.6 -0.145 -0.006 1.6 -0.145 -0.001 1.6 -0.146 -0.006 1.6 -0.146 -0.001" />
-    <mesh name="first_descent_plywood_1_mesh" vertex="1 0.145 0.154 1 0.145 0.159 1 0.146 0.154 1 0.146 0.159 1.6 0.145 -0.006 1.6 0.145 -0.001 1.6 0.146 -0.006 1.6 0.146 -0.001" />
-    <mesh name="second_climb_mesh" vertex="1.59998 -0.145 -0.00600666667 1.59998 -0.145 -6.66666667e-06 1.59998 0.145 -0.00600666667 1.59998 0.145 -6.66666667e-06 2.20002 -0.145 0.194006667 2.20002 -0.145 0.200006667 2.20002 0.145 0.194006667 2.20002 0.145 0.200006667" />
-    <mesh name="second_climb_plywood_-1_mesh" vertex="1.6 -0.145 -0.006 1.6 -0.145 -0.001 1.6 -0.146 -0.006 1.6 -0.146 -0.001 2.2 -0.145 0.194 2.2 -0.145 0.199 2.2 -0.146 0.194 2.2 -0.146 0.199" />
-    <mesh name="second_climb_plywood_1_mesh" vertex="1.6 0.145 -0.006 1.6 0.145 -0.001 1.6 0.146 -0.006 1.6 0.146 -0.001 2.2 0.145 0.194 2.2 0.145 0.199 2.2 0.146 0.194 2.2 0.146 0.199" />
-    <mesh name="raised_platform_mesh" vertex="2.19998 -0.145 0.194 2.19998 -0.145 0.2 2.19998 0.145 0.194 2.19998 0.145 0.2 2.80002 -0.145 0.194 2.80002 -0.145 0.2 2.80002 0.145 0.194 2.80002 0.145 0.2" />
-    <mesh name="raised_platform_plywood_-1_mesh" vertex="2.2 -0.145 0.194 2.2 -0.145 0.199 2.2 -0.146 0.194 2.2 -0.146 0.199 2.8 -0.145 0.194 2.8 -0.145 0.199 2.8 -0.146 0.194 2.8 -0.146 0.199" />
-    <mesh name="raised_platform_plywood_1_mesh" vertex="2.2 0.145 0.194 2.2 0.145 0.199 2.2 0.146 0.194 2.2 0.146 0.199 2.8 0.145 0.194 2.8 0.145 0.199 2.8 0.146 0.194 2.8 0.146 0.199" />
-    <mesh name="final_descent_mesh" vertex="2.79998 -0.145 0.194006667 2.79998 -0.145 0.200006667 2.79998 0.145 0.194006667 2.79998 0.145 0.200006667 3.4 -0.145 -0.006 3.4 -0.145 0 3.4 0.145 -0.006 3.4 0.145 0" />
-    <mesh name="final_descent_plywood_-1_mesh" vertex="2.8 -0.145 0.194 2.8 -0.145 0.199 2.8 -0.146 0.194 2.8 -0.146 0.199 3.4 -0.145 -0.006 3.4 -0.145 -0.001 3.4 -0.146 -0.006 3.4 -0.146 -0.001" />
-    <mesh name="final_descent_plywood_1_mesh" vertex="2.8 0.145 0.194 2.8 0.145 0.199 2.8 0.146 0.194 2.8 0.146 0.199 3.4 0.145 -0.006 3.4 0.145 -0.001 3.4 0.146 -0.006 3.4 0.146 -0.001" />
-    <mesh name="ramp_support_0_-1_mesh" vertex="0.985 -0.115 0 0.985 -0.115 0.154 0.985 -0.085 0 0.985 -0.085 0.154 1.015 -0.115 0 1.015 -0.115 0.154 1.015 -0.085 0 1.015 -0.085 0.154" />
-    <mesh name="ramp_support_0_1_mesh" vertex="0.985 0.085 0 0.985 0.085 0.154 0.985 0.115 0 0.985 0.115 0.154 1.015 0.085 0 1.015 0.085 0.154 1.015 0.115 0 1.015 0.115 0.154" />
-    <mesh name="ramp_support_2_-1_mesh" vertex="2.185 -0.115 0 2.185 -0.115 0.194 2.185 -0.085 0 2.185 -0.085 0.194 2.215 -0.115 0 2.215 -0.115 0.194 2.215 -0.085 0 2.215 -0.085 0.194" />
-    <mesh name="ramp_support_2_1_mesh" vertex="2.185 0.085 0 2.185 0.085 0.194 2.185 0.115 0 2.185 0.115 0.194 2.215 0.085 0 2.215 0.085 0.194 2.215 0.115 0 2.215 0.115 0.194" />
-    <mesh name="ramp_support_3_-1_mesh" vertex="2.785 -0.115 0 2.785 -0.115 0.194 2.785 -0.085 0 2.785 -0.085 0.194 2.815 -0.115 0 2.815 -0.115 0.194 2.815 -0.085 0 2.815 -0.085 0.194" />
-    <mesh name="ramp_support_3_1_mesh" vertex="2.785 0.085 0 2.785 0.085 0.194 2.785 0.115 0 2.785 0.115 0.194 2.815 0.085 0 2.815 0.085 0.194 2.815 0.115 0 2.815 0.115 0.194" />
+    <mesh name="first_climb_mesh" vertex="0.4 -0.145 -0.006 0.4 -0.145 0 0.4 0.145 -0.006 0.4 0.145 0 1.00002 -0.145 0.248693379 1.00002 -0.145 0.254693379 1.00002 0.145 0.248693379 1.00002 0.145 0.254693379" />
+    <mesh name="first_climb_plywood_-1_mesh" vertex="0.4 -0.145 -0.006 0.4 -0.145 -0.001 0.4 -0.146 -0.006 0.4 -0.146 -0.001 1 -0.145 0.24868489 1 -0.145 0.25368489 1 -0.146 0.24868489 1 -0.146 0.25368489" />
+    <mesh name="first_climb_plywood_1_mesh" vertex="0.4 0.145 -0.006 0.4 0.145 -0.001 0.4 0.146 -0.006 0.4 0.146 -0.001 1 0.145 0.24868489 1 0.145 0.25368489 1 0.146 0.24868489 1 0.146 0.25368489" />
+    <mesh name="raised_platform_mesh" vertex="0.99998 -0.145 0.24868489 0.99998 -0.145 0.25468489 0.99998 0.145 0.24868489 0.99998 0.145 0.25468489 1.60002 -0.145 0.24868489 1.60002 -0.145 0.25468489 1.60002 0.145 0.24868489 1.60002 0.145 0.25468489" />
+    <mesh name="raised_platform_plywood_-1_mesh" vertex="1 -0.145 0.24868489 1 -0.145 0.25368489 1 -0.146 0.24868489 1 -0.146 0.25368489 1.6 -0.145 0.24868489 1.6 -0.145 0.25368489 1.6 -0.146 0.24868489 1.6 -0.146 0.25368489" />
+    <mesh name="raised_platform_plywood_1_mesh" vertex="1 0.145 0.24868489 1 0.145 0.25368489 1 0.146 0.24868489 1 0.146 0.25368489 1.6 0.145 0.24868489 1.6 0.145 0.25368489 1.6 0.146 0.24868489 1.6 0.146 0.25368489" />
+    <mesh name="first_descent_mesh" vertex="1.59998 -0.145 0.248693379 1.59998 -0.145 0.254693379 1.59998 0.145 0.248693379 1.59998 0.145 0.254693379 2.20002 -0.145 -0.0060084895 2.20002 -0.145 -8.48949632e-06 2.20002 0.145 -0.0060084895 2.20002 0.145 -8.48949632e-06" />
+    <mesh name="first_descent_plywood_-1_mesh" vertex="1.6 -0.145 0.24868489 1.6 -0.145 0.25368489 1.6 -0.146 0.24868489 1.6 -0.146 0.25368489 2.2 -0.145 -0.006 2.2 -0.145 -0.001 2.2 -0.146 -0.006 2.2 -0.146 -0.001" />
+    <mesh name="first_descent_plywood_1_mesh" vertex="1.6 0.145 0.24868489 1.6 0.145 0.25368489 1.6 0.146 0.24868489 1.6 0.146 0.25368489 2.2 0.145 -0.006 2.2 0.145 -0.001 2.2 0.146 -0.006 2.2 0.146 -0.001" />
+    <mesh name="second_climb_mesh" vertex="2.19998 -0.145 -0.00600649839 2.19998 -0.145 -6.49839392e-06 2.19998 0.145 -0.00600649839 2.19998 0.145 -6.49839392e-06 2.80002 -0.145 0.188958316 2.80002 -0.145 0.194958316 2.80002 0.145 0.188958316 2.80002 0.145 0.194958316" />
+    <mesh name="second_climb_plywood_-1_mesh" vertex="2.2 -0.145 -0.006 2.2 -0.145 -0.001 2.2 -0.146 -0.006 2.2 -0.146 -0.001 2.8 -0.145 0.188951818 2.8 -0.145 0.193951818 2.8 -0.146 0.188951818 2.8 -0.146 0.193951818" />
+    <mesh name="second_climb_plywood_1_mesh" vertex="2.2 0.145 -0.006 2.2 0.145 -0.001 2.2 0.146 -0.006 2.2 0.146 -0.001 2.8 0.145 0.188951818 2.8 0.145 0.193951818 2.8 0.146 0.188951818 2.8 0.146 0.193951818" />
+    <mesh name="final_descent_mesh" vertex="2.79998 -0.145 0.188958316 2.79998 -0.145 0.194958316 2.79998 0.145 0.188958316 2.79998 0.145 0.194958316 3.4 -0.145 -0.006 3.4 -0.145 0 3.4 0.145 -0.006 3.4 0.145 0" />
+    <mesh name="final_descent_plywood_-1_mesh" vertex="2.8 -0.145 0.188951818 2.8 -0.145 0.193951818 2.8 -0.146 0.188951818 2.8 -0.146 0.193951818 3.4 -0.145 -0.006 3.4 -0.145 -0.001 3.4 -0.146 -0.006 3.4 -0.146 -0.001" />
+    <mesh name="final_descent_plywood_1_mesh" vertex="2.8 0.145 0.188951818 2.8 0.145 0.193951818 2.8 0.146 0.188951818 2.8 0.146 0.193951818 3.4 0.145 -0.006 3.4 0.145 -0.001 3.4 0.146 -0.006 3.4 0.146 -0.001" />
+    <mesh name="ramp_support_0_-1_mesh" vertex="0.985 -0.115 0 0.985 -0.115 0.24868489 0.985 -0.085 0 0.985 -0.085 0.24868489 1.015 -0.115 0 1.015 -0.115 0.24868489 1.015 -0.085 0 1.015 -0.085 0.24868489" />
+    <mesh name="ramp_support_0_1_mesh" vertex="0.985 0.085 0 0.985 0.085 0.24868489 0.985 0.115 0 0.985 0.115 0.24868489 1.015 0.085 0 1.015 0.085 0.24868489 1.015 0.115 0 1.015 0.115 0.24868489" />
+    <mesh name="ramp_support_1_-1_mesh" vertex="1.585 -0.115 0 1.585 -0.115 0.24868489 1.585 -0.085 0 1.585 -0.085 0.24868489 1.615 -0.115 0 1.615 -0.115 0.24868489 1.615 -0.085 0 1.615 -0.085 0.24868489" />
+    <mesh name="ramp_support_1_1_mesh" vertex="1.585 0.085 0 1.585 0.085 0.24868489 1.585 0.115 0 1.585 0.115 0.24868489 1.615 0.085 0 1.615 0.085 0.24868489 1.615 0.115 0 1.615 0.115 0.24868489" />
+    <mesh name="ramp_support_3_-1_mesh" vertex="2.785 -0.115 0 2.785 -0.115 0.188951818 2.785 -0.085 0 2.785 -0.085 0.188951818 2.815 -0.115 0 2.815 -0.115 0.188951818 2.815 -0.085 0 2.815 -0.085 0.188951818" />
+    <mesh name="ramp_support_3_1_mesh" vertex="2.785 0.085 0 2.785 0.085 0.188951818 2.785 0.115 0 2.785 0.115 0.188951818 2.815 0.085 0 2.815 0.085 0.188951818 2.815 0.115 0 2.815 0.115 0.188951818" />
     <mesh name="corridor_wall_-1_0_mesh" vertex="3.55 -0.45 0 3.55 -0.45 0.18 2.88007353 -0.45 0 2.88007353 -0.45 0.18 2.88187794 -0.438 0 2.88187794 -0.438 0.18 3.55 -0.438 0 3.55 -0.438 0.18" />
     <mesh name="corridor_wall_-1_1_mesh" vertex="2.88007353 -0.45 0 2.88007353 -0.45 0.18 2.19530858 -0.239303095 0 2.19530858 -0.239303095 0.18 2.1950271 -0.226661281 0 2.1950271 -0.226661281 0.18 2.88187794 -0.438 0 2.88187794 -0.438 0.18" />
     <mesh name="corridor_wall_-1_2_mesh" vertex="2.19530858 -0.239303095 0 2.19530858 -0.239303095 0.18 1.46535725 -0.5 0 1.46535725 -0.5 0.18 1.46327869 -0.488 0 1.46327869 -0.488 0.18 2.1950271 -0.226661281 0 2.1950271 -0.226661281 0.18" />
@@ -2210,22 +2210,22 @@
     <geom name="first_climb" type="mesh" mesh="first_climb_mesh" rgba=".065 .07 .075 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
     <geom name="first_climb_plywood_-1" type="mesh" mesh="first_climb_plywood_-1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
     <geom name="first_climb_plywood_1" type="mesh" mesh="first_climb_plywood_1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
+    <geom name="raised_platform" type="mesh" mesh="raised_platform_mesh" rgba=".065 .07 .075 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
+    <geom name="raised_platform_plywood_-1" type="mesh" mesh="raised_platform_plywood_-1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
+    <geom name="raised_platform_plywood_1" type="mesh" mesh="raised_platform_plywood_1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
     <geom name="first_descent" type="mesh" mesh="first_descent_mesh" rgba=".065 .07 .075 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
     <geom name="first_descent_plywood_-1" type="mesh" mesh="first_descent_plywood_-1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
     <geom name="first_descent_plywood_1" type="mesh" mesh="first_descent_plywood_1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
     <geom name="second_climb" type="mesh" mesh="second_climb_mesh" rgba=".065 .07 .075 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
     <geom name="second_climb_plywood_-1" type="mesh" mesh="second_climb_plywood_-1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
     <geom name="second_climb_plywood_1" type="mesh" mesh="second_climb_plywood_1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
-    <geom name="raised_platform" type="mesh" mesh="raised_platform_mesh" rgba=".065 .07 .075 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
-    <geom name="raised_platform_plywood_-1" type="mesh" mesh="raised_platform_plywood_-1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
-    <geom name="raised_platform_plywood_1" type="mesh" mesh="raised_platform_plywood_1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
     <geom name="final_descent" type="mesh" mesh="final_descent_mesh" rgba=".065 .07 .075 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
     <geom name="final_descent_plywood_-1" type="mesh" mesh="final_descent_plywood_-1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
     <geom name="final_descent_plywood_1" type="mesh" mesh="final_descent_plywood_1_mesh" rgba=".66 .49 .28 1" contype="0" conaffinity="0" friction=".8 .002 .0001" />
     <geom name="ramp_support_0_-1" type="mesh" mesh="ramp_support_0_-1_mesh" rgba=".32 .34 .35 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
     <geom name="ramp_support_0_1" type="mesh" mesh="ramp_support_0_1_mesh" rgba=".32 .34 .35 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
-    <geom name="ramp_support_2_-1" type="mesh" mesh="ramp_support_2_-1_mesh" rgba=".32 .34 .35 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
-    <geom name="ramp_support_2_1" type="mesh" mesh="ramp_support_2_1_mesh" rgba=".32 .34 .35 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
+    <geom name="ramp_support_1_-1" type="mesh" mesh="ramp_support_1_-1_mesh" rgba=".32 .34 .35 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
+    <geom name="ramp_support_1_1" type="mesh" mesh="ramp_support_1_1_mesh" rgba=".32 .34 .35 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
     <geom name="ramp_support_3_-1" type="mesh" mesh="ramp_support_3_-1_mesh" rgba=".32 .34 .35 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
     <geom name="ramp_support_3_1" type="mesh" mesh="ramp_support_3_1_mesh" rgba=".32 .34 .35 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
     <geom name="corridor_wall_-1_0" type="mesh" mesh="corridor_wall_-1_0_mesh" rgba=".68 .49 .29 1" contype="1" conaffinity="2" friction=".8 .002 .0001" />
