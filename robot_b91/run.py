@@ -24,14 +24,14 @@ def load_gait_parameters(path=None):
 
 
 class Robot:
-    def __init__(self, params=None, ramp=False, feedback="sensors"):
+    def __init__(self, params=None, ramp=False, feedback="sensors", model_path=None):
         if feedback not in ("sensors", "ideal"):
             raise ValueError("feedback must be sensors or ideal")
         self.feedback = feedback
         self.navigation = None
         self.p = load_gait_parameters() | (params or {})
         self.m = mujoco.MjModel.from_xml_path(
-            str(ROOT / "models" / ("robot_b98_course.xml" if ramp else "robot_b98.xml"))
+            str(model_path or ROOT / "models" / ("robot_b98_course.xml" if ramp else "robot_b98.xml"))
         )
         self.d = mujoco.MjData(self.m)
         cfg = json.loads((ROOT / "reference/b98_kinematics.json").read_text())

@@ -9,7 +9,6 @@ logs/
 .pio/
 
 dashboard/config.local.json
-dashboard/ir_calibration.local.json
 images/
 
 # Generated reports, recordings and CAD previews.

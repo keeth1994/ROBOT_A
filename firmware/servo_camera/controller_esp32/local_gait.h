@@ -14,14 +14,16 @@ struct Parameters {
   // A 125-degree lift reaches calibrated -80 degrees from +45 foot-down.
   double pitchStance = 0, pitchMin = -125 * pi / 180;
   double headingGain = .8, lateralGain = 5, strafeGain = 0;
-  bool crawl = false;
+  bool crawl = false, corridor = false;
 };
 
 // Same joint order and radians as robot_b91/gait.py: FL, RL, FR, RR.
 inline void targets(const Parameters &p, double elapsed, double gaitTime,
                     double heading, double lateral, double angles[8]) {
   const double trot[] = {0, .5, .5, 0}, crawl[] = {0, .5, .25, .75};
-  double correction = clamp(p.headingGain * (heading + std::atan(p.lateralGain * lateral)), -.5, .5);
+  double turnLimit = p.corridor ? .95 : .5;
+  double correction = clamp(p.headingGain * (heading + std::atan(p.lateralGain * lateral)), -turnLimit, turnLimit);
+  double forward = p.corridor ? std::fmax(.25, 1 - std::abs(correction)) : 1;
   // Limit sideways corrections to reduce overshoot.
   double strafe = clamp(p.strafeGain * lateral, -.3, .3);
   for (int i = 0; i < 4; ++i) {
@@ -39,7 +41,7 @@ inline void targets(const Parameters &p, double elapsed, double gaitTime,
       double ramp = clamp(elapsed / p.period, 0, 1);
       lift *= ramp;
       yaw *= ramp *
-             ((i < 2 ? 1 : -1) + correction + (i % 2 == 0 ? 1 : -1) * strafe);
+             ((i < 2 ? forward : -forward) + correction + (i % 2 == 0 ? 1 : -1) * strafe);
     }
     angles[2 * i] = clamp(yaw, -pi / 4, pi / 4);
     angles[2 * i + 1] = clamp(p.pitchStance + lift, p.pitchMin, 0);

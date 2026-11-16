@@ -13,13 +13,12 @@ from robot_b91.navigation_debug import navigation_debug_image
 from . import devices
 from .walking import WALK_ACTIONS, Walking
 from .navigation import CourseNavigation
-from .corridor import save_calibration_point
 
 
 def orient_camera_frame(jpeg):
     """Use the same upright image for the dashboard and course navigation."""
     with Image.open(BytesIO(jpeg)) as source:
-        upright = source.convert('RGB').transpose(Image.Transpose.ROTATE_180)
+        upright = source.convert('RGB')
     output = BytesIO()
     upright.save(output, format='JPEG', quality=90)
     upright.thumbnail((320, 240))
@@ -190,7 +189,10 @@ class Dashboard:
         self.threads.append(thread)
 
     def _walk_loop(self):
-        while not self.stop_event.wait(.1):
+        next_update = time.monotonic()
+        while not self.stop_event.wait(max(.001, next_update - time.monotonic())):
+            interval = .05 if self.walking.profile == 'corridor' else .1
+            next_update = time.monotonic() + interval
             with self.servo_lock:
                 if not self.walking.active:
                     continue
@@ -228,6 +230,8 @@ class Dashboard:
             try:
                 status = devices.request(url, '/status', timeout=.15)
                 self.walking.prepare(status)
+                if action == 'corridor' and not status.get('corridorGait'):
+                    raise devices.DeviceError('Upload the updated controller firmware for corridor walking.', 409)
                 if status.get('manualActive') or status.get('running') or status.get('externalActive'):
                     raise devices.DeviceError('Press Stop to release existing servo control first.', 409)
                 profile = action
@@ -241,7 +245,8 @@ class Dashboard:
                         not self.camera.enabled):
                     self.camera.enable(True)
             except (devices.DeviceError, KeyError, ValueError, TypeError) as error:
-                self.walking.stop('Walking start failed. Outputs off requested.')
+                detail = str(error) if isinstance(error, (devices.DeviceError, ValueError)) else 'Invalid ESP32 walking response.'
+                self.walking.stop(f'Walking start failed: {detail} Outputs off requested.')
                 try:
                     devices.request(url, '/stop', {}, timeout=.15)
                 except devices.DeviceError:
@@ -255,17 +260,6 @@ class Dashboard:
         with self.servo_lock:
             self.walking.set_speed(speed)
             return self.walking.state()
-
-    def calibrate_ir(self, values):
-        with self.servo_lock:
-            if self.walking.active:
-                raise ValueError('Stop walking before calibrating the IR sensors.')
-            with self.lock:
-                url = self.config['servo']
-            status = devices.request(url, '/status', timeout=.15)
-            if status.get('externalActive') or status.get('running') or status.get('manualActive'):
-                raise ValueError('Stop servo motion before calibrating the IR sensors.')
-            return save_calibration_point(values.get('side'), values.get('distance_cm'), status)
 
     def _poll(self, name):
         while not self.stop_event.is_set():
@@ -308,7 +302,9 @@ class Dashboard:
             # Preview has its own estimator and never starts or alters walking.
             with self.debug_lock:
                 now = time.monotonic()
-                self.debug_preview.update({}, now, self.camera.navigation_frame())
+                with self.lock:
+                    status = self.cache['servo']['data'] or {}
+                self.debug_preview.update(status, now, self.camera.navigation_frame())
                 estimate = copy(self.debug_preview.estimate)
                 elapsed = now - self.debug_preview.started
                 use_imu = False
@@ -327,7 +323,7 @@ class Dashboard:
         return self.servo_command('/heartbeat', {})
 
     def servo_command(self, path, values):
-        if path not in ('/heartbeat', '/start', '/servo', '/release', '/stop'):
+        if path not in ('/heartbeat', '/start', '/servo', '/release', '/stop', '/camera-pitch'):
             raise ValueError('Unknown servo command.')
         arrival = time.monotonic()
         with self.lock:
@@ -335,12 +331,12 @@ class Dashboard:
         with self.servo_lock:
             if path == '/stop':
                 self.walking.stop()
-            elif self.walking.active and path not in ('/heartbeat',):
+            elif self.walking.active and path not in ('/heartbeat', '/camera-pitch'):
                 raise devices.DeviceError('Stop walking before manual control or sweeps.', 409)
             with self.lock:
                 if generation != self.generation:
                     raise devices.DeviceError('Device address changed. Retry explicitly.', 409)
-                if path in ('/start', '/servo'):
+                if path in ('/start', '/servo', '/camera-pitch'):
                     now = time.monotonic()
                     if now - arrival > 1.5 or now - self.browser_heartbeat > 1.5:
                         raise devices.DeviceError('Operator heartbeat expired. Keep the dashboard visible.', 409)
@@ -348,7 +344,7 @@ class Dashboard:
                     if not entry['online'] or now - entry['at'] > 2.5:
                         raise devices.DeviceError('Controller status is unavailable.', 409)
                 url = self.config['servo']
-            result = devices.request(url, path, values)
+            result = devices.request(url, path, values, timeout=.15 if path == '/camera-pitch' else .8)
             if path == '/heartbeat':
                 # This happens ONLY in response to a browser request, never a timer.
                 with self.lock:

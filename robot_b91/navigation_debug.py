@@ -7,6 +7,8 @@ from PIL import Image, ImageDraw
 def navigation_status(navigation, now, use_imu=True):
     """Report readiness without calling ready(), which updates controller telemetry."""
     age = None if navigation.last_seen is None else max(0., now - navigation.last_seen)
+    if navigation.debug and navigation.debug.get('held'):
+        return "HOLD REQUIRED", (255, 100, 80), navigation.debug['reason'], age
     if use_imu and (navigation.last_imu is None or now - navigation.last_imu > .05):
         return "HOLD REQUIRED", (255, 100, 80), "No fresh IMU sample", age
     if age is None or age > navigation.blind_timeout:

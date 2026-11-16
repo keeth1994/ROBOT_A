@@ -45,7 +45,12 @@ function renderControls() {
   const device = current?.servo, s = device?.data;
   const walking = !!current?.walking?.active || !!s?.externalActive;
   const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.calibratedAngles || !s?.servoReady || s?.faulted || s?.running || walking || !current?.operator_alive || commandBusy;
-  el('calibrateIr').disabled = !device?.online || walking || !!s?.running || !!s?.manualActive || commandBusy;
+  const pitch = s?.cameraPitch;
+  const pitchBlocked = document.visibilityState !== 'visible' || !device?.online || !s?.servoReady ||
+    s?.faulted || !current?.operator_alive || commandBusy || !pitch;
+  el('cameraPitchEnable').disabled = pitchBlocked || pitch?.angle !== null;
+  el('cameraPitchRelease').disabled = pitchBlocked || pitch?.angle === null;
+  el('cameraPitch').disabled = pitchBlocked || pitch?.angle === null;
   Object.keys(walkButtons).forEach(id => {
     el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2;
   });
@@ -90,7 +95,7 @@ function renderIr(status) {
     readings.every(n => Number.isFinite(n) && n >= 0) &&
     Number.isFinite(status.irAgeMs) && status.irAgeMs >= 0 && status.irAgeMs < 1000;
   badge('irState', live ? 'Updating' : 'No data', live);
-  ['ir34', 'ir35'].forEach((id, i) => {
+  ['ir35', 'ir34'].forEach((id, i) => {
     el(id).textContent = live ? (readings[i] / 1000).toFixed(3) + ' V' : '—';
   });
 }
@@ -108,10 +113,10 @@ function render(state) {
     ? 'Heading: ' + (nav.heading_rad * 180 / Math.PI).toFixed(1) + '° · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm · Camera accepted: ' + nav.accepted_frames + '/' + nav.camera_frames + (['course', 'course_camera', 'course_tape'].includes(state.walking.profile) ? (nav.guidance === 'blue_tape' ? ' · Blue tape: ' : ' · Ramp: ') + (nav.ramp_detected ? 'detected' : 'not detected') : '')
     : '';
   if (nav?.guidance === 'corridor') {
-    const distance = value => value === null ? 'unavailable' : (value * 100).toFixed(1) + ' cm';
-    el('navigationStats').textContent = 'Left wall: ' + distance(nav.left_distance_m) +
-      ' · Right wall: ' + distance(nav.right_distance_m) +
-      ' · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm';
+    const voltage = value => value === null ? 'unavailable' : value + ' mV';
+    el('navigationStats').textContent = 'Left IR: ' + voltage(nav.left_mv) +
+      ' · Right IR: ' + voltage(nav.right_mv) +
+      ' · Steering: ' + (nav.steering_rad > .001 ? 'right' : nav.steering_rad < -.001 ? 'left' : 'straight');
   }
   if (!addressesLoaded) {
     el('servoAddress').value = state.config.servo; el('cameraAddress').value = state.config.camera; addressesLoaded = true;
@@ -120,6 +125,15 @@ function render(state) {
   badge('servoOnline', state.servo.online ? 'Connected' : 'Offline', state.servo.online);
   badge('cameraOnline', state.camera.online ? 'Connected' : 'Offline', state.camera.online);
   const s = state.servo.data;
+  const pitch = s?.cameraPitch;
+  if (pitch && document.activeElement !== el('cameraPitch') && !commandBusy) {
+    el('cameraPitch').value = pitch.angle ?? 0;
+    el('cameraPitchValue').textContent = (pitch.angle ?? 0) + '°';
+  }
+  el('cameraPitchStatus').textContent = !state.servo.online ? 'Controller offline.' : !pitch
+    ? 'Upload the camera-pitch controller firmware to enable these controls.'
+    : pitch.angle === null ? 'Camera servo released. Enable at 0° before adjusting.'
+    : 'Commanded position: ' + pitch.angle + '°. Camera-guided walking pauses briefly after tilt changes.';
   renderIr(state.servo.online ? s : null);
   if (state.servo.online && s) {
     renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? s.message : 'Upload the calibrated controller firmware to enable these controls.';
@@ -192,14 +206,10 @@ el('cameraDebug').ontoggle = async () => {
   }
 };
 el('stop').onclick = () => servoCommand('stop');
-el('calibrateIr').onclick = async () => {
-  commandBusy = true; renderControls();
-  try {
-    const result = await post('/api/ir/calibrate', {side:el('irSide').value, distance_cm:Number(el('irDistance').value)});
-    message(result.message);
-  } catch (error) { message(error.message, true); }
-  finally { commandBusy = false; renderControls(); }
-};
+el('cameraPitchEnable').onclick = () => servoCommand('camera-pitch', {angle:0});
+el('cameraPitchRelease').onclick = () => servoCommand('camera-pitch', {release:1});
+el('cameraPitch').oninput = () => { el('cameraPitchValue').textContent = el('cameraPitch').value + '°'; };
+el('cameraPitch').onchange = () => servoCommand('camera-pitch', {angle:Number(el('cameraPitch').value)});
 Object.entries(walkButtons).forEach(([id, profile]) => { el(id).onclick = () => walkForward(profile); });
 el('walkSpeed').oninput = () => { el('walkSpeedValue').textContent = el('walkSpeed').value + '%'; };
 el('walkSpeed').onchange = async () => {

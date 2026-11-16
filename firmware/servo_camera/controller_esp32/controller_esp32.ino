@@ -15,11 +15,12 @@
 #include <freertos/task.h>
 #include <freertos/semphr.h>
 #include "measured_servos.h"
+#include "camera_pitch.h"
 #include "motion_stream.h"
 #include "imu_orientation.h"
 
 constexpr int SDA_PIN = 21, SCL_PIN = 22;
-constexpr int IR_PINS[] = {34, 35};
+constexpr int IR_PINS[] = {35, 34}; // Left, right.
 constexpr uint32_t IR_SAMPLE_MS = 50;
 uint32_t irMillivolts[2] = {}, lastIrSample = 0;
 bool irSampled = false;
@@ -78,6 +79,9 @@ uint32_t phaseStarted = 0, lastServoUpdate = 0;
 // Zero means disabled; otherwise this is the last commanded pulse, not feedback.
 uint16_t manualPulse[CHANNEL_COUNT] = {};
 double manualAngle[CHANNEL_COUNT] = {};
+uint16_t cameraPulse = 0;
+int16_t cameraAngle = 0;
+uint32_t cameraChanged = 0;
 
 bool manualActive()
 {
@@ -91,6 +95,7 @@ bool manualActive()
 
 bool allOff()
 {
+  cameraPulse = 0;
   for (size_t i = 0; i < CHANNEL_COUNT; ++i)
     manualPulse[i] = 0;
   if (!servoReady)
@@ -200,12 +205,12 @@ void updateMotion()
                                   "Navigation connection lost. Outputs off; restart explicitly.");
     return;
   }
-  if (((running && wifiRun) || manualActive()) && WiFi.status() != WL_CONNECTED)
+  if (((running && wifiRun) || manualActive() || cameraPulse) && WiFi.status() != WL_CONNECTED)
   {
     stopTest("Wi-Fi disconnected. Outputs off.");
     return;
   }
-  if (((running && wifiRun) || manualActive()) && now - lastHeartbeat > WIFI_TIMEOUT_MS)
+  if (((running && wifiRun) || manualActive() || cameraPulse) && now - lastHeartbeat > WIFI_TIMEOUT_MS)
   {
     stopTest("Wi-Fi heartbeat lost. Outputs off.");
     return;
@@ -337,7 +342,7 @@ void sendStatus()
   json += running ? channelList(groupFirst, groupCount) : String("none");
   json += "\",\"manualActive\":";
   json += manualActive() ? "true" : "false";
-  json += ",\"motionProtocol\":2,\"externalActive\":";
+  json += ",\"motionProtocol\":2,\"corridorGait\":true,\"externalActive\":";
   json += externalActive ? "true" : "false";
   json += ",\"motionSession\":"; json += String(motionSession);
   json += ",\"gaitStopping\":"; json += externalActive && gait.stopping ? "true" : "false";
@@ -352,6 +357,11 @@ void sendStatus()
   json += String(orientation.roll, 6); json += ",";
   json += String(orientation.pitch, 6); json += ",";
   json += String(orientation.heading, 6); json += "]";
+  json += ",\"cameraPitch\":{\"channel\":14,\"minAngle\":-45,\"maxAngle\":45,\"angle\":";
+  json += cameraPulse ? String(cameraAngle) : String("null");
+  json += ",\"moving\":";
+  json += cameraPulse && millis() - cameraChanged < 500 ? "true" : "false";
+  json += "}";
   json += ",\"calibratedAngles\":true,\"joints\":[";
   for (size_t i = 0; i < CHANNEL_COUNT; ++i)
   {
@@ -432,6 +442,31 @@ bool readAngleArg(int16_t &value)
   if (parsed < -90 || parsed > 45) return false;
   value = static_cast<int16_t>(parsed);
   return true;
+}
+
+void handleCameraPitch()
+{
+  const bool release = server.arg("release") == "1";
+  int16_t angle = 0;
+  if (!release && (!readAngleArg(angle) || camera_pitch::pulse(angle) < 0)) {
+    respond(400, "text/plain", "Camera pitch must be an integer from -45 to 45 degrees."); return;
+  }
+  if (!servoReady || faulted || WiFi.status() != WL_CONNECTED) {
+    respond(409, "text/plain", "Camera control unavailable. Check controller status."); return;
+  }
+  if (!release && !cameraPulse && angle != 0) {
+    respond(409, "text/plain", "Enable the camera at 0 degrees first."); return;
+  }
+  const int pulse = release ? 0 : camera_pitch::pulse(angle);
+  const uint16_t ticks = release ? 4096 : static_cast<uint16_t>(pulse / usPerTick + .5f);
+  if (pwm.setPWM(camera_pitch::channel, 0, ticks) != 0) {
+    servoFault(); respond(503, "text/plain", message); return;
+  }
+  if (!cameraPulse || angle != cameraAngle) cameraChanged = millis();
+  cameraPulse = pulse;
+  cameraAngle = angle;
+  lastHeartbeat = millis();
+  respond(200, "text/plain", release ? "Camera servo released." : "Camera pitch applied.");
 }
 
 void handleManual(bool release)
@@ -516,10 +551,10 @@ void startExternal()
     respond(409, "text/plain", "Stop existing motion or fix controller status first."); return;
   }
   String profile = server.arg("profile"), pattern = server.arg("pattern");
-  bool useImu = profile == "course" || profile == "course_imu" || profile == "dance";
+  bool useImu = profile == "course" || profile == "course_imu" || profile == "corridor" || profile == "dance";
   walking::Parameters p;
   if ((profile != "walk" && profile != "course" && profile != "course_camera" &&
-       profile != "course_imu" && profile != "dance") ||
+       profile != "course_imu" && profile != "corridor" && profile != "dance") ||
       (pattern != "trot" && pattern != "crawl") ||
       !readNumber("period", p.period, .2, 10) ||
       !readNumber("duty", p.duty, .1, .9) ||
@@ -536,6 +571,7 @@ void startExternal()
     respond(409, "text/plain", "This motion needs fresh IMU readings. Check the sensor."); return;
   }
   p.crawl = pattern == "crawl";
+  p.corridor = profile == "corridor";
   if (profile == "dance") p.pitchStance = 0;
   uint32_t now = millis();
   gait.begin(now, p, useImu, profile == "walk" ? 0 : 2000,
@@ -581,6 +617,7 @@ void beginWifi()
   onControl("/motion/start", HTTP_POST, startExternal);
   onControl("/motion/adjust", HTTP_POST, receiveAdjustment);
   onControl("/servo", HTTP_POST, []() { handleManual(false); });
+  onControl("/camera-pitch", HTTP_POST, handleCameraPitch);
   onControl("/release", HTTP_POST, []() { handleManual(true); });
   onControl("/heartbeat", HTTP_POST, []()
             {
@@ -615,7 +652,7 @@ void serviceWifi()
   {
     xSemaphoreTake(controlMutex, portMAX_DELAY);
     if (externalActive) gait.stop(millis());
-    if ((running && wifiRun) || manualActive())
+    if ((running && wifiRun) || manualActive() || cameraPulse)
       stopTest("Wi-Fi connection changed. Outputs off.");
     xSemaphoreGive(controlMutex);
     server.stop();
@@ -691,7 +728,7 @@ void setup()
       usPerTick = (pwm.readPrescale() + 1) * 1000000.0f / pwm.getOscillatorFrequency();
       for (size_t i = 0; i < CHANNEL_COUNT; ++i)
       {
-        if (CHANNELS[i] > 15 || calibrated::servos[i].channel != CHANNELS[i] ||
+        if (CHANNELS[i] > 15 || CHANNELS[i] == camera_pitch::channel || calibrated::servos[i].channel != CHANNELS[i] ||
             !calibrated::valid(calibrated::servos[i]) || walking::jointIndex(calibrated::servos[i].name) < 0)
           faulted = true;
         for (size_t j = 0; j < i; ++j)

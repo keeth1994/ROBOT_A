@@ -27,7 +27,9 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
     if elapsed_s > 0:
         offsets = [0, 0.5, 0.25, 0.75] if p["pattern"] == "crawl" else [0, 0.5, 0.5, 0]
         error = heading_error_rad + math.atan(p.get("lateral_gain", 0) * lateral_error_m)
-        correction = np.clip(p["heading_gain"] * error, -0.5, 0.5)
+        turn_limit = .95 if p.get('corridor', False) else .5
+        correction = np.clip(p["heading_gain"] * error, -turn_limit, turn_limit)
+        forward = max(.25, 1 - abs(correction)) if p.get('corridor', False) else 1
         strafe = np.clip(p.get("strafe_gain", 0) * lateral_error_m, -0.3, 0.3)
         for i, leg in enumerate(LEGS):
             u = (gait_time_s / p["period"] + offsets[i]) % 1
@@ -43,7 +45,7 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
                 lift = -p["pitch_lift"] * height * height * (3 - 2 * height)
             sign = 1 if i < 2 else -1
             fore = 1 if leg.startswith("F") else -1
-            target[2 * i] = yaw * ramp * (sign + correction + fore * strafe)
+            target[2 * i] = yaw * ramp * (sign * forward + correction + fore * strafe)
             target[2 * i + 1] = p["pitch_stance"] + lift * ramp
     target[1::2] = np.clip(target[1::2], p.get("pitch_min", math.radians(-125)), 0)
     if joint_ranges is None:

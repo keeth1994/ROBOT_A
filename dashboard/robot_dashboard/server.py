@@ -81,12 +81,11 @@ class Handler(BaseHTTPRequestHandler):
             app = self.server.app
             if path == '/api/heartbeat':
                 result = app.operator_heartbeat()
-            elif path in ('/api/servo/start', '/api/servo/servo', '/api/servo/release', '/api/servo/stop'):
+            elif path in ('/api/servo/start', '/api/servo/servo', '/api/servo/release', '/api/servo/stop',
+                          '/api/servo/camera-pitch'):
                 result = app.servo_command('/' + path.rsplit('/', 1)[1], values)
             elif path == '/api/walk/speed':
                 result = app.set_walking_speed(values.get('speed'))
-            elif path == '/api/ir/calibrate':
-                result = app.calibrate_ir(values)
             elif path in (f'/api/walk/{action}' for action in WALK_ACTIONS):
                 result = app.walk_command(path.rsplit('/', 1)[1])
             elif path == '/api/config':

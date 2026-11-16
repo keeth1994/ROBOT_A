@@ -41,6 +41,10 @@
         <button id="applyCamera">Apply</button>
       </div>
       <p id="cameraStats" class="subtle">Waiting for camera status.</p>
+      <label for="cameraPitch">Camera pitch · channel 14: <output id="cameraPitchValue">0°</output></label>
+      <input id="cameraPitch" type="range" min="-45" max="45" step="1" value="0" disabled>
+      <div class="actions"><button id="cameraPitchEnable" disabled>Enable at 0°</button><button id="cameraPitchRelease" disabled>Release camera servo</button></div>
+      <p id="cameraPitchStatus" class="subtle">Upload the camera-pitch controller firmware to enable these controls.</p>
       <details id="cameraDebug">
         <summary>Camera debug</summary>
         <p id="debugSource" class="subtle">Camera preview only; no walking starts.</p>
@@ -65,18 +69,11 @@
         <table>
           <thead><tr><th>ESP32 input</th><th>Voltage at pin</th></tr></thead>
           <tbody>
-            <tr><th>P34 · Left</th><td id="ir34">—</td></tr>
-            <tr><th>P35 · Right</th><td id="ir35">—</td></tr>
+            <tr><th>P35 · Left</th><td id="ir35">—</td></tr>
+            <tr><th>P34 · Right</th><td id="ir34">—</td></tr>
           </tbody>
         </table>
-        <details>
-          <summary>Calibrate IR wall distances</summary>
-          <div class="form-row">
-            <label>Sensor<select id="irSide"><option value="left">Left · P34</option><option value="right">Right · P35</option></select></label>
-            <label>Wall distance (cm)<input id="irDistance" type="number" min="4" max="30" step="0.1" value="10"></label>
-            <button id="calibrateIr">Save IR reading</button>
-          </div>
-        </details>
+
       </section>
       <section>
         <div class="panel-head"><h2>Servos</h2><span id="servoState" class="badge">Outputs off</span></div>

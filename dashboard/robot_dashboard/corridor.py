@@ -1,33 +1,10 @@
-import json
+"""Center between walls using side IR voltages, without distance calibration."""
 import math
 
-import numpy as np
-
-from robot_b91.paths import ROOT
 from .navigation import CourseNavigation
 
-CALIBRATION_PATH = ROOT / 'dashboard/ir_calibration.local.json'
-
-
-def load_calibration(path=CALIBRATION_PATH):
-    return json.loads(path.read_text()) if path.exists() else {'left': [], 'right': []}
-
-
-def validate_points(points):
-    if not isinstance(points, list):
-        raise ValueError('IR calibration must contain distance and voltage pairs.')
-    previous = None
-    for point in points:
-        if not isinstance(point, list) or len(point) != 2:
-            raise ValueError('Each IR calibration point needs distance in meters and millivolts.')
-        distance, voltage = point
-        if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) for v in point):
-            raise ValueError('IR calibration values must be finite numbers.')
-        if not .04 <= distance <= .30 or not 0 < voltage <= 3300:
-            raise ValueError('Use distances from 4 to 30 cm and voltages from 1 to 3300 mV.')
-        if previous and (distance <= previous[0] or voltage >= previous[1]):
-            raise ValueError('IR voltage must decrease as wall distance increases. Check the measurements.')
-        previous = point
+# A low signal suggests a distant/missing wall; this is not a distance measurement.
+WEAK_SIGNAL_MV = 150
 
 
 def ir_readings(status):
@@ -40,66 +17,81 @@ def ir_readings(status):
     return values
 
 
-def save_calibration_point(side, distance_cm, status, path=CALIBRATION_PATH):
-    if side not in ('left', 'right'):
-        raise ValueError('Choose the left or right IR sensor.')
-    if (isinstance(distance_cm, bool) or not isinstance(distance_cm, (int, float)) or
-            not math.isfinite(distance_cm) or not 4 <= distance_cm <= 30):
-        raise ValueError('Enter a measured wall distance from 4 to 30 cm.')
-    voltage = ir_readings(status)[0 if side == 'left' else 1]
-    calibration = load_calibration(path)
-    distance = round(distance_cm / 100, 5)
-    points = [point for point in calibration[side] if point[0] != distance]
-    points.append([distance, voltage])
-    points.sort()
-    validate_points(points)
-    calibration[side] = points
-    path.write_text(json.dumps(calibration, indent=2) + '\n')
-    return {'message': f'Saved {side} IR reading at {distance_cm:g} cm ({len(points)} points).'}
-
 
 class CorridorNavigation(CourseNavigation):
-    def __init__(self, started, calibration=None):
+    def __init__(self, started, balance_gain=1.0, rate_gain=1.0, max_steering=.4, filter_s=.15,
+                 wall_guard=True):
         super().__init__(started, use_camera=False, use_imu=True)
-        self.calibration = load_calibration() if calibration is None else calibration
-        for side in ('left', 'right'):
-            points = self.calibration.get(side, [])
-            validate_points(points)
-            if len(points) < 2:
-                raise ValueError(f'Calibrate the {side} IR sensor at two or more wall distances first.')
-        self.distances = [None, None]
+        self.filter_s = filter_s
+        self.balance_gain = balance_gain
+        self.rate_gain = rate_gain
+        self.max_steering = max_steering
+        self.wall_guard = wall_guard
+        self.voltages = [None, None]
+        self.balance = 0.0
+        self.balance_rate = 0.0
         self.last_update = None
-        self.reason = 'Waiting for both walls and fresh IMU readings.'
+        self.last_both_seen = None
+        self.last_both_heading = 0.0
+        self.steering = 0.0
+        self.reason = 'Waiting for side IR signals and fresh IMU readings.'
 
     def update(self, status, now, camera_frame=None):
-        self.distances = [None, None]
+        self.voltages = [None, None]
         if not super().update(status, now, None):
             self.last_update = None
             return False
-        self.estimate.heading = 0.0
         try:
-            voltages = ir_readings(status)
-            distances = []
-            for side, voltage in zip(('left', 'right'), voltages):
-                points = self.calibration[side]
-                if not points[-1][1] <= voltage <= points[0][1]:
-                    raise ValueError(f'{side.capitalize()} wall is outside the calibrated IR range.')
-                distances.append(float(np.interp(voltage, [p[1] for p in reversed(points)],
-                                                  [p[0] for p in reversed(points)])))
+            left, right = ir_readings(status)
+            self.voltages = [left, right]
+            if max(left, right) >= 3200:
+                raise ValueError('An IR signal is saturated. Check wall clearance.')
+            weak = [left < WEAK_SIGNAL_MV, right < WEAK_SIGNAL_MV]
+            if all(weak):
+                raise ValueError('Both IR signals are too weak to follow the corridor.')
+            previous_balance = self.balance
+            raw_balance = (left - right) / (left + right)
+            dt = None if self.last_update is None else now - self.last_update
+            gain = 1 if dt is None or self.filter_s <= 0 else 1 - math.exp(-max(0, dt) / self.filter_s)
+            self.balance = raw_balance if self.filter_s <= 0 else self.balance + gain * (raw_balance - self.balance)
+            if dt is None or not .02 <= dt <= .3:
+                self.balance_rate = 0.0
+            else:
+                rate = max(-2.0, min(2.0, (self.balance - previous_balance) / dt))
+                self.balance_rate += (1 - math.exp(-dt / .12)) * (rate - self.balance_rate)
+            if any(weak):
+                if (self.last_both_seen is None or now - self.last_both_seen > 1.0 or
+                        abs(self.imu_heading - self.last_both_heading) > math.radians(10)):
+                    raise ValueError('Could not regain both wall signals. Reposition the robot.')
+                target = -.035 if weak[0] else .035
+                self.balance_rate = 0.0
+                self.reason = f'Turning toward the {"left" if weak[0] else "right"} wall to regain its signal.'
+            else:
+                self.last_both_seen = now
+                self.last_both_heading = self.imu_heading
+                # Higher left voltage means a nearer left wall: positive steering turns right.
+                error = math.copysign(max(0.0, abs(self.balance) - .02), self.balance)
+                # Ease off before reaching center; countersteer if crossing it quickly.
+                target = max(-self.max_steering, min(self.max_steering, self.balance_gain * error + self.rate_gain * self.balance_rate))
+                self.reason = 'Centering between walls using IR signal balance and IMU.'
+                if self.wall_guard and abs(raw_balance) > .12 and target * raw_balance < 0:
+                    # A filter or braking term must not keep turning toward the nearer wall.
+                    target = max(-.10, min(.10, .3 * raw_balance))
+                    self.reason = 'Easing out of the turn to keep clear of the nearer wall.'
         except ValueError as error:
             self.reason = 'Holding steps: ' + str(error)
             self.last_update = None
             return False
-        self.distances = distances
-        # Positive offset means the robot is left of center, so steer right.
-        offset = max(-.08, min(.08, (distances[1] - distances[0]) / 2))
-        gain = 1.0 if self.last_update is None else 1 - math.exp(-max(0, now - self.last_update) / .2)
-        self.estimate.lateral += gain * (offset - self.estimate.lateral)
+        # Smooth the IR signal and its rate, rather than delaying the steering output.
+        self.steering = target
         self.last_update = now
-        self.reason = 'Following corridor with side IR sensors and IMU.'
+        # Send a steering correction, not a fabricated distance in meters.
+        # The ESP32 gyro steadies this direction between PC updates.
+        self.estimate.heading = self.steering
+        self.estimate.lateral = 0.0
         return True
 
     def report(self):
-        return dict(guidance='corridor', lateral_m=self.estimate.lateral,
-                    left_distance_m=self.distances[0], right_distance_m=self.distances[1],
+        return dict(guidance='corridor', left_mv=self.voltages[0], right_mv=self.voltages[1],
+                    signal_balance=self.balance, steering_rad=self.steering,
                     detection_reason=self.reason)
