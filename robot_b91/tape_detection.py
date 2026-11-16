@@ -13,7 +13,7 @@ def detect_blue_tape(rgb):
         if bounds is None:
             continue
         ys, _ = bounds
-        if ys.stop - ys.start < h * .25 or ys.stop < h * .65:
+        if ys.stop - ys.start < h * 0.25 or ys.stop < h * 0.65:
             continue
         component = labels == label
         rows = []
@@ -23,13 +23,21 @@ def detect_blue_tape(rgb):
                 continue
             left, right = int(indices[0]), int(indices[-1])
             width = right - left + 1
-            if left < 3 or right > w - 4 or width > w * .3 or len(indices) < width * .9:
+            if (
+                left < 3
+                or right > w - 4
+                or width > w * 0.3
+                or len(indices) < width * 0.9
+            ):
                 continue
             rows.append((y, left, right))
-        if len(rows) < max(8, h * .08):
+        if len(rows) < max(8, h * 0.08):
             continue
         edges = np.asarray(rows)
-        if np.max(np.diff(edges[:, 0])) > 6 or np.median(np.abs(np.diff(edges[:, 1:], n=2, axis=0))) > 2:
+        if (
+            np.max(np.diff(edges[:, 0])) > 6
+            or np.median(np.abs(np.diff(edges[:, 1:], n=2, axis=0))) > 2
+        ):
             continue
         if len(rows) > len(best_rows):
             best_mask, best_rows = component, rows

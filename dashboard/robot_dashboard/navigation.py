@@ -22,6 +22,9 @@ class CourseNavigation:
         self.reason = 'Waiting for camera and IMU.'
         self.target = 'blue tape' if guidance == 'blue_tape' else 'course'
 
+    def report(self):
+        return self.estimate.report()
+
     def update(self, status, now, camera_frame):
         elapsed = now - self.started
         if self.use_imu:

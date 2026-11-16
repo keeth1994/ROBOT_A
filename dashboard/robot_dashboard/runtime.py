@@ -13,6 +13,7 @@ from robot_b91.navigation_debug import navigation_debug_image
 from . import devices
 from .walking import WALK_ACTIONS, Walking
 from .navigation import CourseNavigation
+from .corridor import save_calibration_point
 
 
 def orient_camera_frame(jpeg):
@@ -230,7 +231,10 @@ class Dashboard:
                 if status.get('manualActive') or status.get('running') or status.get('externalActive'):
                     raise devices.DeviceError('Press Stop to release existing servo control first.', 409)
                 profile = action
-                settings = self.walking.start_settings(profile)
+                try:
+                    settings = self.walking.start_settings(profile)
+                except ValueError as error:
+                    raise devices.DeviceError(str(error), 409) from error
                 result = devices.request(url, '/motion/start', settings, timeout=.15)
                 self.walking.begin(status, result['session'], time.monotonic(), profile=profile)
                 if (self.walking.navigation and self.walking.navigation.use_camera and
@@ -251,6 +255,17 @@ class Dashboard:
         with self.servo_lock:
             self.walking.set_speed(speed)
             return self.walking.state()
+
+    def calibrate_ir(self, values):
+        with self.servo_lock:
+            if self.walking.active:
+                raise ValueError('Stop walking before calibrating the IR sensors.')
+            with self.lock:
+                url = self.config['servo']
+            status = devices.request(url, '/status', timeout=.15)
+            if status.get('externalActive') or status.get('running') or status.get('manualActive'):
+                raise ValueError('Stop servo motion before calibrating the IR sensors.')
+            return save_calibration_point(values.get('side'), values.get('distance_cm'), status)
 
     def _poll(self, name):
         while not self.stop_event.is_set():

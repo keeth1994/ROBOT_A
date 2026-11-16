@@ -4,11 +4,13 @@ import tomllib
 
 from .devices import DeviceError
 from .navigation import CourseNavigation
+from .corridor import CorridorNavigation
 
 ROOT = Path(__file__).resolve().parents[2]
 JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch'))
 PROFILES = {'walk': (), 'course': ('camera', 'imu'), 'course_camera': ('camera',),
-            'course_tape': ('camera', 'imu'), 'course_imu': ('imu',), 'dance': ()}
+            'course_tape': ('camera', 'imu'), 'course_imu': ('imu',),
+            'corridor': ('ir', 'imu'), 'dance': ()}
 WALK_ACTIONS = tuple(PROFILES)
 
 
@@ -29,7 +31,7 @@ class Walking:
                     profile=self.profile, mode='dance' if self.profile == 'dance' else 'walk',
                     controller='ESP32',
                     speed=self.speed, period_s=(1.0 if self.profile == 'dance' else self.params['period']) / self.speed,
-                    navigation=self.navigation.estimate.report() if self.navigation else None)
+                    navigation=self.navigation.report() if self.navigation else None)
 
     def set_speed(self, speed):
         if (isinstance(speed, bool) or not isinstance(speed, (int, float)) or
@@ -63,8 +65,11 @@ class Walking:
         settings = defaults | self.params
         if profile == 'dance':
             settings['pitch_stance'] = 0.0
-        # Tape detection runs on the PC; the ESP32 uses its existing camera + IMU gait.
-        controller_profile = 'course' if profile == 'course_tape' else profile
+        if profile == 'corridor':
+            # Check calibration before starting the controller.
+            CorridorNavigation(0)
+        # Guidance runs on the PC; these modes share the ESP32's existing IMU gait.
+        controller_profile = 'course' if profile in ('course_tape', 'corridor') else profile
         return {'profile': controller_profile, **{name: settings[name] for name in names}}
 
     def begin(self, status, session, now, profile='walk'):
@@ -75,9 +80,12 @@ class Walking:
             raise ValueError('Unknown walking profile.')
         self.profile = profile
         sensors = PROFILES[profile]
-        self.navigation = (CourseNavigation(now, use_camera='camera' in sensors, use_imu='imu' in sensors,
-                                            guidance='blue_tape' if profile == 'course_tape' else 'ramp')
-                           if sensors else None)
+        if profile == 'corridor':
+            self.navigation = CorridorNavigation(now)
+        else:
+            self.navigation = (CourseNavigation(now, use_camera='camera' in sensors, use_imu='imu' in sensors,
+                                                guidance='blue_tape' if profile == 'course_tape' else 'ramp')
+                               if sensors else None)
         self.session, self.sequence = session, 0
         self.started = self.last_confirmed_frame = now
         self.active = True

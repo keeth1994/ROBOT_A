@@ -6,7 +6,7 @@ let debugUrl = null;
 let speedBusy = false;
 const rows = new Map();
 const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
-  walkCourseTape:'course_tape', walkCourseImu:'course_imu', dance:'dance'};
+  walkCourseTape:'course_tape', walkCourseImu:'course_imu', walkCorridor:'corridor', dance:'dance'};
 
 function showSpeed(speed) {
   el('walkSpeed').value = Math.round(speed * 100);
@@ -45,6 +45,7 @@ function renderControls() {
   const device = current?.servo, s = device?.data;
   const walking = !!current?.walking?.active || !!s?.externalActive;
   const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.calibratedAngles || !s?.servoReady || s?.faulted || s?.running || walking || !current?.operator_alive || commandBusy;
+  el('calibrateIr').disabled = !device?.online || walking || !!s?.running || !!s?.manualActive || commandBusy;
   Object.keys(walkButtons).forEach(id => {
     el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2;
   });
@@ -106,6 +107,12 @@ function render(state) {
   el('navigationStats').textContent = nav
     ? 'Heading: ' + (nav.heading_rad * 180 / Math.PI).toFixed(1) + '° · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm · Camera accepted: ' + nav.accepted_frames + '/' + nav.camera_frames + (['course', 'course_camera', 'course_tape'].includes(state.walking.profile) ? (nav.guidance === 'blue_tape' ? ' · Blue tape: ' : ' · Ramp: ') + (nav.ramp_detected ? 'detected' : 'not detected') : '')
     : '';
+  if (nav?.guidance === 'corridor') {
+    const distance = value => value === null ? 'unavailable' : (value * 100).toFixed(1) + ' cm';
+    el('navigationStats').textContent = 'Left wall: ' + distance(nav.left_distance_m) +
+      ' · Right wall: ' + distance(nav.right_distance_m) +
+      ' · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm';
+  }
   if (!addressesLoaded) {
     el('servoAddress').value = state.config.servo; el('cameraAddress').value = state.config.camera; addressesLoaded = true;
   }
@@ -185,6 +192,14 @@ el('cameraDebug').ontoggle = async () => {
   }
 };
 el('stop').onclick = () => servoCommand('stop');
+el('calibrateIr').onclick = async () => {
+  commandBusy = true; renderControls();
+  try {
+    const result = await post('/api/ir/calibrate', {side:el('irSide').value, distance_cm:Number(el('irDistance').value)});
+    message(result.message);
+  } catch (error) { message(error.message, true); }
+  finally { commandBusy = false; renderControls(); }
+};
 Object.entries(walkButtons).forEach(([id, profile]) => { el(id).onclick = () => walkForward(profile); });
 el('walkSpeed').oninput = () => { el('walkSpeedValue').textContent = el('walkSpeed').value + '%'; };
 el('walkSpeed').onchange = async () => {

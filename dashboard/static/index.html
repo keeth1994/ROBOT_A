@@ -69,11 +69,20 @@
             <tr><th>P35 · Right</th><td id="ir35">—</td></tr>
           </tbody>
         </table>
+        <details>
+          <summary>Calibrate IR wall distances</summary>
+          <div class="form-row">
+            <label>Sensor<select id="irSide"><option value="left">Left · P34</option><option value="right">Right · P35</option></select></label>
+            <label>Wall distance (cm)<input id="irDistance" type="number" min="4" max="30" step="0.1" value="10"></label>
+            <button id="calibrateIr">Save IR reading</button>
+          </div>
+        </details>
       </section>
       <section>
         <div class="panel-head"><h2>Servos</h2><span id="servoState" class="badge">Outputs off</span></div>
         <p id="controllerMessage">Waiting for controller.</p>
         <div class="actions"><button id="walk">Walk</button><button id="walkCourse">Follow course (camera + IMU)</button><button id="walkCourseCamera">Follow course (camera only)</button><button id="walkCourseTape">Follow blue tape (camera + IMU)</button><button id="walkCourseImu">Walk with IMU</button><button id="dance">Dance</button></div>
+        <p><button id="walkCorridor">Follow corridor (IR + IMU)</button></p>
         <p id="walkMessage">ESP32 walking is stopped.</p>
         <label for="walkSpeed">Motion speed: <output id="walkSpeedValue" for="walkSpeed">100%</output></label>
         <input id="walkSpeed" type="range" min="25" max="200" step="5" value="100">
