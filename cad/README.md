@@ -1,7 +1,7 @@
-# B9-8 CAD
+# B10 CAD
 
-Latest: [complete assembly](B9_8/Robot_B9_8.f3d), [STEP assembly](B9_8/Robot_B9_8.step), [revised components](B9_8/parts), and [changes and checks](B9_8/README.md).
+Latest: [complete Fusion assembly](B10/Robot_B10.f3d), [STEP assembly](B10/Robot_B10.step), [standalone components](B10/parts), and [changes and checks](B10/README.md).
 
-B9-8 adds a bridge-mounted centre support, slightly stronger chassis posts, two removable equipment levels, a centered matrix-board IMU, accessible sensor/camera fasteners, and battery/controller retention. The user-cleaned B9-7-1 chassis is the base; yaw and pitch parts are retained. Static and sampled clearance checks pass within the documented scope. Physical fit and wiring clearance remain to be checked. Simulation remains B9-1.
+B10 includes the narrowed direct-drive robot, reinforced pillars, the user's edited top plate, and the elevated servo-driven camera. The camera remains driven by a Parallax 900-00005, now with the M3-threaded metal horn and its replacement two-bolt crank. The assembled Fusion model retains 12 joints. Physical fit and loaded strength remain subject to hardware testing.
 
-The source, measured interfaces and validation scope are documented in [B9-8](B9_8/README.md). MuJoCo and its exporter remain tied to the preserved B9-1 assembly.
+The measured interfaces, component generator and validation scope are documented in [B10](B10/README.md). Earlier B9-8 CAD exports are superseded and remain available in Git history. Local draft files are not part of the current tracked release. MuJoCo and its exporter remain tied to the preserved B9-1 assembly.
