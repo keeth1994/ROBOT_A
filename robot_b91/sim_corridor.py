@@ -1,6 +1,9 @@
+import argparse
 import json
 import math
 from collections import deque
+from pathlib import Path
+import tempfile
 import xml.etree.ElementTree as E
 
 import mujoco
