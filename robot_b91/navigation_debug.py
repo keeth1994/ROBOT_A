@@ -23,7 +23,8 @@ def navigation_debug_image(navigation, now, use_imu=True):
     panel = Image.new("RGB", (640, 318), (15, 18, 23))
     draw = ImageDraw.Draw(panel)
     draw.text((6, 4), "RGB: red=left  blue=right  green=midpoint", fill="white")
-    draw.text((326, 4), "Mask: white=ramp surface  cyan=used rows", fill="white")
+    target = "blue tape" if navigation.guidance == "blue_tape" else "ramp surface"
+    draw.text((326, 4), f"Mask: white={target}  cyan=used rows", fill="white")
     debug = navigation.debug
     if debug and debug["mask"] is not None:
         rgb = Image.fromarray(debug["rgb"].astype(np.uint8)).convert("RGB")
@@ -61,7 +62,7 @@ def navigation_debug_image(navigation, now, use_imu=True):
     age_text = "never" if age is None else f"{age:.2f}s"
     rows = len(debug["rows"]) if debug else 0
     used = sum(debug["inliers"]) if debug and debug["accepted"] else 0
-    surface = 'ramp found' if debug and debug.get('surface_detected') else 'no ramp'
+    surface = f'{target} found' if debug and debug.get('surface_detected') else f'no {target}'
     draw.text((6, 266), f"{status} | {surface} | age: {age_text} | rows: {used}/{rows}", fill=color)
     draw.text((6, 282), f"Heading: {math.degrees(navigation.heading):+.2f} deg | lateral: {navigation.lateral*1000:+.1f} mm", fill="white")
     draw.text((6, 298), reason, fill=color)

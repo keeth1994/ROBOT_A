@@ -8,7 +8,7 @@ from .navigation import CourseNavigation
 ROOT = Path(__file__).resolve().parents[2]
 JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch'))
 PROFILES = {'walk': (), 'course': ('camera', 'imu'), 'course_camera': ('camera',),
-            'course_imu': ('imu',), 'dance': ()}
+            'course_tape': ('camera', 'imu'), 'course_imu': ('imu',), 'dance': ()}
 WALK_ACTIONS = tuple(PROFILES)
 
 
@@ -63,7 +63,9 @@ class Walking:
         settings = defaults | self.params
         if profile == 'dance':
             settings['pitch_stance'] = 0.0
-        return {'profile': profile, **{name: settings[name] for name in names}}
+        # Tape detection runs on the PC; the ESP32 uses its existing camera + IMU gait.
+        controller_profile = 'course' if profile == 'course_tape' else profile
+        return {'profile': controller_profile, **{name: settings[name] for name in names}}
 
     def begin(self, status, session, now, profile='walk'):
         self.prepare(status)
@@ -73,7 +75,8 @@ class Walking:
             raise ValueError('Unknown walking profile.')
         self.profile = profile
         sensors = PROFILES[profile]
-        self.navigation = (CourseNavigation(now, use_camera='camera' in sensors, use_imu='imu' in sensors)
+        self.navigation = (CourseNavigation(now, use_camera='camera' in sensors, use_imu='imu' in sensors,
+                                            guidance='blue_tape' if profile == 'course_tape' else 'ramp')
                            if sensors else None)
         self.session, self.sequence = session, 0
         self.started = self.last_confirmed_frame = now

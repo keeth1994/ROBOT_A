@@ -9,9 +9,10 @@ from robot_b91.paths import ROOT
 
 
 class CourseNavigation:
-    def __init__(self, started, use_camera=True, use_imu=True):
+    def __init__(self, started, use_camera=True, use_imu=True, guidance='ramp'):
         config = json.loads((ROOT / 'reference/b91_navigation.json').read_text())
         config.update(json.loads((ROOT / 'dashboard/navigation.json').read_text()))
+        config['guidance'] = guidance
         self.estimate = Navigation(**config)
         self.started = started
         self.use_camera = use_camera
@@ -19,6 +20,7 @@ class CourseNavigation:
         self.imu_heading = 0.0
         self.camera_sequence = -1
         self.reason = 'Waiting for camera and IMU.'
+        self.target = 'blue tape' if guidance == 'blue_tape' else 'course'
 
     def update(self, status, now, camera_frame):
         elapsed = now - self.started
@@ -53,11 +55,11 @@ class CourseNavigation:
                  elapsed - self.estimate.last_seen <= self.estimate.blind_timeout)
         if ready:
             if self.estimate.debug and not self.estimate.debug['accepted']:
-                self.reason = 'Continuing briefly using the last valid ramp direction.'
+                self.reason = f'Continuing briefly using the last valid {self.target} direction.'
             else:
-                self.reason = ('Following course with camera and IMU.' if self.use_imu else
-                               'Following course with camera only. No tilt compensation.')
+                self.reason = (f'Following {self.target} with camera and IMU.' if self.use_imu else
+                               f'Following {self.target} with camera only. No tilt compensation.')
         else:
-            detail = self.estimate.debug['reason'] if self.estimate.debug else 'Waiting for a visible dark course'
+            detail = self.estimate.debug['reason'] if self.estimate.debug else f'Waiting for visible {self.target}'
             self.reason = 'Holding steps: ' + detail + '.'
         return ready

@@ -10,7 +10,13 @@ import numpy as np
 class Navigation:
     def __init__(self, width_m=0.30, fovy_deg=42.9470936, camera_x_m=0.0626,
                  camera_pitch_deg=15.0, dark_min=3, dark_max=25, max_chroma=.28, max_blind_s=8.0,
-                 adaptive_surface=False):
+                 adaptive_surface=False, guidance='ramp', tape_width_m=0.025):
+        if guidance not in ('ramp', 'blue_tape'):
+            raise ValueError('Guidance must be ramp or blue_tape.')
+        if not math.isfinite(tape_width_m) or tape_width_m <= 0:
+            raise ValueError('Tape width must be a positive number in meters.')
+        self.guidance = guidance
+        self.tape_width_m = tape_width_m
         self.width_m = width_m
         self.fovy = math.radians(fovy_deg)
         self.camera_x = camera_x_m
@@ -75,7 +81,14 @@ class Navigation:
             return reject("Invalid RGB image")
         h, w = rgb.shape[:2]
         f = h / (2 * math.tan(self.fovy / 2))
-        if self.adaptive_surface:
+        if self.guidance == 'blue_tape':
+            from .tape_detection import detect_blue_tape
+            dark, edges = detect_blue_tape(rgb)
+            self.debug['mask'] = dark
+            self.debug['surface_detected'] = bool(edges)
+            if not edges:
+                return reject("No clear blue tape found")
+        elif self.adaptive_surface:
             dark, edges = self.surface_detector(rgb, self.dark_min, self.dark_max, self.max_chroma)
             self.debug['mask'] = dark
             self.debug['surface_detected'] = bool(dark.any())
@@ -135,7 +148,8 @@ class Navigation:
         # A narrow visible strip still measures offset using the gyro heading.
         # Only use vision to correct yaw when there is enough depth variation.
         heading = self.heading
-        if len(rows) >= 8 and np.ptp(widths) > (.025 if self.adaptive_surface else .12):
+        depth_threshold = .01 if self.guidance == 'blue_tape' else (.025 if self.adaptive_surface else .12)
+        if len(rows) >= 8 and np.ptp(widths) > depth_threshold:
             A = np.column_stack([widths, np.ones(len(widths))])
             for _ in range(3):
                 slope, intercept = np.linalg.lstsq(A[keep], centers[keep], rcond=None)[0]
@@ -151,7 +165,8 @@ class Navigation:
                 heading += (.2 if timestamp < 2 else .025) * (visual_heading - heading)
         elif not use_imu:
             return reject("Too little edge depth to estimate heading without IMU")
-        offsets = -(centers[keep] + math.tan(heading)) / widths[keep] * self.width_m
+        measured_width = self.tape_width_m if self.guidance == 'blue_tape' else self.width_m
+        offsets = -(centers[keep] + math.tan(heading)) / widths[keep] * measured_width
         self.debug["inliers"] = keep.tolist()
         lateral = np.median(offsets) - self.camera_x * math.sin(heading)
         if abs(lateral) > self.width_m * .4 or np.median(np.abs(offsets-np.median(offsets))) > .015:
@@ -176,6 +191,7 @@ class Navigation:
 
     def report(self):
         return dict(camera_frames=self.frames, accepted_frames=self.accepted,
+                    guidance=self.guidance,
                     ramp_detected=bool(self.debug and self.debug['surface_detected']),
                     detection_reason=self.debug['reason'] if self.debug else 'Waiting for camera',
                     last_seen_s=self.last_seen, heading_rad=self.heading,

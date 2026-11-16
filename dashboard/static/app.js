@@ -6,7 +6,7 @@ let debugUrl = null;
 let speedBusy = false;
 const rows = new Map();
 const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
-  walkCourseImu:'course_imu', dance:'dance'};
+  walkCourseTape:'course_tape', walkCourseImu:'course_imu', dance:'dance'};
 
 function showSpeed(speed) {
   el('walkSpeed').value = Math.round(speed * 100);
@@ -95,7 +95,7 @@ function renderIr(status) {
 }
 function render(state) {
   current = state; token = state.token || token;
-  el('debugSource').textContent = state.walking?.active && ['course', 'course_camera'].includes(state.walking.profile)
+  el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'course_tape'].includes(state.walking.profile)
     ? 'Live walking perception: the actual frame and decision used by the controller.'
     : 'Camera preview only; no walking starts.';
   el('walkMessage').textContent = state.walking?.message || 'ESP32 walking unavailable.';
@@ -104,7 +104,7 @@ function render(state) {
   }
   const nav = state.walking?.navigation;
   el('navigationStats').textContent = nav
-    ? 'Heading: ' + (nav.heading_rad * 180 / Math.PI).toFixed(1) + '° · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm · Camera accepted: ' + nav.accepted_frames + '/' + nav.camera_frames + (['course', 'course_camera'].includes(state.walking.profile) ? ' · Ramp: ' + (nav.ramp_detected ? 'detected' : 'not detected') : '')
+    ? 'Heading: ' + (nav.heading_rad * 180 / Math.PI).toFixed(1) + '° · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm · Camera accepted: ' + nav.accepted_frames + '/' + nav.camera_frames + (['course', 'course_camera', 'course_tape'].includes(state.walking.profile) ? (nav.guidance === 'blue_tape' ? ' · Blue tape: ' : ' · Ramp: ') + (nav.ramp_detected ? 'detected' : 'not detected') : '')
     : '';
   if (!addressesLoaded) {
     el('servoAddress').value = state.config.servo; el('cameraAddress').value = state.config.camera; addressesLoaded = true;
