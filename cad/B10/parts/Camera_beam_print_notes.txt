@@ -1,0 +1,32 @@
+B10 CENTRED CAMERA BEAM
+
+Print ONE B10_Camera_beam_centred_1x.stl at 100% scale in millimetres.
+This replaces the powered camera pitch cradle/crossbeam. The camera and
+its two mounting holes move 20 mm to the robot's left-right centreline.
+The towers, pivot positions, linkage, lower M3 camera crank and plate stay
+unchanged. The beam itself remains asymmetric to fit the existing towers.
+
+PRINTING
+The STL is pre-oriented at bed Z=0, about 57.1 x 138.5 x 18.6 mm.
+PLA, 0.4 mm nozzle: 0.20 mm layers, 4 walls, 5 top/bottom layers and 40%
+infill are a starting point. Enable supports beneath elevated pivot and
+arm features; inspect the slicer preview and clean out nut pockets.
+The STL contains one watertight connected solid.
+
+INSTALLATION
+Reuse both M3 x 12 mm camera screws and their nuts. Camera-hole spacing
+remains 32 mm, with 3.4 mm clearance holes and the existing nut pockets.
+Install the nuts and camera on the new beam, then transfer the original
+pivot hardware, sleeves and connecting rod. Preserve the servo's angular
+indexing. Check free movement by hand before powered operation.
+Nominal checked range: 10 degrees up to 65 degrees down.
+
+CAMERA VIEW
+The lens is on the robot centreline. Both front deck corners remain in
+the nominal view at 40 degrees down. Part of one 6 mm calibration patch
+crosses the conservative allowance for tall electronics/wiring. Keep
+plugs and wires out of that sightline and confirm the actual camera view.
+
+Use this STL instead of the original Camera_pitch_cradle from older B10
+plates. Those previously exported slicer projects are not updated.
+The Git repository's B10 Fusion and STEP assemblies include this beam.

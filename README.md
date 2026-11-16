@@ -1,6 +1,6 @@
 # Robot B10 CAD / B9-1 simulation
 
-The current Fusion assembly is B10, with a narrowed chassis, direct-drive yaw joints, reinforced deck pillars, the user's edited top plate, and an elevated servo-driven camera. The camera's Parallax 900-00005 uses the new M3-threaded metal horn and a replacement two-bolt crank.
+The current Fusion assembly is B10, with a narrowed chassis, direct-drive yaw joints, reinforced deck pillars, the user's edited top plate, and an elevated servo-driven camera. The new camera beam centres the lens on the robot's left-right centreline. The camera's Parallax 900-00005 retains the M3-threaded metal horn and replacement two-bolt crank.
 
 The separate B9-1 MuJoCo model uses four Parallax pitch servos, two HS-475HB front yaw servos and two MG995 rear yaw servos, modeled at 5 V. B10 geometry and direct-drive kinematics have not been transferred to simulation.
 
@@ -28,6 +28,7 @@ A small gait control window opens, allowing you to switch between gait profiles.
 - [Fusion assembly](cad/B10/Robot_B10.f3d)
 - [STEP assembly](cad/B10/Robot_B10.step)
 - [Replacement M3 camera crank](cad/B10/parts/Camera_input_crank_M3.stl)
+- [Centred camera beam STL](cad/B10/parts/Camera_beam_centred.stl)
 - [CAD workflow](cad/README.md)
 - [Simulation assumptions and results](docs/DESIGN_B91_SIM.md)
 - [Ramp controller, validation and physical transfer requirements](docs/RAMP_CONTROLLER.md)

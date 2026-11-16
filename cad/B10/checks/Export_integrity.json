@@ -1,14 +1,16 @@
 {
   "fusion_roundtrip_verified": true,
-  "fusion_archive_validation": "Reopened in Autodesk Fusion; ZIP directory inspected without generic decompression.",
   "joint_count": 12,
   "step_solid_count": 230,
-  "updated_camera_input_solids_matched": 9,
-  "standalone_crank_matches_generator_symmetric_difference_mm3": 0.0,
-  "crank_volume_mm3": 2402.423147136768,
+  "valid_step_solids": 230,
+  "updated_camera_solids_matched": 7,
+  "unchanged_bodies_verified_in_Fusion_and_STEP": 223,
+  "camera_lens_centre_y_mm": 0,
+  "standalone_to_assembly_symmetric_difference_mm3": 0.0,
+  "beam_volume_mm3": 12209.5132834202,
   "stl_watertight": true,
   "stl_connected_shells": 1,
-  "stl_volume_relative_error": 0.00024284648555246478,
+  "stl_volume_relative_error": 6.789652680705416e-05,
   "stl_matches_delivered_replacement_sha256": true,
-  "unchanged_other_bodies_verified_in_Fusion": 221
+  "M3_camera_input_crank": "Unchanged; included among the 223 retained bodies."
 }
