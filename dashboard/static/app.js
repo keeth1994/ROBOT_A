@@ -83,6 +83,16 @@ function renderServos(s) {
 function clearFeed() {
   el('feed').removeAttribute('src'); el('feed').hidden = true; el('placeholder').hidden = false; showingVideo = false;
 }
+function renderIr(status) {
+  const readings = status?.irMillivolts;
+  const live = Array.isArray(readings) && readings.length === 2 &&
+    readings.every(n => Number.isFinite(n) && n >= 0) &&
+    Number.isFinite(status.irAgeMs) && status.irAgeMs >= 0 && status.irAgeMs < 1000;
+  badge('irState', live ? 'Updating' : 'No data', live);
+  ['ir34', 'ir35'].forEach((id, i) => {
+    el(id).textContent = live ? (readings[i] / 1000).toFixed(3) + ' V' : '—';
+  });
+}
 function render(state) {
   current = state; token = state.token || token;
   el('debugSource').textContent = state.walking?.active && ['course', 'course_camera'].includes(state.walking.profile)
@@ -103,6 +113,7 @@ function render(state) {
   badge('servoOnline', state.servo.online ? 'Connected' : 'Offline', state.servo.online);
   badge('cameraOnline', state.camera.online ? 'Connected' : 'Offline', state.camera.online);
   const s = state.servo.data;
+  renderIr(state.servo.online ? s : null);
   if (state.servo.online && s) {
     renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? s.message : 'Upload the calibrated controller firmware to enable these controls.';
     badge('servoState', s.faulted ? 'Fault' : s.externalActive ? (state.walking?.profile === 'dance' ? 'Dancing' : 'ESP32 walking') : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
@@ -141,6 +152,7 @@ async function poll() {
     render(await response.json());
   } catch (error) {
     current = null; renderControls(); clearFeed(); badge('operator', 'PC server unavailable', false, true);
+    renderIr(null);
     el('accel').textContent = el('gyro').textContent = '— / — / —';
     el('frameAge').textContent = el('receiveFps').textContent = '—';
   } finally { setTimeout(poll, 500); }

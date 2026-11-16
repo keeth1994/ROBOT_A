@@ -19,6 +19,10 @@
 #include "imu_orientation.h"
 
 constexpr int SDA_PIN = 21, SCL_PIN = 22;
+constexpr int IR_PINS[] = {34, 35};
+constexpr uint32_t IR_SAMPLE_MS = 50;
+uint32_t irMillivolts[2] = {}, lastIrSample = 0;
+bool irSampled = false;
 constexpr uint8_t SERVO_ADDRESS = 0x40;
 constexpr uint8_t CHANNELS[] = {0, 1, 2, 3, 8, 9, 10, 11};
 constexpr size_t CHANNEL_COUNT = sizeof(CHANNELS) / sizeof(CHANNELS[0]);
@@ -190,8 +194,10 @@ void updateMotion()
     }
     bool fresh = imuValid && orientation.initialized && now - lastImuSuccess <= 100;
     gait.update(now, fresh, orientation.heading);
+    if (gait.danceError) message = gait.danceError;
     if (!writeGait()) return;
-    if (gait.stopped(now)) stopTest("Navigation connection lost. Outputs off; restart explicitly.");
+    if (gait.stopped(now)) stopTest(gait.danceError ? gait.danceError :
+                                  "Navigation connection lost. Outputs off; restart explicitly.");
     return;
   }
   if (((running && wifiRun) || manualActive()) && WiFi.status() != WL_CONNECTED)
@@ -291,6 +297,17 @@ void serviceImu()
     Serial.write(reinterpret_cast<const uint8_t *>(line), length);
 }
 
+void serviceIr()
+{
+  uint32_t now = millis();
+  if (irSampled && now - lastIrSample < IR_SAMPLE_MS) return;
+  // Report voltage at the ESP32 pins; distance needs sensor calibration.
+  for (size_t i = 0; i < 2; ++i)
+    irMillivolts[i] = analogReadMilliVolts(IR_PINS[i]);
+  lastIrSample = now;
+  irSampled = true;
+}
+
 String channelList(size_t first, size_t count)
 {
   String result;
@@ -324,6 +341,9 @@ void sendStatus()
   json += externalActive ? "true" : "false";
   json += ",\"motionSession\":"; json += String(motionSession);
   json += ",\"gaitStopping\":"; json += externalActive && gait.stopping ? "true" : "false";
+  json += ",\"danceTurnDegrees\":";
+  json += externalActive && gait.dance && gait.danceTurnPhase ?
+          String((orientation.heading - gait.danceTurnHeading) * 180 / walking::pi, 1) : String("null");
   json += ",\"controllerTimeMs\":"; json += String(millis());
   json += ",\"imuTimestampMs\":"; json += String(lastImuSuccess);
   json += ",\"imuAgeMs\":"; json += String(millis() - lastImuSuccess);
@@ -370,6 +390,12 @@ void sendStatus()
   json += ",";
   json += fresh ? String(imu.data.gyroZ, 2) : "null";
   json += "]";
+  json += ",\"irMillivolts\":[";
+  json += irSampled ? String(irMillivolts[0]) : String("null");
+  json += ",";
+  json += irSampled ? String(irMillivolts[1]) : String("null");
+  json += "],\"irAgeMs\":";
+  json += irSampled ? String(millis() - lastIrSample) : String("null");
   json += "}";
   server.sendHeader("Cache-Control", "no-store");
   respond(200, "application/json", json);
@@ -490,7 +516,7 @@ void startExternal()
     respond(409, "text/plain", "Stop existing motion or fix controller status first."); return;
   }
   String profile = server.arg("profile"), pattern = server.arg("pattern");
-  bool useImu = profile == "course" || profile == "course_imu";
+  bool useImu = profile == "course" || profile == "course_imu" || profile == "dance";
   walking::Parameters p;
   if ((profile != "walk" && profile != "course" && profile != "course_camera" &&
        profile != "course_imu" && profile != "dance") ||
@@ -507,12 +533,12 @@ void startExternal()
     respond(400, "text/plain", "Invalid walking profile or gait settings."); return;
   }
   if (useImu && (!imuReady || !imuValid || millis() - lastImuSuccess > 100)) {
-    respond(409, "text/plain", "Walking needs fresh IMU readings. Check the sensor."); return;
+    respond(409, "text/plain", "This motion needs fresh IMU readings. Check the sensor."); return;
   }
   p.crawl = pattern == "crawl";
   if (profile == "dance") p.pitchStance = 0;
   uint32_t now = millis();
-  gait.begin(now, p, useImu, profile == "walk" || profile == "dance" ? 0 : 2000,
+  gait.begin(now, p, useImu, profile == "walk" ? 0 : 2000,
              profile == "dance");
   orientation.reset(now);
   if (!writeGait()) { respond(503, "text/plain", message); return; }
@@ -624,6 +650,7 @@ void controlTask(void *)
     xSemaphoreTake(controlMutex, portMAX_DELAY);
     serviceImu();
     updateMotion();
+    serviceIr();
     xSemaphoreGive(controlMutex);
     vTaskDelayUntil(&wake, pdMS_TO_TICKS(UPDATE_MS));
   }
@@ -634,6 +661,11 @@ void setup()
   Serial.setTxBufferSize(512);
   Serial.begin(9600);
   delay(1000);
+  analogReadResolution(12);
+  for (int pin : IR_PINS) {
+    pinMode(pin, INPUT);
+    analogSetPinAttenuation(pin, ADC_11db);
+  }
   Wire.begin(SDA_PIN, SCL_PIN);
   Wire.setClock(100000);
   Wire.setTimeOut(20);

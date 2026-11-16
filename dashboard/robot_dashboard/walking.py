@@ -28,7 +28,7 @@ class Walking:
         return dict(active=self.active, message=self.message,
                     profile=self.profile, mode='dance' if self.profile == 'dance' else 'walk',
                     controller='ESP32',
-                    speed=self.speed, period_s=(3.4 if self.profile == 'dance' else self.params['period']) / self.speed,
+                    speed=self.speed, period_s=(1.0 if self.profile == 'dance' else self.params['period']) / self.speed,
                     navigation=self.navigation.estimate.report() if self.navigation else None)
 
     def set_speed(self, speed):
@@ -78,8 +78,7 @@ class Walking:
         self.session, self.sequence = session, 0
         self.started = self.last_confirmed_frame = now
         self.active = True
-        self.message = ('Settling for 2 seconds; keep the robot still.' if sensors else
-                        'Dancing on the ESP32.' if profile == 'dance' else
+        self.message = ('Settling for 2 seconds; keep the robot still.' if sensors or profile == 'dance' else
                         'Walking on the ESP32.')
 
     def frame(self, status, now, camera_frame=None):
@@ -93,8 +92,10 @@ class Walking:
         if status.get('gaitStopping'):
             raise DeviceError('ESP32 is stopping after losing navigation; restart explicitly.', 409)
         ready = self.navigation.update(status, now, camera_frame) if self.navigation else True
-        if PROFILES[self.profile] and now - self.started < 2:
+        if (PROFILES[self.profile] or self.profile == 'dance') and now - self.started < 2:
             self.message = 'Settling for 2 seconds; keep the robot still.'
+        elif self.profile == 'dance' and status.get('danceTurnDegrees') is not None:
+            self.message = f"Turning while dancing: {abs(status['danceTurnDegrees']):.0f}° / 360°."
         elif self.navigation:
             self.message = self.navigation.reason
         else:

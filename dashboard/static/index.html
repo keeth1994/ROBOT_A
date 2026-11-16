@@ -61,25 +61,29 @@
         <small>Acceleration includes gravity.</small>
       </section>
       <section>
+        <div class="panel-head"><h2>IR sensors</h2><span id="irState" class="badge">No data</span></div>
+        <table>
+          <thead><tr><th>ESP32 input</th><th>Voltage at pin</th></tr></thead>
+          <tbody>
+            <tr><th>P34 · Left</th><td id="ir34">—</td></tr>
+            <tr><th>P35 · Right</th><td id="ir35">—</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section>
         <div class="panel-head"><h2>Servos</h2><span id="servoState" class="badge">Outputs off</span></div>
         <p id="controllerMessage">Waiting for controller.</p>
         <div class="actions"><button id="walk">Walk</button><button id="walkCourse">Follow course (camera + IMU)</button><button id="walkCourseCamera">Follow course (camera only)</button><button id="walkCourseImu">Walk with IMU</button><button id="dance">Dance</button></div>
         <p id="walkMessage">ESP32 walking is stopped.</p>
         <label for="walkSpeed">Motion speed: <output id="walkSpeedValue" for="walkSpeed">100%</output></label>
         <input id="walkSpeed" type="range" min="25" max="200" step="5" value="100">
-        <p class="subtle">25% slower — 100% original — 200% faster. Applies to walking and dancing; release to apply.</p>
         <p id="navigationStats" class="stats"></p>
-        <p class="subtle">Camera only estimates heading and side offset from visible course edges, without tilt compensation. Steps pause after 2 seconds without an accepted camera measurement.</p>
-        <p class="subtle">Walk uses the same leg motion as course following, without camera or IMU corrections. Dance alternates diagonal leg lifts to −80° with all four feet down between lifts. Start with the robot supported until you have checked clearance and stability.</p>
-        <p class="subtle">Walk with IMU works on flat ground or slopes; no ramp is required. Keep still for the first 2 seconds. The IMU corrects heading relative to the starting direction; sideways drift is not measured.</p>
-        <p class="subtle">Follow course uses the simulation gait to follow the 29 cm dark course. Start aligned with the course and keep still for the first 2 seconds. Camera starts automatically. Brief camera occlusions use the IMU; longer losses pause steps. Stop turns outputs off. Keep this tab visible.</p>
         <div class="actions"><button id="all">Sweep all</button><button id="groups">Sweep four at a time</button></div>
         <div id="servos"></div>
-        <p class="subtle">Measured angles: yaw −45° to +45°; pitch −90° to +45° (raised zero, +45° = foot down). Sweeps use −45° to +45°. Support the robot before enabling or sweeping; enabling can jump. Stop disables pulses; servo power stays on.</p>
       </section>
     </div>
   </div>
-  <p class="subtle">Keep this tab visible during servo control. Lost heartbeat disables Wi-Fi motion after 3 seconds.</p>
+  <p class="subtle">Lost heartbeat disables Wi-Fi motion after 3 seconds.</p>
 </main>
 <script src="/app.js"></script>
 </body>
