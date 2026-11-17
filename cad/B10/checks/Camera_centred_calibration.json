@@ -1,0 +1,32 @@
+{
+  "lens_xyz_mm": [
+    -76.0,
+    0.0,
+    211.0
+  ],
+  "calibration_pitch_deg": 40,
+  "front_corner_pixels_640x480": [
+    [
+      541.3843143323206,
+      235.21321330765304
+    ],
+    [
+      98.61568566767936,
+      235.21321330765304
+    ]
+  ],
+  "minimum_frame_margin_pixels": 95.6268011190636,
+  "in_frame_angle_interval_whole_degrees": [
+    20,
+    61
+  ],
+  "blocked_sightlines": [
+    [
+      1,
+      "Board electronics reserve",
+      72.58564199085669
+    ]
+  ],
+  "assumption": "66.5 degree diagonal, rectilinear full-frame 4:3; uncalibrated lens. Camera centred on robot Y=0.",
+  "note": "Both front-corner rays clear. Part of the positive-Y 6 mm calibration patch crosses the conservative full-height electronics envelope. Route tall plugs/wires outside this sightline and confirm the physical view; no actual modeled part intersects these rays."
+}

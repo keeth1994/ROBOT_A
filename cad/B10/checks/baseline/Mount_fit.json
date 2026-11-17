@@ -1,0 +1,7 @@
+{
+  "edited_plate_vs_other_bodies": 231,
+  "fixed_camera_vs_B10_pairs": 3382,
+  "volume_threshold_mm3": 0.04,
+  "interferences": [],
+  "minimum_distance_from_edit_bounds_to_mount_centrelines_mm": 8.016
+}

@@ -1,0 +1,5 @@
+# Preserve CAD and mesh bytes; generated geometry is not mergeable text.
+*.step binary
+*.f3d binary
+*.stl binary
+*.json text eol=lf
