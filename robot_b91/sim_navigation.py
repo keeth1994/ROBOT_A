@@ -1,6 +1,8 @@
 """Sensor acquisition adapter. Only RGB, accelerometer and gyro cross the boundary."""
 import mujoco
 import json
+import math
+import numpy as np
 from robot_b91.navigation import Navigation
 from robot_b91.paths import ROOT
 
@@ -9,6 +11,11 @@ class SimNavigation:
     def __init__(self, model):
         config = json.loads((ROOT / 'reference/b91_navigation.json').read_text())
         config['camera_x_m'] = float(model.camera('project_camera').pos[0])
+        camera = model.camera('project_camera')
+        rotation = np.empty(9)
+        mujoco.mju_quat2Mat(rotation, camera.quat)
+        forward = -rotation.reshape(3, 3)[:, 2]
+        config['camera_pitch_deg'] = math.degrees(math.atan2(-forward[2], forward[0]))
         self.estimate = Navigation(**config)
         self.renderer = mujoco.Renderer(model, height=240, width=320)
         self.options = mujoco.MjvOption()

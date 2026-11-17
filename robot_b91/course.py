@@ -157,15 +157,19 @@ def build_course(asset, world, cfg):
         w = corridor["clear_width_m"]
         t = corridor["wall_thickness_m"]
         h = corridor["wall_height_m"]
+        widths = w + np.asarray(corridor.get("width_offsets_m", np.zeros(len(pts))), float)
         ds = np.diff(pts, axis=0)
         lengths = np.linalg.norm(ds, axis=1)
-        if len(pts) < 2 or min(w, t, h) <= 0 or np.any(lengths < 1e-6):
+        if (len(pts) < 2 or min(w, t, h) <= 0 or np.any(lengths < 1e-6)
+                or widths.shape != (len(pts),) or not np.isfinite(widths).all() or np.any(widths <= 0)):
             raise ValueError("Invalid corridor dimensions")
         tangents = ds / lengths[:, None]
         normals = np.c_[-tangents[:, 1], tangents[:, 0]]
         miters = [normals[0]]
         for j in range(1, len(pts) - 1):
             n = normals[j - 1] + normals[j]
+            if np.linalg.norm(n) < 1e-6:
+                raise ValueError("Corridor cannot turn directly back on itself")
             n /= np.linalg.norm(n)
             den = np.dot(n, normals[j])
             if den < 0.3:
@@ -173,8 +177,8 @@ def build_course(asset, world, cfg):
             miters.append(n / den)
         miters = np.array(miters + [normals[-1]])
         for side in [-1, 1]:
-            inner = pts + side * w / 2 * miters
-            outer = pts + side * (w / 2 + t) * miters
+            inner = pts + side * widths[:, None] / 2 * miters
+            outer = pts + side * (widths[:, None] / 2 + t) * miters
             for j in range(len(pts) - 1):
                 polygon = [inner[j], inner[j + 1], outer[j + 1], outer[j]]
                 verts = [[p[0], p[1], z] for p in polygon for z in [0, h]]

@@ -55,7 +55,6 @@ The STL is the same checked replacement delivered to the user. Complete build pl
 
 [Export checks](checks/Export_integrity.json) verify all 230 STEP solids, the seven replacement bodies, 223 unchanged bodies, standalone beam and STL. The earlier [M3-crank Fusion update](checks/Fusion_update.json) and [B10 baseline checks](checks/baseline) remain historical evidence. Their leg-motion and top-plate checks retain their scope; the centred-camera optical report supersedes the old offset-camera calibration check. These are not dynamics or load tests. FDM tolerances, wiring, backlash, physical fit and structural strength still require hardware testing.
 
-The MuJoCo model remains **B9-1**. B10 has not been transferred to simulation, and B9-1 mass, gait direction, gear ratio and course results must not be applied directly to the direct-drive robot.
 
 ## Editing
 

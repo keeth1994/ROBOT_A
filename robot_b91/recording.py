@@ -34,7 +34,7 @@ class Recording:
         draw = ImageDraw.Draw(frame)
         draw.rectangle((0, 0, 960, 38), fill=(20, 25, 30))
         status = "COMPLETE" if progress and progress.completed_at else "SIMULATION | 2x playback"
-        draw.text((12, 8), f"B9-8 | {robot.d.time:.1f} s | {status}", fill="white", font=self.font)
+        draw.text((12, 8), f"B10 | {robot.d.time:.1f} s | {status}", fill="white", font=self.font)
         if progress:
             c = progress.course
             draw.rectangle((0, 570, 960, 640), fill=(20, 25, 30))

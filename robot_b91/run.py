@@ -1,4 +1,4 @@
-"""B9-8 torque/speed-limited rocker gait experiment. No imposed base forces."""
+"""B10 torque/speed-limited rocker gait experiment. No imposed base forces."""
 
 import argparse, json, math, time
 import tomllib
@@ -31,10 +31,10 @@ class Robot:
         self.navigation = None
         self.p = load_gait_parameters() | (params or {})
         self.m = mujoco.MjModel.from_xml_path(
-            str(model_path or ROOT / "models" / ("robot_b98_course.xml" if ramp else "robot_b98.xml"))
+            str(model_path or ROOT / "models" / ("robot_b10_course.xml" if ramp else "robot_b10.xml"))
         )
         self.d = mujoco.MjData(self.m)
-        cfg = json.loads((ROOT / "reference/b98_kinematics.json").read_text())
+        cfg = json.loads((ROOT / "reference/b10_kinematics.json").read_text())
         self.names = [l + "_" + s for l in LEGS for s in ["yaw", "pitch"]]
         js = [self.m.joint(n).id for n in self.names]
         self.qa = self.m.jnt_qposadr[js]
@@ -71,7 +71,7 @@ class Robot:
         self.torque.fill(0)
         self.next_command_time = 0.0
         self.next_ir_time = 0.0
-        self.ir_distances_m = np.full(3, np.nan)
+        self.ir_distances_m = np.full(2, np.nan)
         self.gait_time_origin = 2.0
         self._sample_ir()
         if self.navigation:
@@ -137,7 +137,7 @@ class Robot:
         if self.d.time + 1e-10 >= self.next_ir_time:
             # Sharp GP2Y0A41SK0F: nominal 16.5 ms period, valid between 4 and 30 cm.
             raw = np.array(
-                [self.d.sensor(n).data[0] for n in ["ir_left", "ir_right", "ir_ground"]]
+                [self.d.sensor(n).data[0] for n in ["ir_left", "ir_right"]]
             )
             self.ir_distances_m = np.where((raw >= 0.04) & (raw <= 0.30), raw, np.nan)
             self.next_ir_time += 0.0165
@@ -202,7 +202,7 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
                 break
         delta = r.d.qpos[:3] - start
         result = dict(
-            revision="B9-8",
+            revision="B10",
             parameters=r.p,
             duration_s=float(r.d.time),
             requested_duration_s=seconds,
@@ -232,7 +232,7 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
 
 
 def main():
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(epilog="For the IR corridor, run: python robot.py walk --corridor")
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--hold", action="store_true")
     ap.add_argument("--feedback", choices=("sensors", "ideal"), default="sensors",
@@ -254,7 +254,7 @@ def main():
     if args.seconds is None:
         args.seconds = 120 if args.ramp else 20
     print(
-        "B9-8: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
+        "B10: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
     )
     try:
         p = load_gait_parameters(args.params)
@@ -270,7 +270,7 @@ def main():
         finally:
             if recording:
                 recording.close()
-        name = "b98_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
+        name = "b10_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
         (ROOT / "results").mkdir(exist_ok=True)
         (ROOT / "results" / f"{name}.json").write_text(json.dumps(result, indent=2))
         print(json.dumps(result, indent=2))

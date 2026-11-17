@@ -1,3 +1,4 @@
+import math
 import mujoco
 from robot_b91.navigation_debug import navigation_debug_image, navigation_status
 
@@ -32,8 +33,12 @@ class SensorOverlay:
         vector = lambda values: "  ".join(f"{v:+8.3f}" for v in values)
         labels = "Ideal IMU (local X Y Z)\nAcceleration (m/s^2)\nGyroscope (rad/s)"
         values = f"t = {self.robot.d.time:.2f} s\n{vector(acceleration)}\n{vector(gyro)}"
+        labels += "\nLeft IR (cm)\nRight IR (cm)"
+        values += "\n" + "\n".join(
+            f"{distance * 100:.1f}" if math.isfinite(distance) else "out of range"
+            for distance in self.robot.ir_distances_m
+        )
         if self.robot.navigation:
-            import math
             n = self.robot.navigation.estimate
             labels += "\nEstimated heading (deg)\nEstimated lateral (mm)\nCamera age (s)"
             age = self.robot.d.time - n.last_seen if n.last_seen is not None else float('inf')

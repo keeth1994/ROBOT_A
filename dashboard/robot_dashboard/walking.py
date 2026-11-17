@@ -65,9 +65,8 @@ class Walking:
         settings = defaults | self.params
         if profile == 'dance':
             settings['pitch_stance'] = 0.0
-        if profile == 'corridor':
         # Guidance runs on the PC; these modes share the ESP32's existing IMU gait.
-        controller_profile = 'course' if profile == 'course_tape' else profile
+        controller_profile = 'course' if profile in ('course_tape', 'corridor') else profile
         return {'profile': controller_profile, **{name: settings[name] for name in names}}
 
     def begin(self, status, session, now, profile='walk'):

@@ -1,4 +1,4 @@
-"""CAD mesh export helpers for B9-8."""
+"""CAD mesh export helpers for B10."""
 
 import numpy as np
 
