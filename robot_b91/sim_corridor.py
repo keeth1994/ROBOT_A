@@ -19,7 +19,7 @@ from robot_b91.navigation import Navigation
 from robot_b91.run import Robot
 from robot_b91.paths import ROOT
 from robot_b91.course import build_course
-from robot_b91.corridor_navigation import IRWallNavigation
+from dashboard.robot_dashboard.corridor_walls import IRWallNavigation, load_corridor_settings
 
 
 def create_robot(params, width, bend_scale=1.0):
@@ -53,14 +53,17 @@ def evaluate(seconds=360, offset=0, yaw=0, latency=.05, mismatch=0, noise=0,
              observer=None, shared_gait=False, yaw_bias=None, wall_fit=True):
     if not math.isfinite(seconds) or seconds <= 0:
         raise ValueError('Simulation duration must be a positive number of seconds.')
+    corridor_settings = load_corridor_settings()
     if not shared_gait and yaw_amplitude is None:
-        yaw_amplitude = .4
+        yaw_amplitude = corridor_settings['gait']['yaw_amplitude']
     if yaw_bias is None:
-        yaw_bias = 0 if shared_gait else .3
+        yaw_bias = 0 if shared_gait else corridor_settings['gait']['yaw_bias']
     params = {name: value for name, value in dict(yaw_amplitude=yaw_amplitude,
               pitch_stance=pitch_stance, pitch_lift=pitch_lift).items() if value is not None}
     if corridor_gait:
         params['corridor'] = True
+    if yaw_bias:
+        params['yaw_bias'] = yaw_bias
     robot = create_robot(params, width, bend_scale)
     try:
         origin = robot.course['corridor']['origin_xy_m']
@@ -74,7 +77,7 @@ def evaluate(seconds=360, offset=0, yaw=0, latency=.05, mismatch=0, noise=0,
         if wall_fit:
             sensor_positions = [robot.m.site(name + '_site').pos[:2].copy()
                                 for name in ('ir_left', 'ir_right')]
-            nav = IRWallNavigation(0, sensor_positions)
+            nav = IRWallNavigation(0, **(corridor_settings['navigation'] | {'sensor_positions': sensor_positions}))
         imu = Navigation()
         queue = deque()
         next_sample = gait_time = active_time = 0.0
@@ -101,7 +104,10 @@ def evaluate(seconds=360, offset=0, yaw=0, latency=.05, mismatch=0, noise=0,
             imu.imu(t, robot.d.sensor('imu_acceleration').data, robot.d.sensor('imu_angular_velocity').data)
             if t >= next_sample:
                 distances = [float(robot.d.sensor(n).data[0]) for n in ('ir_left', 'ir_right')]
-                volts = [100 if d < 0 or d > .30 else min(3300, 120 / max(d, .001)) for d in distances]
+                calibration = corridor_settings['navigation']
+                volts = [100 if d < 0 or d > .30 else min(3300,
+                         calibration['ir_offset_mv'][i] + calibration['ir_scale_mv_m'][i] / max(d, .001))
+                         for i, d in enumerate(distances)]
                 volts = [max(1, min(3300, v * (1 + (mismatch if i == 0 else -mismatch)) + rng.normal(0, noise)))
                          for i, v in enumerate(volts)]
                 packet = dict(irMillivolts=volts, irAgeMs=0, orientationValid=imu.initialized,
@@ -119,9 +125,6 @@ def evaluate(seconds=360, offset=0, yaw=0, latency=.05, mismatch=0, noise=0,
                 gait_time += robot.m.opt.timestep
                 target = rocker_targets(robot.p, active_time, gait_time,
                                         command_heading + imu.heading - reference_heading, nav.estimate.lateral, robot.joint_ranges)
-                # Fold the walking stance inward; servo zeroes stay diagonal.
-                target[::2] += min(1, active_time / robot.p['period']) * yaw_bias * np.array([-1, 1, 1, -1])
-                target = np.clip(target, robot.joint_ranges[:, 0], robot.joint_ranges[:, 1])
             robot.step_targets(target)
             touching = False
             for index, contact in enumerate(robot.d.contact):

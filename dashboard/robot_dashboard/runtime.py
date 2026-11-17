@@ -204,6 +204,9 @@ class Dashboard:
                         raise devices.DeviceError('Operator heartbeat lost; walking stopped.')
                     status = devices.request(url, '/status', timeout=.15)
                     frame = self.walking.frame(status, time.monotonic(), self.camera.navigation_frame())
+                    if not self.walking.active:
+                        devices.request(url, '/stop', {}, timeout=.15)
+                        continue
                     devices.request(url, '/motion/adjust', frame, timeout=.15)
                     self.walking.last_confirmed_frame = time.monotonic()
                 except (devices.DeviceError, ValueError, KeyError, TypeError) as error:
@@ -230,7 +233,7 @@ class Dashboard:
             try:
                 status = devices.request(url, '/status', timeout=.15)
                 self.walking.prepare(status)
-                if action == 'corridor' and not status.get('corridorGait'):
+                if action == 'corridor' and status.get('corridorWallGait') is not True:
                     raise devices.DeviceError('Upload the updated controller firmware for corridor walking.', 409)
                 if status.get('manualActive') or status.get('running') or status.get('externalActive'):
                     raise devices.DeviceError('Press Stop to release existing servo control first.', 409)

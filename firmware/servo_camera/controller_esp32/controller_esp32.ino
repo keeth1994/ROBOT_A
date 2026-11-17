@@ -342,7 +342,7 @@ void sendStatus()
   json += running ? channelList(groupFirst, groupCount) : String("none");
   json += "\",\"manualActive\":";
   json += manualActive() ? "true" : "false";
-  json += ",\"motionProtocol\":2,\"corridorGait\":true,\"externalActive\":";
+  json += ",\"motionProtocol\":2,\"corridorGait\":true,\"corridorWallGait\":true,\"externalActive\":";
   json += externalActive ? "true" : "false";
   json += ",\"motionSession\":"; json += String(motionSession);
   json += ",\"gaitStopping\":"; json += externalActive && gait.stopping ? "true" : "false";
@@ -559,6 +559,7 @@ void startExternal()
       !readNumber("period", p.period, .2, 10) ||
       !readNumber("duty", p.duty, .1, .9) ||
       !readNumber("yaw_amplitude", p.yawAmplitude, 0, walking::pi / 4) ||
+      (server.hasArg("yaw_bias") && !readNumber("yaw_bias", p.yawBias, 0, walking::pi / 4)) ||
       !readNumber("pitch_lift", p.pitchLift, 0, 125 * walking::pi / 180) ||
       !readNumber("pitch_min", p.pitchMin, -125 * walking::pi / 180, 0) ||
       !readNumber("pitch_stance", p.pitchStance, p.pitchMin, 0) ||

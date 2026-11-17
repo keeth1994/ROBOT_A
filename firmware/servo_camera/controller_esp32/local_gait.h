@@ -14,6 +14,7 @@ struct Parameters {
   // A 125-degree lift reaches calibrated -80 degrees from +45 foot-down.
   double pitchStance = 0, pitchMin = -125 * pi / 180;
   double headingGain = .8, lateralGain = 5, strafeGain = 0;
+  double yawBias = 0;
   bool crawl = false, corridor = false;
 };
 
@@ -43,7 +44,9 @@ inline void targets(const Parameters &p, double elapsed, double gaitTime,
       yaw *= ramp *
              ((i < 2 ? forward : -forward) + correction + (i % 2 == 0 ? 1 : -1) * strafe);
     }
-    angles[2 * i] = clamp(yaw, -pi / 4, pi / 4);
+    double bias = clamp(elapsed / p.period, 0, 1) * p.yawBias *
+                  ((i == 0 || i == 3) ? -1 : 1);
+    angles[2 * i] = clamp(clamp(yaw, -pi / 4, pi / 4) + bias, -pi / 4, pi / 4);
     angles[2 * i + 1] = clamp(p.pitchStance + lift, p.pitchMin, 0);
   }
 }
@@ -255,8 +258,11 @@ struct Gait {
     if (stopping) {
       double u = clamp(uint32_t(now - stopStarted) / 300.0, 0, 1);
       u = u * u * (3 - 2 * u);
-      for (int i = 0; i < 8; ++i)
-        angles[i] = stopAngles[i] + u * ((i % 2 ? params.pitchStance : 0) - stopAngles[i]);
+      for (int i = 0; i < 8; ++i) {
+        double stance = i % 2 ? params.pitchStance :
+                        params.yawBias * ((i == 0 || i == 6) ? -1 : 1);
+        angles[i] = stopAngles[i] + u * (stance - stopAngles[i]);
+      }
       return;
     }
     if (dance && uint32_t(now - started) >= settleMs &&

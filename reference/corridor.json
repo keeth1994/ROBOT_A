@@ -1,0 +1,14 @@
+{
+  "calibration_note": "Starting estimates from simulation and B10 CAD. Measure IR response and walking speed on the physical robot.",
+  "gait": {
+    "yaw_amplitude": 0.4,
+    "yaw_bias": 0.3
+  },
+  "navigation": {
+    "sensor_positions": [[0.004, 0.0716], [0.004, -0.0716]],
+    "walk_speed": 0.04,
+    "window_s": 1.5,
+    "ir_scale_mv_m": [120, 120],
+    "ir_offset_mv": [0, 0]
+  }
+}

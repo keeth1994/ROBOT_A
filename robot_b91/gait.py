@@ -52,4 +52,7 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
         joint_ranges = np.tile([-math.pi / 4, math.pi / 4], (8, 1))
         joint_ranges[1::2, 0] = -3 * math.pi / 4
         joint_ranges[1::2, 1] = 0
+    target = np.clip(target, joint_ranges[:, 0], joint_ranges[:, 1])
+    ramp = max(0, min(1, elapsed_s / p['period']))
+    target[::2] += ramp * p.get('yaw_bias', 0) * np.array([-1, 1, 1, -1])
     return np.clip(target, joint_ranges[:, 0], joint_ranges[:, 1])

@@ -4,7 +4,7 @@ import tomllib
 
 from .devices import DeviceError
 from .navigation import CourseNavigation
-from .corridor import CorridorNavigation
+from .corridor_walls import IRWallNavigation, load_corridor_settings
 
 ROOT = Path(__file__).resolve().parents[2]
 JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch'))
@@ -23,6 +23,7 @@ class Walking:
         self.started = self.last_confirmed_frame = 0.0
         self.profile = 'walk'
         self.navigation = None
+        self.corridor_settings = None
         self.speed = 1.0
         self.message = 'Stopped. Walking is not started automatically.'
 
@@ -59,10 +60,13 @@ class Walking:
             raise ValueError('Unknown walking profile.')
         with (ROOT / 'reference/b91_gait.toml').open('rb') as stream:
             self.params = tomllib.load(stream)
-        defaults = {'pitch_min': -125 * math.pi / 180, 'lateral_gain': 0, 'strafe_gain': 0}
+        defaults = {'pitch_min': -125 * math.pi / 180, 'lateral_gain': 0, 'strafe_gain': 0, 'yaw_bias': 0}
         names = ('period', 'duty', 'yaw_amplitude', 'pitch_lift', 'pitch_stance',
-                 'pitch_min', 'heading_gain', 'lateral_gain', 'strafe_gain', 'pattern')
+                 'pitch_min', 'heading_gain', 'lateral_gain', 'strafe_gain', 'pattern', 'yaw_bias')
         settings = defaults | self.params
+        if profile == 'corridor':
+            self.corridor_settings = load_corridor_settings()
+            settings.update(self.corridor_settings['gait'])
         if profile == 'dance':
             settings['pitch_stance'] = 0.0
         # Guidance runs on the PC; these modes share the ESP32's existing IMU gait.
@@ -78,7 +82,8 @@ class Walking:
         self.profile = profile
         sensors = PROFILES[profile]
         if profile == 'corridor':
-            self.navigation = CorridorNavigation(now)
+            self.corridor_settings = self.corridor_settings or load_corridor_settings()
+            self.navigation = IRWallNavigation(now, **self.corridor_settings['navigation'])
         else:
             self.navigation = (CourseNavigation(now, use_camera='camera' in sensors, use_imu='imu' in sensors,
                                                 guidance='blue_tape' if profile == 'course_tape' else 'ramp')
@@ -99,6 +104,8 @@ class Walking:
             raise DeviceError('ESP32 motion session ended; restart explicitly.', 409)
         if status.get('gaitStopping'):
             raise DeviceError('ESP32 is stopping after losing navigation; restart explicitly.', 409)
+        if self.profile == 'corridor':
+            self.navigation.set_speed(self.speed)
         ready = self.navigation.update(status, now, camera_frame) if self.navigation else True
         if (PROFILES[self.profile] or self.profile == 'dance') and now - self.started < 2:
             self.message = 'Settling for 2 seconds; keep the robot still.'
@@ -115,6 +122,8 @@ class Walking:
                  'heading': estimate.heading if estimate else 0,
                  'heading_reference': self.navigation.imu_heading if self.navigation else 0,
                  'lateral': estimate.lateral if estimate else 0}
+        if self.profile == 'corridor' and self.navigation.exit_complete:
+            self.stop('Corridor exit movement finished. Outputs off requested.')
         return frame
 
     def stop(self, message='Stopped. Outputs off requested.'):
