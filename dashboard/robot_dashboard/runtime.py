@@ -191,7 +191,7 @@ class Dashboard:
     def _walk_loop(self):
         next_update = time.monotonic()
         while not self.stop_event.wait(max(.001, next_update - time.monotonic())):
-            interval = .05 if self.walking.profile == 'corridor' else .1
+            interval = .05 if self.walking.profile in ('corridor', 'corridor_search') else .1
             next_update = time.monotonic() + interval
             with self.servo_lock:
                 if not self.walking.active:
@@ -235,6 +235,8 @@ class Dashboard:
                 self.walking.prepare(status)
                 if action == 'corridor' and status.get('corridorWallGait') is not True:
                     raise devices.DeviceError('Upload the updated controller firmware for corridor walking.', 409)
+                if action == 'corridor_search' and status.get('corridorSearchGait') is not True:
+                    raise devices.DeviceError('Upload the updated controller firmware for corridor search.', 409)
                 if status.get('manualActive') or status.get('running') or status.get('externalActive'):
                     raise devices.DeviceError('Press Stop to release existing servo control first.', 409)
                 profile = action
@@ -298,6 +300,10 @@ class Dashboard:
             navigation = self.walking.navigation
             live = self.walking.active and navigation is not None and navigation.use_camera
             if live:
+                if self.walking.profile == 'corridor_search':
+                    output = BytesIO()
+                    Image.fromarray(navigation.debug_image()).save(output, format='JPEG', quality=85)
+                    return output.getvalue()
                 estimate = copy(navigation.estimate)
                 elapsed = time.monotonic() - navigation.started
                 use_imu = navigation.use_imu

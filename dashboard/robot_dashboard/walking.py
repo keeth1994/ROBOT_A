@@ -5,12 +5,13 @@ import tomllib
 from .devices import DeviceError
 from .navigation import CourseNavigation
 from .corridor_walls import IRWallNavigation, load_corridor_settings
+from .corridor_search import CorridorSearch
 
 ROOT = Path(__file__).resolve().parents[2]
 JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch'))
 PROFILES = {'walk': (), 'course': ('camera', 'imu'), 'course_camera': ('camera',),
             'course_tape': ('camera', 'imu'), 'course_imu': ('imu',),
-            'corridor': ('ir', 'imu'), 'dance': ()}
+            'corridor': ('ir', 'imu'), 'corridor_search': ('camera', 'ir', 'imu'), 'dance': ()}
 WALK_ACTIONS = tuple(PROFILES)
 
 
@@ -64,7 +65,7 @@ class Walking:
         names = ('period', 'duty', 'yaw_amplitude', 'pitch_lift', 'pitch_stance',
                  'pitch_min', 'heading_gain', 'lateral_gain', 'strafe_gain', 'pattern', 'yaw_bias')
         settings = defaults | self.params
-        if profile == 'corridor':
+        if profile in ('corridor', 'corridor_search'):
             self.corridor_settings = load_corridor_settings()
             settings.update(self.corridor_settings['gait'])
         if profile == 'dance':
@@ -81,9 +82,11 @@ class Walking:
             raise ValueError('Unknown walking profile.')
         self.profile = profile
         sensors = PROFILES[profile]
-        if profile == 'corridor':
+        if profile in ('corridor', 'corridor_search'):
             self.corridor_settings = self.corridor_settings or load_corridor_settings()
-            self.navigation = IRWallNavigation(now, **self.corridor_settings['navigation'])
+            self.navigation = (CorridorSearch(now, self.corridor_settings['navigation'])
+                               if profile == 'corridor_search' else
+                               IRWallNavigation(now, **self.corridor_settings['navigation']))
         else:
             self.navigation = (CourseNavigation(now, use_camera='camera' in sensors, use_imu='imu' in sensors,
                                                 guidance='blue_tape' if profile == 'course_tape' else 'ramp')
@@ -104,7 +107,7 @@ class Walking:
             raise DeviceError('ESP32 motion session ended; restart explicitly.', 409)
         if status.get('gaitStopping'):
             raise DeviceError('ESP32 is stopping after losing navigation; restart explicitly.', 409)
-        if self.profile == 'corridor':
+        if self.profile in ('corridor', 'corridor_search'):
             self.navigation.set_speed(self.speed)
         ready = self.navigation.update(status, now, camera_frame) if self.navigation else True
         if (PROFILES[self.profile] or self.profile == 'dance') and now - self.started < 2:
@@ -122,6 +125,10 @@ class Walking:
                  'heading': estimate.heading if estimate else 0,
                  'heading_reference': self.navigation.imu_heading if self.navigation else 0,
                  'lateral': estimate.lateral if estimate else 0}
+        if self.profile == 'corridor_search':
+            frame.update(speed=self.navigation.speed, forward=self.navigation.forward)
+            if self.navigation.finished:
+                self.stop(self.navigation.reason + ' Outputs off requested.')
         if self.profile == 'corridor' and self.navigation.exit_complete:
             self.stop('Corridor exit movement finished. Outputs off requested.')
         return frame

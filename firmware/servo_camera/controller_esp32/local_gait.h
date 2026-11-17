@@ -15,16 +15,18 @@ struct Parameters {
   double pitchStance = 0, pitchMin = -125 * pi / 180;
   double headingGain = .8, lateralGain = 5, strafeGain = 0;
   double yawBias = 0;
-  bool crawl = false, corridor = false;
+  bool crawl = false, corridor = false, search = false;
 };
 
 // Same joint order and radians as robot_b91/gait.py: FL, RL, FR, RR.
 inline void targets(const Parameters &p, double elapsed, double gaitTime,
-                    double heading, double lateral, double angles[8]) {
+                    double heading, double lateral, double angles[8], double forwardScale = 1) {
   const double trot[] = {0, .5, .5, 0}, crawl[] = {0, .5, .25, .75};
   double turnLimit = p.corridor ? .95 : .5;
   double correction = clamp(p.headingGain * (heading + std::atan(p.lateralGain * lateral)), -turnLimit, turnLimit);
   double forward = p.corridor ? std::fmax(.25, 1 - std::abs(correction)) : 1;
+  // Search can pivot with no forward stride, then approach an opening slowly.
+  if (p.search) forward = clamp(forwardScale, 0, 1);
   // Limit sideways corrections to reduce overshoot.
   double strafe = clamp(p.strafeGain * lateral, -.3, .3);
   for (int i = 0; i < 4; ++i) {
@@ -188,7 +190,7 @@ struct Gait {
   bool useImu = false, dance = false, ready = false, stopping = false;
   uint32_t started = 0, lastUpdate = 0, stopStarted = 0, settleMs = 0;
   double elapsed = 0, gaitTime = 0, speed = 1;
-  double headingOffset = 0, lateral = 0;
+  double headingOffset = 0, lateral = 0, forward = 1;
   double angles[8] = {}, stopAngles[8] = {};
   int danceTurnPhase = 0;
   bool danceTurnDone = false;
@@ -286,7 +288,7 @@ struct Gait {
     }
     gaitTime += dt * speed;
     if (dance) danceTargets(gaitTime, angles);
-    else targets(params, elapsed, gaitTime, headingOffset + (useImu ? heading : 0), lateral, angles);
+    else targets(params, elapsed, gaitTime, headingOffset + (useImu ? heading : 0), lateral, angles, forward);
   }
 };
 }

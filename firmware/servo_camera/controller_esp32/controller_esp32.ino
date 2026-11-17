@@ -342,7 +342,7 @@ void sendStatus()
   json += running ? channelList(groupFirst, groupCount) : String("none");
   json += "\",\"manualActive\":";
   json += manualActive() ? "true" : "false";
-  json += ",\"motionProtocol\":2,\"corridorGait\":true,\"corridorWallGait\":true,\"externalActive\":";
+  json += ",\"motionProtocol\":2,\"corridorGait\":true,\"corridorWallGait\":true,\"corridorSearchGait\":true,\"externalActive\":";
   json += externalActive ? "true" : "false";
   json += ",\"motionSession\":"; json += String(motionSession);
   json += ",\"gaitStopping\":"; json += externalActive && gait.stopping ? "true" : "false";
@@ -551,10 +551,11 @@ void startExternal()
     respond(409, "text/plain", "Stop existing motion or fix controller status first."); return;
   }
   String profile = server.arg("profile"), pattern = server.arg("pattern");
-  bool useImu = profile == "course" || profile == "course_imu" || profile == "corridor" || profile == "dance";
+  bool useImu = profile == "course" || profile == "course_imu" || profile == "corridor" ||
+                profile == "corridor_search" || profile == "dance";
   walking::Parameters p;
   if ((profile != "walk" && profile != "course" && profile != "course_camera" &&
-       profile != "course_imu" && profile != "corridor" && profile != "dance") ||
+       profile != "course_imu" && profile != "corridor" && profile != "corridor_search" && profile != "dance") ||
       (pattern != "trot" && pattern != "crawl") ||
       !readNumber("period", p.period, .2, 10) ||
       !readNumber("duty", p.duty, .1, .9) ||
@@ -572,7 +573,8 @@ void startExternal()
     respond(409, "text/plain", "This motion needs fresh IMU readings. Check the sensor."); return;
   }
   p.crawl = pattern == "crawl";
-  p.corridor = profile == "corridor";
+  p.search = profile == "corridor_search";
+  p.corridor = profile == "corridor" || p.search;
   if (profile == "dance") p.pitchStance = 0;
   uint32_t now = millis();
   gait.begin(now, p, useImu, profile == "walk" ? 0 : 2000,
@@ -592,16 +594,18 @@ void receiveAdjustment()
       !stream.accepts(session, sequence)) {
     respond(409, "text/plain", "Inactive, stale or mismatched walking session."); return;
   }
-  double speed, heading, reference, lateral;
+  double speed, heading, reference, lateral, forward = 1;
   String ready = server.arg("ready");
   if ((ready != "0" && ready != "1") ||
       !readNumber("speed", speed, .25, 2) ||
       !readNumber("heading", heading, -1000000, 1000000) ||
       !readNumber("heading_reference", reference, -1000000, 1000000) ||
-      !readNumber("lateral", lateral, -.5, .5)) {
-    respond(400, "text/plain", "Use valid speed, heading, side offset and ready values."); return;
+      !readNumber("lateral", lateral, -.5, .5) ||
+      (gait.params.search && !readNumber("forward", forward, 0, 1))) {
+    respond(400, "text/plain", "Use valid speed, heading, side offset, forward and ready values."); return;
   }
-  gait.speed = speed;
+  gait.speed = gait.params.search ? walking::clamp(speed, .25, .5) : speed;
+  gait.forward = forward;
   // The PC sends heading at a known IMU sample. Local gyro updates continue between requests.
   gait.headingOffset = heading - (gait.useImu ? reference : 0);
   gait.lateral = lateral;

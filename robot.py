@@ -11,7 +11,8 @@ COMMANDS = {
     'build': ('robot_b91.build', 'Rebuild MuJoCo assets from the saved CAD export'),
 }
 CHECKS = {'b10': 'tests.test_b10', 'structure': 'tests.test_structure',
-          'course': 'tests.test_course', 'walking': 'tests.test_walking'}
+          'course': 'tests.test_course', 'walking': 'tests.test_walking',
+          'transfer': 'tests.test_transfer'}
 
 def main():
     os.chdir(ROOT)
@@ -20,7 +21,7 @@ def main():
         print('B10: python robot.py COMMAND [options]')
         for name, (_, description) in COMMANDS.items():
             print(f'  {name:10} {description}')
-        print('  check      Run checks: all, b10, structure, course, walking')
+        print('  check      Run checks: all, b10, structure, course, walking, transfer')
         return
     command, *rest = args
     if command == 'walk' and '--corridor' in rest:

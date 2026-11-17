@@ -7,12 +7,13 @@ from .navigation import CourseNavigation
 WEAK_SIGNAL_MV = 150
 
 
-def ir_readings(status):
+def ir_readings(status, allow_zero=False):
     age, values = status.get('irAgeMs'), status.get('irMillivolts')
     if (isinstance(age, bool) or not isinstance(age, (int, float)) or not 0 <= age <= 150 or
             not isinstance(values, list) or len(values) != 2 or
             any(isinstance(v, bool) or not isinstance(v, (int, float)) or
-                not math.isfinite(v) or not 0 < v <= 3300 for v in values)):
+                not math.isfinite(v) or not 0 <= v <= 3300 or (v == 0 and not allow_zero)
+                for v in values)):
         raise ValueError('Waiting for fresh readings from both IR sensors.')
     return values
 

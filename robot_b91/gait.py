@@ -14,7 +14,7 @@ LEGS = ("FL", "RL", "FR", "RR")
 
 
 def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
-                   lateral_error_m=0.0, joint_ranges=None):
+                   lateral_error_m=0.0, joint_ranges=None, forward_scale=1.0):
     """Return eight bounded joint angles; call at the existing 50 Hz command rate.
 
     elapsed_s is time since walking began; gait_time_s preserves phase when
@@ -30,6 +30,8 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
         turn_limit = .95 if p.get('corridor', False) else .5
         correction = np.clip(p["heading_gain"] * error, -turn_limit, turn_limit)
         forward = max(.25, 1 - abs(correction)) if p.get('corridor', False) else 1
+        if p.get('search', False):
+            forward = np.clip(forward_scale, 0, 1)
         strafe = np.clip(p.get("strafe_gain", 0) * lateral_error_m, -0.3, 0.3)
         for i, leg in enumerate(LEGS):
             u = (gait_time_s / p["period"] + offsets[i]) % 1

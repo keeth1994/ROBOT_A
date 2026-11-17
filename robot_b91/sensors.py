@@ -19,8 +19,10 @@ class SensorOverlay:
             return
         self.next_frame = now + 1 / 15
         if self.robot.navigation:
-            panel = navigation_debug_image(self.robot.navigation.estimate, self.robot.d.time)
-            self.viewer.set_images((mujoco.MjrRect(10, 10, 640, 318), panel))
+            search = self.robot.navigation.search
+            panel = (search.debug_image() if search else
+                     navigation_debug_image(self.robot.navigation.estimate, self.robot.d.time))
+            self.viewer.set_images((mujoco.MjrRect(10, 10, panel.shape[1], panel.shape[0]), panel))
         else:
             self.renderer.update_scene(
                 self.robot.d, camera="project_camera", scene_option=self.options
@@ -39,12 +41,14 @@ class SensorOverlay:
             for distance in self.robot.ir_distances_m
         )
         if self.robot.navigation:
-            n = self.robot.navigation.estimate
+            search = self.robot.navigation.search
+            n = search.estimate if search else self.robot.navigation.estimate
             labels += "\nEstimated heading (deg)\nEstimated lateral (mm)\nCamera age (s)"
-            age = self.robot.d.time - n.last_seen if n.last_seen is not None else float('inf')
+            seen = self.robot.navigation.camera_frame[1] if search else n.last_seen
+            age = self.robot.d.time - seen if seen is not None else float('inf')
             values += f"\n{math.degrees(n.heading):+.2f}\n{n.lateral * 1000:+.1f}\n{age:.2f}"
             labels += "\nNavigation status"
-            values += "\n" + navigation_status(n, self.robot.d.time)[0]
+            values += "\n" + (search.reason if search else navigation_status(n, self.robot.d.time)[0])
         self.viewer.set_texts((
             mujoco.mjtFontScale.mjFONTSCALE_100,
             mujoco.mjtGridPos.mjGRID_TOPRIGHT,

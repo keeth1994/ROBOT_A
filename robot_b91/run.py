@@ -8,7 +8,7 @@ import mujoco
 from robot_b91.paths import ROOT
 from robot_b91 import servo_properties
 from robot_b91.course import local_points
-from robot_b91.progress import CourseProgress
+from robot_b91.progress import CourseProgress, corridor_entry_score
 from robot_b91.gait import rocker_targets
 
 LEGS = ["FL", "RL", "FR", "RR"]
@@ -74,6 +74,7 @@ class Robot:
         self.next_ir_time = 0.0
         self.ir_distances_m = np.full(2, np.nan)
         self.gait_time_origin = 2.0
+        self.search_gait_time = self.search_active_time = 0.0
         self._sample_ir()
         if self.navigation:
             self.navigation.close()
@@ -91,6 +92,19 @@ class Robot:
         p = self.p
         self.target = np.tile([0.0, p["pitch_stance"]], 4)
         sensor_errors = self.navigation.update(self.d) if self.navigation else None
+        if self.navigation and self.navigation.search:
+            search = self.navigation.search
+            if walk and self.navigation.search_ready:
+                self.search_gait_time += self.m.opt.timestep * search.speed
+                self.search_active_time += self.m.opt.timestep
+                params = p | self.navigation.search_gait_settings
+                heading, lateral = sensor_errors
+                self.target = rocker_targets(params, self.search_active_time, self.search_gait_time,
+                                             heading, lateral, self.joint_ranges, search.forward)
+            else:
+                self.target = self.command_target
+            self.step_targets(self.target)
+            return
         if walk and t > 0 and self.navigation and not self.navigation.estimate.ready(self.d.time):
             self.gait_time_origin += self.m.opt.timestep
             self.step_targets(self.command_target)
@@ -154,9 +168,11 @@ class Robot:
 
 
 def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial_yaw_rad=0.0,
-             observer=None, feedback="sensors"):
+             observer=None, feedback="sensors", find_corridor=False):
     if not math.isfinite(seconds) or seconds <= 2:
         raise ValueError("Evaluation duration must exceed the 2-second settling period")
+    if find_corridor and (not ramp or feedback != 'sensors' or not walk):
+        raise ValueError('Corridor search needs --ramp, sensor feedback and walking enabled.')
     terrain = json.loads((ROOT / "reference/b91_course.json").read_text())
     surfaces = terrain.get("surface_geoms", terrain["required_surfaces"])
     obstacles = terrain["obstacle_geoms"]
@@ -173,6 +189,8 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
         n = 0
         bad = 0
         rampcontact = False
+        corridor_collision = False
+        wall_ids = {i for i in range(r.m.ngeom) if (r.m.geom(i).name or '').startswith('corridor_wall')}
         while r.d.time < seconds:
             r.step(walk)
             if r.d.time >= 2:
@@ -181,9 +199,11 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
                 tilt = max(tilt, r.tilt())
                 sat += int(np.count_nonzero(np.abs(r.torque) > 0.95 * r.limit))
                 n += 1
-                if progress:
+                if progress and progress.completed_at is None:
                     progress.update(r.d, r.tilt())
                 for c in r.d.contact:
+                    if find_corridor and (c.geom1 in wall_ids or c.geom2 in wall_ids):
+                        corridor_collision = True
                     names = [
                         mujoco.mj_id2name(r.m, mujoco.mjtObj.mjOBJ_GEOM, g) or ""
                         for g in [c.geom1, c.geom2]
@@ -199,8 +219,15 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
                 raise RuntimeError("Non-finite physics state")
             if observer:
                 observer(r, progress)
-            if progress and progress.completed_at is not None:
+            if find_corridor and (corridor_collision or r.tilt() > 45):
                 break
+            if progress and progress.completed_at is not None:
+                if not find_corridor:
+                    break
+                if r.navigation.search is None:
+                    r.navigation.begin_corridor_search(r.d.time)
+                if r.navigation.search.finished:
+                    break
         delta = r.d.qpos[:3] - start
         result = dict(
             revision=r.revision,
@@ -227,6 +254,15 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
         )
         if progress:
             result.update(progress.report())
+        if find_corridor:
+            search = r.navigation.search
+            score = corridor_entry_score(r.m, r.d, terrain)
+            result['corridor_search'] = search.report() if search else None
+            result['corridor_entry'] = score
+            result['corridor_collision'] = corridor_collision
+            result['corridor_found'] = bool(search and search.succeeded and score['inside_and_centered']
+                                           and not corridor_collision and tilt <= 45)
+            result['final_position_m'] = r.d.qpos[:3].tolist()
         return result
     finally:
         r.close()
@@ -239,7 +275,9 @@ def main():
     ap.add_argument("--feedback", choices=("sensors", "ideal"), default="sensors",
                     help="ramp navigation source (default: camera and IMU)")
     ap.add_argument("--ramp", action="store_true")
-    ap.add_argument("--seconds", type=float, help="simulation duration (default: 120 on course, 20 on flat)")
+    ap.add_argument('--find-corridor', action='store_true',
+                    help='Continue after the ramp, find the corridor with camera/IMU/IR, and stop centered')
+    ap.add_argument("--seconds", type=float, help="duration (default: 300 with search, 120 on ramp, 20 on flat)")
     ap.add_argument("--render")
     ap.add_argument(
         "--sensors", action="store_true",
@@ -252,8 +290,10 @@ def main():
         ap.error("Choose either --video or --render")
     if args.sensors and (args.test or args.video or args.render):
         ap.error("--sensors requires the interactive simulation")
+    if args.find_corridor and (not args.ramp or args.feedback != 'sensors' or args.hold or args.render):
+        ap.error('--find-corridor needs --ramp, sensor feedback and walking enabled')
     if args.seconds is None:
-        args.seconds = 120 if args.ramp else 20
+        args.seconds = 300 if args.find_corridor else 120 if args.ramp else 20
     print(
         "B10: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
     )
@@ -267,15 +307,19 @@ def main():
             from robot_b91.recording import Recording
             recording = Recording(Path(args.video))
         try:
-            result = evaluate(p, args.seconds, not args.hold, args.ramp, observer=recording, feedback=args.feedback)
+            result = evaluate(p, args.seconds, not args.hold, args.ramp, observer=recording,
+                              feedback=args.feedback, find_corridor=args.find_corridor)
         finally:
             if recording:
                 recording.close()
-        name = "b10_" + ("ramp" if args.ramp else "hold" if args.hold else "walk")
+        name = "b10_" + ('ramp_to_corridor' if args.find_corridor else
+                         "ramp" if args.ramp else "hold" if args.hold else "walk")
         (ROOT / "results").mkdir(exist_ok=True)
         (ROOT / "results" / f"{name}.json").write_text(json.dumps(result, indent=2))
         print(json.dumps(result, indent=2))
         if args.ramp and not args.hold and not result["course_completed"]:
+            raise SystemExit(1)
+        if args.find_corridor and not result['corridor_found']:
             raise SystemExit(1)
         return
     r = Robot(p, args.ramp, args.feedback)
@@ -316,12 +360,20 @@ def main():
                 sensors = SensorOverlay(r, v)
             while v.is_running():
                 t = time.perf_counter()
-                if r.d.time < args.seconds and not (progress and progress.completed_at is not None):
+                search = r.navigation.search if r.navigation else None
+                finished = (search.finished if search else bool(progress and progress.completed_at is not None))
+                if r.d.time < args.seconds and not finished:
                     r.step(not args.hold)
-                    if progress:
+                    if progress and progress.completed_at is None:
                         progress.update(r.d, r.tilt())
                         if progress.completed_at is not None:
-                            print(f"Course completed in {progress.completed_at:.2f} simulated seconds; simulation paused.")
+                            if args.find_corridor:
+                                r.navigation.begin_corridor_search(r.d.time)
+                                print(f'Ramp completed at {r.d.time:.2f}s; searching for the corridor.')
+                            else:
+                                print(f"Course completed in {progress.completed_at:.2f} simulated seconds; simulation paused.")
+                    if search and search.finished:
+                        print(search.reason)
                 if not args.ramp:
                     v.cam.lookat[:2] = r.d.qpos[:2]
                 if sensors:

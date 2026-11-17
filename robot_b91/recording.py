@@ -23,7 +23,7 @@ class Recording:
         self.options.geomgroup[3] = 0
 
     def __call__(self, robot, progress):
-        if robot.d.time < self.next_frame and not (progress and progress.completed_at):
+        if robot.d.time < self.next_frame:
             return
         self.next_frame += 0.1
         if self.renderer is None:
@@ -34,6 +34,8 @@ class Recording:
         draw = ImageDraw.Draw(frame)
         draw.rectangle((0, 0, 960, 38), fill=(20, 25, 30))
         status = "COMPLETE" if progress and progress.completed_at else "SIMULATION | 2x playback"
+        if robot.navigation and robot.navigation.search:
+            status = 'CORRIDOR SEARCH | ' + robot.navigation.search.stage
         draw.text((12, 8), f"B10 | {robot.d.time:.1f} s | {status}", fill="white", font=self.font)
         if progress:
             c = progress.course

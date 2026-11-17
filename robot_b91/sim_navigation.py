@@ -23,16 +23,75 @@ class SimNavigation:
         self.options.sitegroup[:] = 0
         self.options.flags[mujoco.mjtVisFlag.mjVIS_RANGEFINDER] = False
         self.next_frame = self.next_imu = 0.0
+        self.model = model
+        self.imu = Navigation()
+        self.search = None
+        self.search_ready = False
+        self.frame_sequence = 0
+        self.camera_frame = None
+
+    def begin_corridor_search(self, now):
+        from dashboard.robot_dashboard.corridor_search import CorridorSearch
+        from dashboard.robot_dashboard.corridor_walls import load_corridor_settings
+
+        corridor = load_corridor_settings()
+        self.search_gait_settings = corridor['gait'] | dict(corridor=True, search=True)
+        settings = corridor['navigation']
+        settings['sensor_positions'] = [self.model.site(name + '_site').pos[:2].tolist()
+                                        for name in ('ir_left', 'ir_right')]
+        # Nominal floor speed for this simulated gait; this is only an odometry estimate.
+        settings['walk_speed'] = .032
+        camera = self.model.camera('project_camera')
+        geometry = dict(height_m=float(camera.pos[2]) + .047, forward_m=float(camera.pos[0]),
+                        pitch_deg=15, fovy_deg=float(camera.fovy[0]))
+        self.search = CorridorSearch(now, settings, camera_geometry=geometry)
+        # Represent camera tilt optically; the CAD mount remains fixed.
+        self.set_search_pitch(15)
+        self.next_frame = now
+        self.next_search_update = now
+
+    def set_search_pitch(self, degrees):
+        self.search.camera_geometry['pitch_deg'] = degrees
+        pitch = math.radians(degrees)
+        axes = np.array([[0, math.sin(pitch), -math.cos(pitch)],
+                         [-1, 0, 0], [0, math.cos(pitch), math.sin(pitch)]])
+        mujoco.mju_mat2Quat(self.model.cam_quat[self.model.camera('project_camera').id], axes.ravel())
 
     def update(self, data):
+        if self.search:
+            pitch = 35 if self.search.stage in ('enter', 'center') else 15
+            if self.search.camera_geometry['pitch_deg'] != pitch:
+                self.set_search_pitch(pitch)
+                mujoco.mj_camlight(self.model, data)
+                self.next_frame = data.time
         if data.time >= self.next_imu:
-            self.estimate.imu(data.time, data.sensor('imu_acceleration').data.copy(),
-                              data.sensor('imu_angular_velocity').data.copy())
+            acceleration = data.sensor('imu_acceleration').data.copy()
+            gyro = data.sensor('imu_angular_velocity').data.copy()
+            self.imu.imu(data.time, acceleration, gyro)
+            if not self.search:
+                self.estimate.imu(data.time, acceleration, gyro)
             self.next_imu = data.time + .005
         if data.time >= self.next_frame:
             self.renderer.update_scene(data, camera='project_camera', scene_option=self.options)
-            self.estimate.frame(data.time, self.renderer.render())
+            rgb = self.renderer.render()
+            self.frame_sequence += 1
+            self.camera_frame = (self.frame_sequence, data.time, rgb)
+            if not self.search:
+                self.estimate.frame(data.time, rgb)
             self.next_frame = data.time + .1
+        if self.search and data.time >= self.next_search_update:
+            settings = self.search.settings
+            distances = [float(data.sensor(name).data[0]) for name in ('ir_left', 'ir_right')]
+            volts = [100 if d < 0 or d > .30 else min(3300, settings['ir_offset_mv'][i] +
+                     settings['ir_scale_mv_m'][i] / max(d, .001)) for i, d in enumerate(distances)]
+            status = dict(irMillivolts=volts, irAgeMs=0, orientationValid=self.imu.initialized,
+                          imuAgeMs=(data.time - self.imu.last_imu) * 1000,
+                          orientation=[self.imu.roll, self.imu.pitch, self.imu.heading])
+            self.search_ready = self.search.update(status, data.time, self.camera_frame)
+            self.next_search_update = data.time + .05
+        if self.search:
+            return (self.search.estimate.heading + self.imu.heading - self.search.imu_heading,
+                    self.search.estimate.lateral)
         return self.estimate.heading, self.estimate.lateral
 
     def close(self):

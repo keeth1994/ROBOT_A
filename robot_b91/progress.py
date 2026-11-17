@@ -1,7 +1,27 @@
 """Course scoring, independent of the gait. Never applies forces to the robot."""
 
+import math
 import numpy as np
 from robot_b91.course import local_points
+
+
+def corridor_entry_score(model, data, course):
+    """Measure actual entry for validation; these coordinates never steer the robot."""
+    corridor = course['corridor']
+    yaw = math.radians(corridor['yaw_deg'])
+    rotation = np.array([[math.cos(yaw), -math.sin(yaw)], [math.sin(yaw), math.cos(yaw)]])
+    points = np.asarray(corridor['centerline_xy_m']) @ rotation.T + corridor['origin_xy_m']
+    direction = points[1] - points[0]
+    length = float(np.linalg.norm(direction))
+    direction /= length
+    position = data.qpos[:2] - points[0]
+    along = float(position @ direction)
+    lateral = float(position @ np.array([-direction[1], direction[0]]))
+    forward = data.xmat[model.body('platform').id].reshape(3, 3)[:2, 0]
+    angle = math.atan2(forward[1], forward[0]) - math.atan2(direction[1], direction[0])
+    angle = math.atan2(math.sin(angle), math.cos(angle))
+    return dict(inside_and_centered=bool(.03 < along < length and abs(lateral) < .04 and abs(angle) < .20),
+                entry_progress_m=along, lateral_error_m=lateral, heading_error_rad=angle)
 
 
 class CourseProgress:
