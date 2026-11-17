@@ -150,7 +150,7 @@ def evaluate(seconds=360, offset=0, yaw=0, latency=.05, mismatch=0, noise=0,
             max_offset = max(max_offset, float(distance))
             if (collision and stop_on_contact) or robot.tilt() > 35 or robot.d.qpos[0] < target_x:
                 break
-        result = dict(revision="B10", width_m=width, target_x=target_x, completed=bool(robot.d.qpos[0] < target_x), collision=collision, collision_pair=collision_pair,
+        result = dict(revision=robot.revision, width_m=width, target_x=target_x, completed=bool(robot.d.qpos[0] < target_x), collision=collision, collision_pair=collision_pair,
                       contact_s=round(contact_time, 3), max_contact_streak_s=round(max_contact_streak, 3),
                       max_wall_force_n=round(max_wall_force, 2), elapsed_s=round(robot.d.time, 2), progress_m=round(start_x - robot.d.qpos[0], 3),
                       max_offset_m=round(max_offset, 3), tilt_deg=round(robot.tilt(), 1),

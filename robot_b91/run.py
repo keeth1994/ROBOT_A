@@ -35,6 +35,7 @@ class Robot:
         )
         self.d = mujoco.MjData(self.m)
         cfg = json.loads((ROOT / "reference/b10_kinematics.json").read_text())
+        self.revision = cfg["cad_revision"]
         self.names = [l + "_" + s for l in LEGS for s in ["yaw", "pitch"]]
         js = [self.m.joint(n).id for n in self.names]
         self.qa = self.m.jnt_qposadr[js]
@@ -202,7 +203,7 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
                 break
         delta = r.d.qpos[:3] - start
         result = dict(
-            revision="B10",
+            revision=r.revision,
             parameters=r.p,
             duration_s=float(r.d.time),
             requested_duration_s=seconds,

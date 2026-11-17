@@ -1,4 +1,4 @@
-﻿# Robot B9-8
+# Robot B10_1
 
 - MuJoCo simulation
 - PC dashboard
@@ -47,10 +47,9 @@ python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
 
 ## CAD and rebuild
 
-- Current assembly and parts: `cad/B9_8/`
+- Current assembly and parts: `cad/B10_1/`
 - Rebuild simulation: `python robot.py build`
 - After STEP changes:
   1. `python -m pip install -r requirements-cad.txt`
-  2. `python cad/export_b98_sim.py`
+  2. `python cad/export_b10_sim.py`
   3. `python robot.py build`
-- Fusion CAD tools: `cad/B98Builder/` (build, validate and access scripts)

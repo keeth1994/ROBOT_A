@@ -1,5 +1,5 @@
 {
-  "cad_revision": "B10",
+  "cad_revision": "B10_1",
   "legs": {
     "FL": {
       "yaw_center_mm": [
@@ -100,9 +100,9 @@
   },
   "camera": {
     "lens_xyz_m": [
-      -0.076,
-      0,
-      0.211
+      -0.0127163717,
+      0.0,
+      0.2436313333
     ],
     "pitch_deg": 40,
     "actuated": false

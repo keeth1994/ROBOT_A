@@ -22,8 +22,8 @@ def main():
         for task in json.loads(tasks.read_text())["tasks"]:
             assert task["args"][1] in robot.COMMANDS or task["args"][1] == "check"
     for path in (
-        "cad/B10/Robot_B10.f3d",
-        "cad/B10/Robot_B10.step",
+        "cad/B10_1/Robot_B10_1.f3d",
+        "cad/B10_1/Robot_B10_1.step",
         "models/robot_b10.xml",
         "models/robot_b10_course.xml",
         "reference/robot_b10_manifest.json",

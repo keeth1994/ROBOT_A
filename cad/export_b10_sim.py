@@ -1,4 +1,4 @@
-"""Export the B10 STEP assembly for MuJoCo (optional cadquery-ocp dependency).
+"""Export the current STEP assembly for MuJoCo (optional cadquery-ocp dependency).
 
 Run with: python cad/export_b10_sim.py
 STEPCAF preserves occurrence names and assembly placements. OpenCascade reads
@@ -30,14 +30,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
-    source = ROOT / 'cad/B10/Robot_B10.step'
+    design = json.loads((ROOT / "cad/current_design.json").read_text())
+    source = ROOT / design["step"]
+    revision = design["cad_revision"]
     reader = STEPCAFControl_Reader()
     reader.SetNameMode(True)
     if reader.ReadFile(str(source)) != IFSelect_RetDone:
-        raise RuntimeError('Could not read B10 STEP assembly')
-    doc = TDocStd_Document(TCollection_ExtendedString('B10 simulation export'))
+        raise RuntimeError(f'Could not read {revision} STEP assembly')
+    doc = TDocStd_Document(TCollection_ExtendedString(revision + ' simulation export'))
     if not reader.Transfer(doc):
-        raise RuntimeError('Could not transfer B10 STEP assembly')
+        raise RuntimeError(f'Could not transfer {revision} STEP assembly')
     tool = XCAFDoc_DocumentTool.ShapeTool_s(doc.Main())
     records = []
 
@@ -112,7 +114,7 @@ def main():
     tool.GetFreeShapes(roots)
     for i in range(1, roots.Length() + 1):
         visit(roots.Value(i), TopLoc_Location())
-    export = dict(revision='B10', source=str(source.relative_to(ROOT)),
+    export = dict(revision=revision, source=str(source.relative_to(ROOT)),
                   source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
                   tessellation_tolerance_m=0.0001, bodies=records)
     output = ROOT / 'reference/b10_cad_meshes.json.gz'
@@ -120,7 +122,7 @@ def main():
     with output.open('wb') as raw:
         with gzip.GzipFile(filename='', mode='wb', fileobj=raw, mtime=0) as zipped:
             zipped.write(json.dumps(export, separators=(',', ':')).encode())
-    print(f'Exported {len(records)} B10 CAD solids to {output.relative_to(ROOT)}')
+    print(f'Exported {len(records)} {revision} CAD solids to {output.relative_to(ROOT)}')
 
 
 if __name__ == '__main__':

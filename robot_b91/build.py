@@ -1,4 +1,4 @@
-"""Build B10 visuals, CAD-derived segmented collision hulls and explicit mass estimates."""
+"""Build current CAD visuals, CAD-derived segmented collision hulls and explicit mass estimates."""
 
 from pathlib import Path
 from collections import defaultdict
@@ -31,17 +31,13 @@ def classify(n):
     ]:
         if key in n:
             return kind
+    if n == "Upper journal washer":
+        return "PLA"
     # An M3/M4 mention in a printed part's name describes its interface.
-    if any(k in n for k in [" axle", "washer", " bolt", " screw", " nut", "pitch M4"]):
+    if any(k in n for k in [" axle", "washer", " bolt", " screw", " nut", "pitch M4", " M3x", " sleeve"]):
         if not any(k in n for k in ["captive support nuts", "captive nut pocket"]):
             return "steel"
     return "PLA"
-
-
-def camera_mount(record):
-    if record["component"] in ("Lens", "TimerCamera-X housing"):
-        return False
-    return record["assembly"].startswith("Tilt ") or "camera" in record["component"].lower()
 
 
 def group(record):
@@ -49,7 +45,7 @@ def group(record):
     assembly = record["assembly"]
     if assembly in [leg + " " + joint for leg in LEGS for joint in ("yaw", "pitch")]:
         return assembly.replace(" ", "_")
-    if assembly in ("Robot frame", "Tilt input", "Tilt cradle", "Tilt link"):
+    if assembly in ("Robot frame", "Camera input", "Camera cradle", "Camera link", "Upper rocker"):
         return "platform"
     raise ValueError(f"Unknown STEP assembly: {assembly}")
 
@@ -132,7 +128,7 @@ def main():
     cfg = json.loads((ref / "b10_kinematics.json").read_text())
     records = neutral_records(export["bodies"], cfg)
     masscfg = json.loads((ref / "b10_mass.json").read_text())
-    xml = E.Element("mujoco", model="B10 CAD transfer")
+    xml = E.Element("mujoco", model=export["revision"] + " CAD transfer")
     E.SubElement(
         xml,
         "compiler",
@@ -186,7 +182,7 @@ def main():
         conaffinity="2",
         friction=".8 .002 .0001",
     )
-    allv = np.concatenate([r["vertices"] for r in records if not camera_mount(r)])
+    allv = np.concatenate([r["vertices"] for r in records])
     height = -allv[:, 2].min() + 0.002
     root = E.SubElement(wb, "body", name="platform", pos=fmt([0, 0, height]))
     E.SubElement(root, "freejoint")
@@ -235,8 +231,6 @@ def main():
         "horn": ".9 .65 .1 1",
     }
     for i, r in enumerate(records):
-        if camera_mount(r):
-            continue
         n = r["component"]
         g = group(r)
         kind = classify(n)
@@ -257,7 +251,9 @@ def main():
         )
         if kind == "servo":
             joint = n[:2] + ("_pitch" if "pitch servo" in n else "_yaw")
-            audit[-1]["servo_model"] = cfg["joint_servos"][joint]
+            audit[-1]["servo_model"] = (
+                "Parallax" if n.startswith("Camera ") else cfg["joint_servos"][joint]
+            )
         vv, ff = visual_mesh(r, origins[g])
         name = "cad_" + str(i)
         path = folder / (name + ".obj")
@@ -421,12 +417,12 @@ def main():
         ROOT / "models/robot_b10_course.xml", encoding="utf-8", xml_declaration=True
     )
     manifest = dict(
-        revision="B10",
+        revision=export["revision"],
         source=export["source"],
         source_sha256=export["source_sha256"],
         cad_bodies=len(records),
         simulated_bodies=len(audit),
-        excluded_components=[r["component"] for r in records if camera_mount(r)],
+        excluded_components=[],
         collision_hulls=collision_count,
         total_mass_kg=measured_mass,
         estimated_total_mass_kg=estimated_mass,
@@ -441,8 +437,8 @@ def main():
             "Yaw conservatively limited to +/-45 degrees; larger range not cleared",
             "Rigid terrain and assumed 0.8 friction",
             "Ideal IMU and IR rays; no calibrated sensor noise",
-            "Camera mount, motor and linkage omitted; camera retained at the exported 40-degree pose",
-            "The previous robot gait and course results do not validate B10",
+            "Camera mount, motor, gears and linkage included, fixed at the exported 40-degree pose; camera tilt is not actuated",
+            "Course results depend on the CAD revision and must be rechecked after model changes",
         ],
     )
     (ref / "robot_b10_manifest.json").write_text(json.dumps(manifest, indent=2))
