@@ -177,8 +177,11 @@ class CorridorSearch:
         if camera is not None:
             angle = camera.get('angle')
             if (isinstance(angle, bool) or not isinstance(angle, (int, float)) or
-                    not math.isfinite(angle) or not -45 <= angle <= 45):
+                    not math.isfinite(angle) or not -80 <= angle <= 45):
                 return self.hold('Enable the camera pitch servo before searching.', reset=True)
+            target = self.orientation.camera_calibration['corridor_servo_deg']
+            if angle != target:
+                return self.hold(f'Waiting for camera pitch {target} degrees before corridor search.', reset=True)
             if angle != self.camera_angle:
                 self.camera_angle, self.camera_changed = angle, now
                 self.matches = 0

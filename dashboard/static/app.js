@@ -48,7 +48,7 @@ function renderControls() {
   const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.calibratedAngles || !s?.servoReady || s?.faulted || s?.running || walking || !current?.operator_alive || commandBusy;
   const pitch = s?.cameraPitch;
   const pitchBlocked = document.visibilityState !== 'visible' || !device?.online || !s?.servoReady ||
-    s?.faulted || !current?.operator_alive || commandBusy || !pitch;
+    s?.faulted || !current?.operator_alive || commandBusy || !pitch || current?.walking?.camera_controlled;
   el('cameraPitchEnable').disabled = pitchBlocked || pitch?.angle !== null;
   el('cameraPitchRelease').disabled = pitchBlocked || pitch?.angle === null;
   el('cameraPitch').disabled = pitchBlocked || pitch?.angle === null;
@@ -132,6 +132,10 @@ function render(state) {
   badge('cameraOnline', state.camera.online ? 'Connected' : 'Offline', state.camera.online);
   const s = state.servo.data;
   const pitch = s?.cameraPitch;
+  if (pitch) {
+    el('cameraPitch').min = pitch.minAngle;
+    el('cameraPitch').max = pitch.maxAngle;
+  }
   if (pitch && document.activeElement !== el('cameraPitch') && !commandBusy) {
     el('cameraPitch').value = pitch.angle ?? 0;
     el('cameraPitchValue').textContent = (pitch.angle ?? 0) + '°';
@@ -139,6 +143,7 @@ function render(state) {
   el('cameraPitchStatus').textContent = !state.servo.online ? 'Controller offline.' : !pitch
     ? 'Upload the camera-pitch controller firmware to enable these controls.'
     : pitch.angle === null ? 'Camera servo released. Enable at 0° before adjusting.'
+    : current?.walking?.camera_controlled ? 'Automatic camera control: ' + pitch.angle + '°. Stop walking to adjust manually.'
     : 'Commanded position: ' + pitch.angle + '°. Camera-guided walking pauses briefly after tilt changes.';
   renderIr(state.servo.online ? s : null);
   if (state.servo.online && s) {

@@ -89,7 +89,14 @@ class Navigation:
             if not edges:
                 return reject("No clear blue tape found")
         elif self.adaptive_surface:
-            dark, edges = self.surface_detector(rgb, self.dark_min, self.dark_max, self.max_chroma)
+            # Pitching over the top inverts the rear image. Detect on an upright view,
+            # then put the edges back in raw camera coordinates for ray projection.
+            rear = getattr(self, 'view_sign', 1) < 0
+            upright = rgb[::-1, ::-1] if rear else rgb
+            dark, edges = self.surface_detector(upright, self.dark_min, self.dark_max, self.max_chroma)
+            if rear:
+                dark = dark[::-1, ::-1]
+                edges = sorted((h - 1 - y, w - 1 - right, w - 1 - left) for y, left, right in edges)
             self.debug['mask'] = dark
             self.debug['surface_detected'] = bool(dark.any())
             if not dark.any():
@@ -136,7 +143,7 @@ class Navigation:
                               -(y - (h - 1) / 2) / f] for x in [left, right]])
             rays = rays @ mount.T
             rays = rays @ rotation.T
-            if np.min(rays[:, 0]) < .2:
+            if np.min(rays[:, 0] * getattr(self, "view_sign", 1)) < .2:
                 continue
             bearings = rays[:, 1] / rays[:, 0]
             rows.append([bearings[0] - bearings[1], np.mean(bearings)])

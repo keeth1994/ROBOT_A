@@ -10,6 +10,7 @@ from robot_b91 import servo_properties
 from robot_b91.course import local_points
 from robot_b91.progress import CourseProgress, corridor_entry_score
 from robot_b91.gait import rocker_targets
+from robot_b91.camera_calibration import load_camera_scan_settings
 
 LEGS = ["FL", "RL", "FR", "RR"]
 
@@ -36,6 +37,13 @@ class Robot:
         self.d = mujoco.MjData(self.m)
         cfg = json.loads((ROOT / "reference/b10_kinematics.json").read_text())
         self.revision = cfg["cad_revision"]
+        self.camera_scan = load_camera_scan_settings()
+        self.scan_enabled = bool(ramp and feedback == "sensors" and self.camera_scan["enabled"])
+        self.camera_qa = self.m.joint("camera_cradle").qposadr[0]
+        self.camera_da = self.m.joint("camera_cradle").dofadr[0]
+        self.camera_actuator = self.m.actuator("camera_tilt").id
+        self.camera_limit = cfg["servos"]["Parallax"]["stall_Nm"] / 2
+        self.camera_speed = math.radians(cfg["servos"]["Parallax"]["free_speed_deg_s"] * 2)
         self.names = [l + "_" + s for l in LEGS for s in ["yaw", "pitch"]]
         js = [self.m.joint(n).id for n in self.names]
         self.qa = self.m.jnt_qposadr[js]
@@ -66,6 +74,11 @@ class Robot:
     def reset(self):
         mujoco.mj_resetData(self.m, self.d)
         self.d.qpos[self.qa[1::2]] = self.p["pitch_stance"]
+        if self.scan_enabled:
+            angle = math.radians(self.camera_scan["forward_deg"])
+            for name, ratio in [("camera_cradle", 1), ("camera_input", -.5),
+                                ("upper_rocker", -.5), ("camera_link", .5)]:
+                self.d.qpos[self.m.joint(name).qposadr[0]] = angle * ratio
         mujoco.mj_forward(self.m, self.d)
         self.target = np.tile([0.0, self.p["pitch_stance"]], 4)
         self.command_target = self.target.copy()
@@ -80,7 +93,7 @@ class Robot:
             self.navigation.close()
         if self.feedback == "sensors" and self.course:
             from robot_b91.sim_navigation import SimNavigation
-            self.navigation = SimNavigation(self.m)
+            self.navigation = SimNavigation(self.m, self.camera_scan if self.scan_enabled else None)
 
     def close(self):
         if self.navigation:
@@ -106,6 +119,8 @@ class Robot:
             self.step_targets(self.target)
             return
         if walk and t > 0 and self.navigation and not self.navigation.estimate.ready(self.d.time):
+            if self.scan_enabled:
+                self.navigation.estimate.walking = False
             self.gait_time_origin += self.m.opt.timestep
             self.step_targets(self.command_target)
             return
@@ -125,6 +140,8 @@ class Robot:
                 p, t, self.d.time - self.gait_time_origin,
                 heading, lateral, self.joint_ranges,
             )
+        if self.navigation and self.scan_enabled:
+            self.navigation.estimate.walking = bool(walk and t > 0 and self.navigation.estimate.ready(self.d.time))
         self.step_targets(self.target)
 
     def step_targets(self, target):
@@ -145,6 +162,17 @@ class Robot:
         )
         self.torque = np.clip(req, -available, available)
         self.d.ctrl[self.ai] = self.torque
+        camera_target = 0
+        if self.scan_enabled:
+            camera_target = (self.navigation.estimate.camera_target(self.d.time) if self.navigation else
+                             math.radians(self.camera_scan["forward_deg"]))
+        velocity = self.d.qvel[self.camera_da]
+        # Servo damping is integrated implicitly in the camera joint for stability.
+        requested = 2.3 * (camera_target - self.d.qpos[self.camera_qa])
+        available_camera = self.camera_limit
+        if requested * velocity > 0:
+            available_camera *= max(0, 1 - abs(velocity) / self.camera_speed)
+        self.d.ctrl[self.camera_actuator] = np.clip(requested, -available_camera, available_camera)
         mujoco.mj_step(self.m, self.d)
         self._sample_ir()
 

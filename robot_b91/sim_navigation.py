@@ -1,4 +1,4 @@
-"""Sensor acquisition adapter. Only RGB, accelerometer and gyro cross the boundary."""
+"""Simulation acquisition: RGB, IMU and camera tilt encoder, without robot ground truth."""
 import mujoco
 import json
 import math
@@ -8,15 +8,24 @@ from robot_b91.paths import ROOT
 
 
 class SimNavigation:
-    def __init__(self, model):
+    def __init__(self, model, scan_settings=None):
         config = json.loads((ROOT / 'reference/b91_navigation.json').read_text())
-        config['camera_x_m'] = float(model.camera('project_camera').pos[0])
+        self.scan_settings = scan_settings
+        self.camera = model.camera('project_camera')
+        self.pivot = model.body('camera_cradle').pos.copy()
+        config['camera_x_m'] = float(self.pivot[0] + self.camera.pos[0])
         camera = model.camera('project_camera')
         rotation = np.empty(9)
         mujoco.mju_quat2Mat(rotation, camera.quat)
         forward = -rotation.reshape(3, 3)[:, 2]
         config['camera_pitch_deg'] = math.degrees(math.atan2(-forward[2], forward[0]))
-        self.estimate = Navigation(**config)
+        if scan_settings:
+            from robot_b91.camera_scan import RampScanNavigation
+            self.estimate = RampScanNavigation(scan_settings, **config)
+            self.angle_address = model.joint('camera_cradle').qposadr[0]
+            self.speed_address = model.joint('camera_cradle').dofadr[0]
+        else:
+            self.estimate = Navigation(**config)
         self.renderer = mujoco.Renderer(model, height=240, width=320)
         self.options = mujoco.MjvOption()
         self.options.geomgroup[3] = 0
@@ -77,7 +86,14 @@ class SimNavigation:
             self.frame_sequence += 1
             self.camera_frame = (self.frame_sequence, data.time, rgb)
             if not self.search:
-                self.estimate.frame(data.time, rgb)
+                if self.scan_settings:
+                    angle = float(data.qpos[self.angle_address])
+                    camera_x = (self.pivot[0] + math.cos(angle) * self.camera.pos[0]
+                                + math.sin(angle) * self.camera.pos[2])
+                    self.estimate.scan_frame(data.time, rgb, angle,
+                                             float(data.qvel[self.speed_address]), camera_x)
+                else:
+                    self.estimate.frame(data.time, rgb)
             self.next_frame = data.time + .1
         if self.search and data.time >= self.next_search_update:
             settings = self.search.settings

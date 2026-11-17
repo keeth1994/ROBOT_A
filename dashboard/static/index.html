@@ -42,9 +42,10 @@
       </div>
       <p id="cameraStats" class="subtle">Waiting for camera status.</p>
       <label for="cameraPitch">Camera pitch · channel 14: <output id="cameraPitchValue">0°</output></label>
-      <input id="cameraPitch" type="range" min="-45" max="45" step="1" value="0" disabled>
+      <input id="cameraPitch" type="range" min="-80" max="45" step="1" value="0" disabled>
       <div class="actions"><button id="cameraPitchEnable" disabled>Enable at 0°</button><button id="cameraPitchRelease" disabled>Release camera servo</button></div>
       <p id="cameraPitchStatus" class="subtle">Upload the camera-pitch controller firmware to enable these controls.</p>
+      <p class="subtle">Ramp starts at −65°. Ramp search: −80° forward · −4° backward. Corridor search uses −80°.</p>
       <details id="cameraDebug">
         <summary>Camera debug</summary>
         <p id="debugSource" class="subtle">Camera preview only; no walking starts.</p>
@@ -78,7 +79,7 @@
       <section>
         <div class="panel-head"><h2>Servos</h2><span id="servoState" class="badge">Outputs off</span></div>
         <p id="controllerMessage">Waiting for controller.</p>
-        <div class="actions"><button id="walk">Walk</button><button id="walkCourse">Follow course (camera + IMU)</button><button id="walkCourseCamera">Follow course (camera only)</button><button id="walkCourseTape">Follow blue tape (camera + IMU)</button><button id="walkCourseImu">Walk with IMU</button><button id="dance">Dance</button></div>
+        <div class="actions"><button id="walk">Walk</button><button id="walkCourse">Follow ramp (camera + IMU)</button><button id="walkCourseCamera">Follow ramp (camera only)</button><button id="walkCourseTape">Follow blue tape (camera + IMU)</button><button id="walkCourseImu">Walk with IMU</button><button id="dance">Dance</button></div>
         <p class="actions"><button id="searchCorridor">Find corridor (camera + IR + IMU)</button><button id="walkCorridor">Follow corridor (IR + IMU)</button></p>
         <p id="walkMessage">ESP32 walking is stopped.</p>
         <label for="walkSpeed">Motion speed: <output id="walkSpeedValue" for="walkSpeed">100%</output></label>

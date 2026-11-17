@@ -6,6 +6,7 @@ from .devices import DeviceError
 from .navigation import CourseNavigation
 from .corridor_walls import IRWallNavigation, load_corridor_settings
 from .corridor_search import CorridorSearch
+from robot_b91.camera_calibration import load_camera_scan_settings
 
 ROOT = Path(__file__).resolve().parents[2]
 JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch'))
@@ -26,6 +27,7 @@ class Walking:
         self.navigation = None
         self.corridor_settings = None
         self.speed = 1.0
+        self.camera_settings = load_camera_scan_settings()
         self.message = 'Stopped. Walking is not started automatically.'
 
     def state(self):
@@ -33,7 +35,22 @@ class Walking:
                     profile=self.profile, mode='dance' if self.profile == 'dance' else 'walk',
                     controller='ESP32',
                     speed=self.speed, period_s=(1.0 if self.profile == 'dance' else self.params['period']) / self.speed,
+                    camera_controlled=self.active and self.camera_start_angle(self.profile) is not None,
                     navigation=self.navigation.report() if self.navigation else None)
+
+    def camera_start_angle(self, profile):
+        if profile == 'corridor_search':
+            return self.camera_settings['corridor_servo_deg']
+        if profile in ('course', 'course_camera', 'course_tape'):
+            return self.camera_settings['forward_servo_deg']
+        return None
+
+    def camera_target(self, now):
+        if not self.active:
+            return None
+        if self.profile in ('course', 'course_camera'):
+            return self.navigation.camera_target(now)
+        return self.camera_start_angle(self.profile)
 
     def set_speed(self, speed):
         if (isinstance(speed, bool) or not isinstance(speed, (int, float)) or
@@ -59,6 +76,7 @@ class Walking:
     def start_settings(self, profile):
         if profile not in PROFILES:
             raise ValueError('Unknown walking profile.')
+        self.camera_settings = load_camera_scan_settings()
         with (ROOT / 'reference/b91_gait.toml').open('rb') as stream:
             self.params = tomllib.load(stream)
         defaults = {'pitch_min': -125 * math.pi / 180, 'lateral_gain': 0, 'strafe_gain': 0, 'yaw_bias': 0}
@@ -89,7 +107,8 @@ class Walking:
                                IRWallNavigation(now, **self.corridor_settings['navigation']))
         else:
             self.navigation = (CourseNavigation(now, use_camera='camera' in sensors, use_imu='imu' in sensors,
-                                                guidance='blue_tape' if profile == 'course_tape' else 'ramp')
+                                                guidance='blue_tape' if profile == 'course_tape' else 'ramp',
+                                                scan_ramp=profile in ('course', 'course_camera'))
                                if sensors else None)
         self.session, self.sequence = session, 0
         self.started = self.last_confirmed_frame = now

@@ -208,6 +208,8 @@ class Dashboard:
                         devices.request(url, '/stop', {}, timeout=.15)
                         continue
                     devices.request(url, '/motion/adjust', frame, timeout=.15)
+                    # Pause the gait before issuing a camera turn requested after ramp loss.
+                    self._aim_camera(url, status, self.walking.camera_target(time.monotonic()))
                     self.walking.last_confirmed_frame = time.monotonic()
                 except (devices.DeviceError, ValueError, KeyError, TypeError) as error:
                     if (isinstance(error, devices.DeviceConnectionError) and
@@ -244,6 +246,11 @@ class Dashboard:
                     settings = self.walking.start_settings(profile)
                 except ValueError as error:
                     raise devices.DeviceError(str(error), 409) from error
+                required_angles = ()
+                if profile in ('course', 'course_camera'):
+                    required_angles = (self.walking.camera_settings['search_forward_servo_deg'],
+                                       self.walking.camera_settings['backward_servo_deg'])
+                self._aim_camera(url, status, self.walking.camera_start_angle(profile), required_angles)
                 result = devices.request(url, '/motion/start', settings, timeout=.15)
                 self.walking.begin(status, result['session'], time.monotonic(), profile=profile)
                 if (self.walking.navigation and self.walking.navigation.use_camera and
@@ -260,6 +267,18 @@ class Dashboard:
                     raise
                 raise devices.DeviceError('Invalid ESP32 walking response; motion stopped.', 409) from error
             return {'message': self.walking.message}
+
+    def _aim_camera(self, url, status, angle, required_angles=()):
+        if angle is None:
+            return
+        camera = status.get('cameraPitch')
+        for target in (angle, *required_angles):
+            if (not camera or camera.get('minAngle', 0) > target or camera.get('maxAngle', 0) < target):
+                raise devices.DeviceError(f'Upload controller firmware that supports camera pitch {target} degrees.', 409)
+        if camera.get('angle') is None:
+            devices.request(url, '/camera-pitch', {'angle': 0}, timeout=.15)
+        if camera.get('angle') != angle:
+            devices.request(url, '/camera-pitch', {'angle': angle}, timeout=.15)
 
     def set_walking_speed(self, speed):
         with self.servo_lock:
@@ -340,6 +359,8 @@ class Dashboard:
         with self.servo_lock:
             if path == '/stop':
                 self.walking.stop()
+            elif path == '/camera-pitch' and self.walking.state()['camera_controlled']:
+                raise devices.DeviceError('Stop camera-guided walking before adjusting the camera manually.', 409)
             elif self.walking.active and path not in ('/heartbeat', '/camera-pitch'):
                 raise devices.DeviceError('Stop walking before manual control or sweeps.', 409)
             with self.lock:

@@ -357,7 +357,10 @@ void sendStatus()
   json += String(orientation.roll, 6); json += ",";
   json += String(orientation.pitch, 6); json += ",";
   json += String(orientation.heading, 6); json += "]";
-  json += ",\"cameraPitch\":{\"channel\":14,\"minAngle\":-45,\"maxAngle\":45,\"angle\":";
+  json += ",\"cameraPitch\":{\"channel\":14,\"minAngle\":";
+  json += camera_pitch::minAngle;
+  json += ",\"maxAngle\":"; json += camera_pitch::maxAngle;
+  json += ",\"angle\":";
   json += cameraPulse ? String(cameraAngle) : String("null");
   json += ",\"moving\":";
   json += cameraPulse && millis() - cameraChanged < 500 ? "true" : "false";
@@ -449,7 +452,7 @@ void handleCameraPitch()
   const bool release = server.arg("release") == "1";
   int16_t angle = 0;
   if (!release && (!readAngleArg(angle) || camera_pitch::pulse(angle) < 0)) {
-    respond(400, "text/plain", "Camera pitch must be an integer from -45 to 45 degrees."); return;
+    respond(400, "text/plain", "Camera pitch must be an integer from -80 to 45 degrees."); return;
   }
   if (!servoReady || faulted || WiFi.status() != WL_CONNECTED) {
     respond(409, "text/plain", "Camera control unavailable. Check controller status."); return;

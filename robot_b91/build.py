@@ -6,6 +6,7 @@ import gzip, json, hashlib, math
 import numpy as np
 from scipy.spatial import ConvexHull, QhullError
 import xml.etree.ElementTree as E
+from itertools import combinations
 from robot_b91.paths import ROOT
 from robot_b91.mesh_utils import fmt, visual_mesh
 from robot_b91.geometry import rz
@@ -45,9 +46,20 @@ def group(record):
     assembly = record["assembly"]
     if assembly in [leg + " " + joint for leg in LEGS for joint in ("yaw", "pitch")]:
         return assembly.replace(" ", "_")
-    if assembly in ("Robot frame", "Camera input", "Camera cradle", "Camera link", "Upper rocker"):
+    if assembly == "Robot frame":
         return "platform"
+    if assembly in ("Camera input", "Camera cradle", "Camera link", "Upper rocker"):
+        return assembly.lower().replace(" ", "_")
     raise ValueError(f"Unknown STEP assembly: {assembly}")
+
+
+def camera_component(record):
+    """Include the complete mount, its hardware and the camera transmission."""
+    if record["assembly"] in ("Camera input", "Camera cradle", "Camera link", "Upper rocker"):
+        return True
+    name = record["component"]
+    return (name.startswith(("Camera ", "Slide M3", "Parallax ear ", "Upper journal ")) or
+            name in ("Parallax low servo mount", "Drive tower", "Idler tower"))
 
 
 def neutral_records(records, cfg):
@@ -55,7 +67,7 @@ def neutral_records(records, cfg):
     result = []
     for record in records:
         link = group(record)
-        if link == "platform":
+        if link[:2] not in LEGS:
             result.append(record)
             continue
         leg = cfg["legs"][link[:2]]
@@ -128,6 +140,7 @@ def main():
     cfg = json.loads((ref / "b10_kinematics.json").read_text())
     records = neutral_records(export["bodies"], cfg)
     masscfg = json.loads((ref / "b10_mass.json").read_text())
+    exclude_camera_mass = masscfg.get("exclude_camera_mass", False)
     xml = E.Element("mujoco", model=export["revision"] + " CAD transfer")
     E.SubElement(
         xml,
@@ -216,6 +229,34 @@ def main():
             E.SubElement(
                 act, "motor", name=n, joint=n, ctrlrange=fmt([-limit, limit])
             )
+    # Four-bar arms rotate together; the external 40T/20T gears reverse and double travel.
+    mechanism = cfg["camera"]["mechanism"]
+    for name, settings in mechanism.items():
+        origin = np.array(settings["origin_m"])
+        parent = settings["parent"]
+        origins[name] = origin
+        bodies[name] = E.SubElement(
+            bodies[parent], "body", name=name, pos=fmt(origin - origins[parent])
+        )
+        joint = E.SubElement(bodies[name], "joint", name=name, axis="0 1 0",
+                             damping=".0005", armature=".000001")
+        if name == "camera_cradle":
+            joint.set("damping", ".035")
+            joint.set("range", fmt(np.radians(cfg["camera"]["range_deg"])))
+    equality = E.SubElement(xml, "equality")
+    for name, other, ratio in [("camera_input", "camera_cradle", -.5),
+                               ("upper_rocker", "camera_cradle", -.5),
+                               ("camera_link", "camera_input", -1)]:
+        E.SubElement(equality, "joint", joint1=name, joint2=other,
+                     polycoef=fmt([0, ratio, 0, 0, 0]), solref=".004 1")
+    camera_torque = cfg["servos"]["Parallax"]["stall_Nm"] / 2
+    E.SubElement(act, "motor", name="camera_tilt", joint="camera_cradle",
+                 ctrlrange=fmt([-camera_torque, camera_torque]))
+    contact = E.SubElement(xml, "contact")
+    # Coupled joints model the transmission; meshing teeth and mounting interfaces
+    # must not also be solved as independent collision contacts.
+    for first, second in combinations(["platform", *mechanism], 2):
+        E.SubElement(contact, "exclude", body1=first, body2=second)
     folder = ROOT / "models/robot_meshes_b10"
     folder.mkdir(parents=True, exist_ok=True)
     groups = defaultdict(list)
@@ -245,9 +286,12 @@ def main():
             mass = servo_properties(
                 cfg, n[:2] + ("_pitch" if "pitch servo" in n else "_yaw")
             )[2]
-        groups[g].append((mass, np.array(r["com_m"]), np.array(r["unit_inertia_m2"])))
+        is_camera = camera_component(r)
+        simulated_mass = 0 if exclude_camera_mass and is_camera else mass
+        groups[g].append((simulated_mass, np.array(r["com_m"]), np.array(r["unit_inertia_m2"])))
         audit.append(
-            dict(component=n, link=g, kind=kind, mass_kg=mass, volume_m3=r["volume_m3"])
+            dict(component=n, link=g, kind=kind, mass_kg=mass, volume_m3=r["volume_m3"],
+                 camera_assembly=is_camera)
         )
         if kind == "servo":
             joint = n[:2] + ("_pitch" if "pitch servo" in n else "_yaw")
@@ -344,15 +388,27 @@ def main():
             np.diag([0.14**2 + 0.05**2, 0.14**2 + 0.05**2, 2 * 0.14**2]) / 12,
         )
     )
-    estimated_mass = sum(m for entries in groups.values() for m, _, _ in entries)
+    # Keep the original calibration so removing the camera does not make other parts heavier.
+    estimated_mass = sum(part["mass_kg"] for part in audit) + masscfg["extra_wiring_fasteners_kg"]
     measured_mass = masscfg["measured_total_mass_kg"]
     if not math.isfinite(measured_mass) or measured_mass <= 0:
         raise ValueError("Measured robot mass must be a positive number in kilograms.")
     mass_scale = measured_mass / estimated_mass
+    camera_mass = 0
     for part in audit:
         part["mass_kg"] *= mass_scale
+        part["reference_mass_kg"] = part["mass_kg"]
+        if part["camera_assembly"]:
+            camera_mass += part["mass_kg"]
+            if exclude_camera_mass:
+                part["mass_kg"] = 0
+    numerical_mass = 0
     for g, entries in groups.items():
-        entries = [(m * mass_scale, c, s) for m, c, s in entries]
+        entries = [(m * mass_scale, c, s) for m, c, s in entries if m > 0]
+        if not entries:
+            # MuJoCo requires positive mass/inertia on moving bodies: 1 mg per body.
+            entries = [(1e-6, origins[g], np.eye(3) * 1e-6)]
+            numerical_mass += 1e-6
         total = sum(m for m, c, s in entries)
         com = sum(m * c for m, c, s in entries) / total
         I = np.zeros((3, 3))
@@ -393,14 +449,15 @@ def main():
             size=".001",
         )
         E.SubElement(sensors, "rangefinder", name=s["name"], site=s["name"] + "_site")
+    E.SubElement(sensors, "jointpos", name="camera_tilt_angle", joint="camera_cradle")
     # TimerCamera-X: 66.5 degree diagonal FOV converted to vertical for 4:3.
     navigation = json.loads((ref / "b91_navigation.json").read_text())
     camera_pitch = np.radians(cfg["camera"]["pitch_deg"])
     E.SubElement(
-        root,
+        bodies["camera_cradle"],
         "camera",
         name="project_camera",
-        pos=fmt(cfg["camera"]["lens_xyz_m"]),
+        pos=fmt(np.array(cfg["camera"]["lens_xyz_m"]) - origins["camera_cradle"]),
         xyaxes=fmt([0, -1, 0, np.sin(camera_pitch), 0, np.cos(camera_pitch)]),
         fovy=str(navigation["fovy_deg"]),
     )
@@ -424,20 +481,26 @@ def main():
         simulated_bodies=len(audit),
         excluded_components=[],
         collision_hulls=collision_count,
-        total_mass_kg=measured_mass,
+        total_mass_kg=measured_mass - (camera_mass if exclude_camera_mass else 0) + numerical_mass,
+        reference_total_mass_kg=measured_mass,
+        camera_mass_enabled=not exclude_camera_mass,
+        camera_assembly_mass_kg=camera_mass,
+        removed_camera_mass_kg=camera_mass if exclude_camera_mass else 0,
+        numerical_camera_mass_kg=numerical_mass,
         estimated_total_mass_kg=estimated_mass,
         mass_scale=mass_scale,
         neutral_bounds_m=np.ptp(allv, axis=0).tolist(),
         parts=audit,
         limitations=[
-            "Total mass matched to the measured robot; part masses scaled proportionally from CAD estimates",
+            "Full robot calibrated to measured mass; camera mass can be excluded without changing other part masses",
+            "Moving camera bodies retain 1 mg each when camera mass is excluded, to satisfy MuJoCo mass requirements",
             "CAD solid inertia scaled uniformly to provisional component masses; equipment internals approximated",
             "Segmented convex CAD hulls after 0.5 mm vertex clustering; small holes/fasteners omitted",
             "Estimated 5 V direct-drive servo ratings; no backlash, thermal or supply-current model",
             "Yaw conservatively limited to +/-45 degrees; larger range not cleared",
             "Rigid terrain and assumed 0.8 friction",
             "Ideal IMU and IR rays; no calibrated sensor noise",
-            "Camera mount, motor, gears and linkage included, fixed at the exported 40-degree pose; camera tilt is not actuated",
+            "Camera tilt uses coupled CAD joints and an estimated geared servo; gear tooth contact, backlash and linkage flexibility are not simulated",
             "Course results depend on the CAD revision and must be rechecked after model changes",
         ],
     )

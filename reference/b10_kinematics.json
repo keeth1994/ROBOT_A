@@ -105,7 +105,45 @@
       0.2436313333
     ],
     "pitch_deg": 40,
-    "actuated": false
+    "actuated": true,
+    "mechanism": {
+      "camera_input": {
+        "origin_m": [
+          -0.0345,
+          -0.05485,
+          0.132
+        ],
+        "parent": "platform"
+      },
+      "upper_rocker": {
+        "origin_m": [
+          -0.032,
+          -0.061,
+          0.183
+        ],
+        "parent": "platform"
+      },
+      "camera_cradle": {
+        "origin_m": [
+          -0.032,
+          0,
+          0.22065
+        ],
+        "parent": "platform"
+      },
+      "camera_link": {
+        "origin_m": [
+          -0.0631402655,
+          -0.0557,
+          0.1438631864
+        ],
+        "parent": "camera_input"
+      }
+    },
+    "range_deg": [
+      -50,
+      140
+    ]
   },
   "neutral_pose": "Yaw zero points diagonally outward from each corner: FL +45, FR -45, RL +135, RR -135 degrees about body Z. CAD leg assemblies are rotated from their saved poses; pitch zero is foot-down."
 }
