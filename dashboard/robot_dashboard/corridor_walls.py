@@ -28,6 +28,12 @@ def load_corridor_settings():
                    for key in ('yaw_amplitude', 'yaw_bias')):
             raise ValueError('Corridor yaw settings must be between 0 and 45 degrees.')
         validate_wall_settings(**settings['navigation'])
+        camera = settings['camera']
+        if (not all(math.isfinite(camera[key]) for key in ('height_m', 'wall_height_m', 'forward_m', 'pitch_deg', 'fovy_deg')) or
+                not 0 < camera['height_m'] < 1 or not 0 < camera['fovy_deg'] < 180 or
+                not 0 < camera['wall_height_m'] < camera['height_m'] or
+                not -90 < camera['pitch_deg'] < 90):
+            raise ValueError('Use a positive camera height and valid camera angles.')
         return settings
     except (KeyError, TypeError, ValueError, OSError) as error:
         raise ValueError(f'Invalid corridor settings in reference/corridor.json: {error}') from error

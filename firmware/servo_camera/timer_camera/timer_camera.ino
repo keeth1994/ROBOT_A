@@ -12,7 +12,7 @@
 #include <mutex>
 
 constexpr int BAT_HOLD_PIN = 33, STATUS_LED_PIN = 2;
-constexpr uint8_t DEFAULT_FPS = 10, DEFAULT_JPEG_QUALITY = 12;
+constexpr uint8_t DEFAULT_FPS = 15, DEFAULT_JPEG_QUALITY = 12;
 constexpr bool FLIP_VERTICAL = true;
 constexpr bool MIRROR_HORIZONTAL = false;
 

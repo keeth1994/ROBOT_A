@@ -14,7 +14,7 @@ def flip_target(elapsed, start, end, settings):
 
 
 class RampScanNavigation(Navigation):
-    def __init__(self, settings, use_imu=True, search_forward_deg=None, **config):
+    def __init__(self, settings, use_imu=True, **config):
         config['max_blind_s'] = settings['cache_s']
         super().__init__(**config)
         self.settings = settings
@@ -23,16 +23,14 @@ class RampScanNavigation(Navigation):
         self.view_sign = 1
         self.walking = False
         self.view = 'forward'
-        self.forward_angle = math.radians(settings['forward_deg'])
-        self.search_forward_deg = search_forward_deg
         self.searching = False
         self.move_started = None
-        self.move_from = self.forward_angle
+        self.move_from = math.radians(settings['forward_deg'])
         self.search_wait_since = None
-        self.reacquired_since = None
+        self.reacquired_since = self.last_confirmation = None
 
     def view_target(self):
-        return self.forward_angle if self.view == 'forward' else math.radians(self.settings['backward_deg'])
+        return math.radians(self.settings[self.view + '_deg'])
 
     def camera_target(self, timestamp):
         target = self.view_target()
@@ -49,7 +47,18 @@ class RampScanNavigation(Navigation):
         self.walking = False
         self.move_started = timestamp
         self.move_from = angle
-        self.search_wait_since = self.reacquired_since = None
+        self.search_wait_since = None
+        self.reacquired_since = self.last_confirmation = None
+
+    def confirm_ramp(self, now, accepted):
+        if not accepted or (self.last_confirmation is not None and now - self.last_confirmation > .35):
+            self.reacquired_since = None
+        self.last_confirmation = now
+        if not accepted:
+            return False
+        if self.reacquired_since is None:
+            self.reacquired_since = now
+        return now - self.reacquired_since >= self.settings['reacquire_s']
 
     def imu(self, timestamp, acceleration, angular_velocity):
         previous = self.last_imu
@@ -60,49 +69,42 @@ class RampScanNavigation(Navigation):
                 # Speed is a gait estimate, not simulator position or velocity.
                 self.lateral += self.settings['estimated_speed_m_s'] * math.sin(self.heading) * dt
 
-    def scan_frame(self, timestamp, rgb, angle, angular_speed, camera_x):
+    def scan_frame(self, timestamp, rgb, angle, angular_speed, camera_x, now=None):
+        # Dashboard video can arrive before the current IMU sample. Search timing
+        # uses control time while ramp observation age keeps the image timestamp.
+        now = timestamp if now is None else now
         self.camera_pitch = self.mount_pitch + angle
         self.camera_x = camera_x
         self.view_sign = 1 if math.cos(self.camera_pitch) >= 0 else -1
         accepted = self.frame(timestamp, rgb, use_imu=self.use_imu)
         fresh_imu = (not self.use_imu or
-                     self.last_imu is not None and 0 <= timestamp - self.last_imu <= .05)
-        if fresh_imu and timestamp >= 2:
+                     self.last_imu is not None and 0 <= now - self.last_imu <= .05)
+        if fresh_imu and now >= 2:
             if self.searching:
                 target = self.view_target()
-                arrived = (timestamp - self.move_started >= self.settings['sweep_s'] and
-                           abs(angle - target) <= math.radians(self.settings['view_tolerance_deg']) and
+                arrived = (abs(angle - target) <= math.radians(self.settings['view_tolerance_deg']) and
                            abs(angular_speed) < math.radians(5))
                 if arrived:
                     if self.search_wait_since is None:
-                        self.search_wait_since = timestamp
-                    if accepted:
-                        if self.reacquired_since is None:
-                            self.reacquired_since = timestamp
-                        if timestamp - self.reacquired_since >= self.settings['reacquire_s']:
-                            self.searching = False
-                            self.move_started = None
-                            self.search_wait_since = self.reacquired_since = None
-                    else:
-                        self.reacquired_since = None
-                    if (self.searching and
-                            timestamp - self.search_wait_since >= self.settings['search_view_s']):
-                        self.flip(timestamp, angle)
+                        self.search_wait_since = now
+                    if self.confirm_ramp(now, accepted):
+                        self.searching = False
+                        self.move_started = None
+                        self.search_wait_since = None
+                    if (self.searching and self.reacquired_since is None and
+                            now - self.search_wait_since >= self.settings['search_view_s']):
+                        self.flip(now, angle)
                 else:
-                    self.search_wait_since = self.reacquired_since = None
+                    self.search_wait_since = None
+                    self.confirm_ramp(now, False)
             elif not accepted:
                 last_good = self.last_seen if self.last_seen is not None else 2.0
-                if timestamp - last_good >= self.settings['loss_timeout_s']:
-                    if self.search_forward_deg is None:
-                        self.flip(timestamp, angle)
-                    else:
-                        # Search the forward view first after losing the ramp.
-                        self.forward_angle = math.radians(self.search_forward_deg)
-                        self.start_search(timestamp, angle, 'forward')
+                if now - last_good >= self.settings['loss_timeout_s']:
+                    self.flip(now, angle)
         if self.searching:
             self.debug.update(held=True, reason=f'Walking paused; searching the {self.view} view for ramp guidance')
         elif not accepted and self.last_seen is not None:
-            if timestamp - self.last_seen <= self.settings['loss_timeout_s']:
+            if now - self.last_seen <= self.settings['loss_timeout_s']:
                 self.debug['reason'] += '; using recent ramp observation'
             else:
                 self.debug['reason'] += '; ramp guidance lost; walking held'
@@ -111,7 +113,7 @@ class RampScanNavigation(Navigation):
     def ready(self, timestamp):
         fresh = (super().ready(timestamp) if self.use_imu else
                  self.last_seen is not None and timestamp - self.last_seen <= self.blind_timeout)
-        return (fresh and not self.searching and
+        return (timestamp >= 2 and fresh and not self.searching and
                 timestamp - self.last_seen <= self.settings['loss_timeout_s'])
 
     def report(self):

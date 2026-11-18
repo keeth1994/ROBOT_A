@@ -208,11 +208,14 @@ class Dashboard:
                         devices.request(url, '/stop', {}, timeout=.15)
                         continue
                     devices.request(url, '/motion/adjust', frame, timeout=.15)
+                    if getattr(self.walking.navigation, 'corridor_requested', False):
+                        self._corridor_after_ramp(url)
+                        continue
                     # Pause the gait before issuing a camera turn requested after ramp loss.
                     self._aim_camera(url, status, self.walking.camera_target(time.monotonic()))
                     self.walking.last_confirmed_frame = time.monotonic()
                 except (devices.DeviceError, ValueError, KeyError, TypeError) as error:
-                    if (isinstance(error, devices.DeviceConnectionError) and
+                    if (isinstance(error, devices.DeviceConnectionError) and self.walking.active and
                             time.monotonic() - self.walking.last_confirmed_frame <= 1.0):
                         continue
                     self.walking.stop(str(error))
@@ -220,6 +223,20 @@ class Dashboard:
                         devices.request(url, '/stop', {}, timeout=.15)
                     except devices.DeviceError:
                         pass
+
+    def _corridor_after_ramp(self, url):
+        devices.request(url, '/stop', {}, timeout=.15)
+        self.walking.stop('Ramp ended. Starting corridor search.')
+        status = devices.request(url, '/status', timeout=.15)
+        self.walking.prepare(status)
+        if status.get('corridorSearchGait') is not True:
+            raise devices.DeviceError('Upload the controller firmware for automatic corridor search.', 409)
+        if status.get('externalActive') or status.get('running') or status.get('manualActive'):
+            raise devices.DeviceError('Controller did not stop the ramp gait. Corridor search was not started.', 409)
+        settings = self.walking.start_settings('corridor_search')
+        self._aim_camera(url, status, self.walking.camera_start_angle('corridor_search'))
+        result = devices.request(url, '/motion/start', settings, timeout=.15)
+        self.walking.begin(status, result['session'], time.monotonic(), profile='corridor_search')
 
     def walk_command(self, action):
         with self.servo_lock:
@@ -248,8 +265,9 @@ class Dashboard:
                     raise devices.DeviceError(str(error), 409) from error
                 required_angles = ()
                 if profile in ('course', 'course_camera'):
-                    required_angles = (self.walking.camera_settings['search_forward_servo_deg'],
-                                       self.walking.camera_settings['backward_servo_deg'])
+                    required_angles = (self.walking.camera_settings['backward_servo_deg'],)
+                if profile == 'course':
+                    required_angles += (self.walking.camera_settings['corridor_servo_deg'],)
                 self._aim_camera(url, status, self.walking.camera_start_angle(profile), required_angles)
                 result = devices.request(url, '/motion/start', settings, timeout=.15)
                 self.walking.begin(status, result['session'], time.monotonic(), profile=profile)

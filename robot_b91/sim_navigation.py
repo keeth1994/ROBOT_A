@@ -51,11 +51,13 @@ class SimNavigation:
         # Nominal floor speed for this simulated gait; this is only an odometry estimate.
         settings['walk_speed'] = .032
         camera = self.model.camera('project_camera')
-        geometry = dict(height_m=float(camera.pos[2]) + .047, forward_m=float(camera.pos[0]),
-                        pitch_deg=15, fovy_deg=float(camera.fovy[0]))
+        pivot = self.model.body('camera_cradle').pos
+        geometry = dict(corridor['camera'], height_m=float(pivot[2] + camera.pos[2]) + .047,
+                        forward_m=float(pivot[0] + camera.pos[0]),
+                        fovy_deg=float(camera.fovy[0]))
         self.search = CorridorSearch(now, settings, camera_geometry=geometry)
         # Represent camera tilt optically; the CAD mount remains fixed.
-        self.set_search_pitch(15)
+        self.set_search_pitch(geometry['pitch_deg'])
         self.next_frame = now
         self.next_search_update = now
 
@@ -67,12 +69,6 @@ class SimNavigation:
         mujoco.mju_mat2Quat(self.model.cam_quat[self.model.camera('project_camera').id], axes.ravel())
 
     def update(self, data):
-        if self.search:
-            pitch = 35 if self.search.stage in ('enter', 'center') else 15
-            if self.search.camera_geometry['pitch_deg'] != pitch:
-                self.set_search_pitch(pitch)
-                mujoco.mj_camlight(self.model, data)
-                self.next_frame = data.time
         if data.time >= self.next_imu:
             acceleration = data.sensor('imu_acceleration').data.copy()
             gyro = data.sensor('imu_angular_velocity').data.copy()

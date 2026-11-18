@@ -2,8 +2,7 @@
   "enabled": true,
   "backward_servo_deg": -4,
   "forward_servo_deg": -65,
-  "search_forward_servo_deg": -80,
-  "corridor_servo_deg": -80,
+  "corridor_servo_deg": -65,
   "forward_deg": -10,
   "backward_deg": 118,
   "sweep_s": 2.0,
@@ -11,7 +10,12 @@
   "estimated_speed_m_s": 0.06,
   "downward_speed_factor": 3.0,
   "view_tolerance_deg": 6.0,
-  "search_view_s": 0.8,
+  "search_view_s": 1.5,
   "loss_timeout_s": 1.0,
-  "reacquire_s": 0.3
+  "reacquire_s": 0.3,
+  "downhill_deg": 8.0,
+  "flat_deg": 3.0,
+  "downhill_confirm_s": 0.3,
+  "flat_confirm_s": 0.2,
+  "exit_check_s": 0.3
 }

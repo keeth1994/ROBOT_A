@@ -16,6 +16,7 @@ struct Parameters {
   double headingGain = .8, lateralGain = 5, strafeGain = 0;
   double yawBias = 0;
   bool crawl = false, corridor = false, search = false;
+  double steeringTrim = 0.01;
 };
 
 // Same joint order and radians as robot_b91/gait.py: FL, RL, FR, RR.
@@ -23,7 +24,12 @@ inline void targets(const Parameters &p, double elapsed, double gaitTime,
                     double heading, double lateral, double angles[8], double forwardScale = 1) {
   const double trot[] = {0, .5, .5, 0}, crawl[] = {0, .5, .25, .75};
   double turnLimit = p.corridor ? .95 : .5;
-  double correction = clamp(p.headingGain * (heading + std::atan(p.lateralGain * lateral)), -turnLimit, turnLimit);
+  double correction = clamp(
+    p.headingGain * (heading + std::atan(p.lateralGain * lateral))
+    + p.steeringTrim,
+    -turnLimit,
+    turnLimit
+  );
   double forward = p.corridor ? std::fmax(.25, 1 - std::abs(correction)) : 1;
   // Search can pivot with no forward stride, then approach an opening slowly.
   if (p.search) forward = clamp(forwardScale, 0, 1);

@@ -163,7 +163,7 @@ class Robot:
         self.torque = np.clip(req, -available, available)
         self.d.ctrl[self.ai] = self.torque
         camera_target = 0
-        if self.scan_enabled:
+        if self.scan_enabled and not (self.navigation and self.navigation.search):
             camera_target = (self.navigation.estimate.camera_target(self.d.time) if self.navigation else
                              math.radians(self.camera_scan["forward_deg"]))
         velocity = self.d.qvel[self.camera_da]

@@ -607,7 +607,7 @@ void receiveAdjustment()
       (gait.params.search && !readNumber("forward", forward, 0, 1))) {
     respond(400, "text/plain", "Use valid speed, heading, side offset, forward and ready values."); return;
   }
-  gait.speed = gait.params.search ? walking::clamp(speed, .25, .5) : speed;
+  gait.speed = speed;
   gait.forward = forward;
   // The PC sends heading at a known IMU sample. Local gyro updates continue between requests.
   gait.headingOffset = heading - (gait.useImu ? reference : 0);

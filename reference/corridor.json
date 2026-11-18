@@ -1,8 +1,15 @@
 {
-  "calibration_note": "Starting estimates from simulation and B10 CAD. Measure IR response and walking speed on the physical robot.",
+  "calibration_note": "Starting estimates from B10 CAD. Measure camera height/angle, wall height, IR response and walking speed on the physical robot. Camera pitch includes the -65 degree forward camera command.",
   "gait": {
     "yaw_amplitude": 0.4,
     "yaw_bias": 0.3
+  },
+  "camera": {
+    "height_m": 0.29,
+    "wall_height_m": 0.18,
+    "forward_m": -0.013,
+    "pitch_deg": 30.0,
+    "fovy_deg": 42.9470936
   },
   "navigation": {
     "sensor_positions": [[0.004, 0.0716], [0.004, -0.0716]],
