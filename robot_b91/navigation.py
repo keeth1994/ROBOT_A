@@ -166,6 +166,7 @@ class Navigation:
                     break
                 keep = candidate
             visual_heading = -math.atan(intercept)
+            if not use_imu or self.last_seen is None or getattr(self, 'searching', False):
                 heading = visual_heading
             elif abs(visual_heading - self.heading) < .12:
                 heading += (.2 if timestamp < 2 else .025) * (visual_heading - heading)
