@@ -45,6 +45,68 @@ python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
 - Pitch angles: -90 to +45 degrees; +45 means foot down
 - Stop: disables PWM; servo power remains on
 
+### Experimental first-crest gait
+
+`python dashboard/run.py --ramp-only --crest-wave --adaptive-ramp-speed`
+
+The opt-in crest wave lifts, returns and plants one foot at a time, with intervals
+where all four feet are commanded down. It uses smaller yaw strokes and less lift
+than the diagonal crest gait: duty 0.8, yaw amplitude 0.55, lift 0.25, stance 0,
+inward yaw bias -0.25 radians. Onboard pitch triggers the first-crest transition;
+established camera/IMU guidance is retained. The crest uses the requested speed
+(65% planned for the next trial); adaptive speed is automatically enabled for the
+wave and reduces speed to 50% when roll, heading error or lateral drift increases.
+It restores requested speed after one second of stable alignment. The original
+gait resumes on descent. `--crest-assist` retains the
+previous diagonal crest gait for comparison. Neither option starts motion by itself.
+
+Upload the servo-controller sketch and accompanying headers before using
+`--crest-wave`; the dashboard requires the new `crestWaveGait` status capability
+before starting the climb. Joint limits, stale-data pauses, heartbeat stop,
+12-degree ramp roll limit and 40-second crest timeout remain in effect.
+
+Ramp profiles now use gentler steering: heading gain 1.2 instead of 3.0 and
+maximum turn correction 0.2 instead of 0.5 (a 60% reduction). Sideways offset
+uses the strafe term without adding a turn request. Heading error over 12 degrees
+stops the run for recentering. The controller must report `boundedSteering` before
+the dashboard starts a ramp run, so older firmware cannot silently ignore the cap.
+This revision follows a reported hard-turn fall; the exact run is unconfirmed,
+and the change has not been physically tested.
+
+Offline comparison: `python -m robot_b91.crest_experiment --build --compare --seconds 40`.
+This creates separate results under `results/ramp_trials/crest_wave_sim/`, with
+bare plastic feet, restored camera mass and a sharp crest. The selected wave
+crossed 10/18 cases versus 6/18 for the previous crest gait at 50% speed. Two cases
+per gait became unstable during neutral settling before walking; excluding those,
+the counts are 10/16 and 6/16. These are deterministic local crest tests, not full
+ramp runs or measured success probabilities. Starts 4 cm before the peak still
+failed with the wave; it is not a general replacement for the climbing gait.
+Those comparisons predate the gentler steering revision above.
+Slope, dimensions, friction and contact softness are assumptions. Softness uses
+[MuJoCo contact parameters](https://mujoco.readthedocs.io/en/stable/modeling.html#contact-parameters),
+not a calibrated deformation model of the foam. The new gait has not yet been
+uploaded or physically tested.
+
+### Experimental sideways steps
+
+The dashboard's **Side step left/right** controls move sideways while the IMU
+holds the starting heading. They require the updated servo-controller firmware
+(`sidestepGait` capability), a fresh IMU and a level stance. Each command performs
+one cycle, limited by the ESP32 itself, at up to 65% speed. The feet finish down;
+outputs then turn off. Stale observations, excessive tilt/heading error, lost
+heartbeat and a 12-second dashboard timeout stop the trial. These controls are
+for an initial floor test; automatic ramp recentering is not enabled.
+
+Front and rear legs sweep in opposing directions, with no forward stride and
+no lateral-position-to-turn correction. The single-foot lift/return/plant
+sequence is retained. `python -m robot_b91.sidestep_experiment` checks both
+directions with three assumed friction levels using bare-foot geometry and
+restored camera mass. In six simulated one-cycle trials at 65%, the selected
+gait moved 11–24 mm sideways with up to 6.9 mm fore/aft drift and 2.5 degrees
+maximum heading deviation. These are flat-floor simulation results, not a
+guarantee of perfectly straight sideways motion or physical ramp performance.
+Neither this gait nor the crest wave has been uploaded yet.
+
 ## CAD and rebuild
 
 - Current assembly and parts: `cad/B10_1/`

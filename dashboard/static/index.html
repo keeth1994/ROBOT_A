@@ -81,6 +81,8 @@
         <p id="controllerMessage">Waiting for controller.</p>
         <div class="actions"><button id="walk">Walk</button><button id="walkCourse">Follow ramp (camera + IMU)</button><button id="walkCourseCamera">Follow ramp (camera only)</button><button id="walkCourseTape">Follow blue tape (camera + IMU)</button><button id="walkCourseImu">Walk with IMU</button><button id="dance">Dance</button></div>
         <p class="actions"><button id="searchCorridor">Find corridor (camera + IR + IMU)</button><button id="walkCorridor">Follow corridor (IR + IMU)</button></p>
+        <p class="actions"><button id="sidestepLeft" disabled>Side step left</button><button id="sidestepRight" disabled>Side step right</button></p>
+        <p class="subtle">Side steps: experimental floor test, one cycle with heading hold, up to 65% speed.</p>
         <p id="walkMessage">ESP32 walking is stopped.</p>
         <label for="walkSpeed">Motion speed: <output id="walkSpeedValue" for="walkSpeed">100%</output></label>
         <input id="walkSpeed" type="range" min="25" max="200" step="5" value="100">

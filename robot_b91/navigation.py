@@ -10,7 +10,8 @@ import numpy as np
 class Navigation:
     def __init__(self, width_m=0.30, fovy_deg=42.9470936, camera_x_m=0.0626,
                  camera_pitch_deg=15.0, dark_min=3, dark_max=25, max_chroma=.28, max_blind_s=8.0,
-                 adaptive_surface=False, guidance='ramp', tape_width_m=0.025):
+                 adaptive_surface=False, guidance='ramp', tape_width_m=0.025,
+                 camera_y_m=0.0, camera_z_m=0.0):
         if guidance not in ('ramp', 'blue_tape'):
             raise ValueError('Guidance must be ramp or blue_tape.')
         if not math.isfinite(tape_width_m) or tape_width_m <= 0:
@@ -20,6 +21,8 @@ class Navigation:
         self.width_m = width_m
         self.fovy = math.radians(fovy_deg)
         self.camera_x = camera_x_m
+        self.camera_y = camera_y_m
+        self.camera_z = camera_z_m
         self.camera_pitch = math.radians(camera_pitch_deg)
         self.dark_min, self.dark_max = dark_min, dark_max
         self.max_chroma = max_chroma
@@ -35,6 +38,7 @@ class Navigation:
         self.bias = np.zeros(3)
         self.bias_samples = []
         self.initialized = False
+        self.heading_initialized = False
         self.max_blind_s = 0.0
         self.debug = None
 
@@ -137,7 +141,7 @@ class Navigation:
         rotation = np.array([[cp, sp * sr, sp * cr], [0, cr, -sr], [-sp, cp * sr, cp * cr]])
         cm, sm = math.cos(self.camera_pitch), math.sin(self.camera_pitch)
         mount = np.array([[cm, 0, sm], [0, 1, 0], [-sm, 0, cm]])
-        rows = []
+        ray_pairs = []
         for y, left, right in edges:
             rays = np.array([[1., -(x - (w - 1) / 2) / f,
                               -(y - (h - 1) / 2) / f] for x in [left, right]])
@@ -145,18 +149,38 @@ class Navigation:
             rays = rays @ rotation.T
             if np.min(rays[:, 0] * getattr(self, "view_sign", 1)) < .2:
                 continue
-            bearings = rays[:, 1] / rays[:, 0]
-            rows.append([bearings[0] - bearings[1], np.mean(bearings)])
+            ray_pairs.append(rays)
             self.debug["rows"].append((y, left, right))
-        if len(rows) < 3:
+        if len(ray_pairs) < 3:
             return reject("Too few visible edge pairs (edges may be clipped)")
-        widths, centers = np.asarray(rows).T
+        # Equal image rows cease to represent equal elevations when the body
+        # rolls. Pair the two edges after attitude correction, without
+        # extrapolating beyond the part visible on both sides.
+        rays = np.asarray(ray_pairs)
+        elevation = rays[:, :, 2] / rays[:, :, 0]
+        bearing = rays[:, :, 1] / rays[:, :, 0]
+        right_order = np.argsort(elevation[:, 1])
+        right_elevation, unique = np.unique(elevation[right_order, 1], return_index=True)
+        if len(right_elevation) < 3:
+            return reject("Too little edge elevation to pair both sides")
+        right_bearing = bearing[right_order[unique], 1]
+        paired = np.flatnonzero((elevation[:, 0] >= right_elevation[0]) &
+                               (elevation[:, 0] <= right_elevation[-1]))
+        if len(paired) < 3:
+            return reject("Too little overlapping edge elevation after tilt correction")
+        left = bearing[paired, 0]
+        right = np.interp(elevation[paired, 0], right_elevation, right_bearing)
+        widths, centers = left - right, (left + right) / 2
+        if np.any(np.abs(widths) < 1e-6):
+            return reject("Degenerate edge pair after tilt correction")
+        self.debug['rows'] = [self.debug['rows'][i] for i in paired]
         keep = np.ones(len(widths), dtype=bool)
         # A narrow visible strip still measures offset using the gyro heading.
         # Only use vision to correct yaw when there is enough depth variation.
         heading = self.heading
+        heading_observed = False
         depth_threshold = .01 if self.guidance == 'blue_tape' else (.025 if self.adaptive_surface else .12)
-        if len(rows) >= 8 and np.ptp(widths) > depth_threshold:
+        if len(paired) >= 8 and np.ptp(widths) > depth_threshold:
             A = np.column_stack([widths, np.ones(len(widths))])
             for _ in range(3):
                 slope, intercept = np.linalg.lstsq(A[keep], centers[keep], rcond=None)[0]
@@ -166,19 +190,31 @@ class Navigation:
                     break
                 keep = candidate
             visual_heading = -math.atan(intercept)
-            if not use_imu or self.last_seen is None or getattr(self, 'searching', False):
+            heading_observed = True
+            # Camera turns clear last_seen and enter search, but neither event
+            # invalidates the heading already established and propagated by IMU.
+            # A partial rear view must not reset it to an unrelated visual fit.
+            difference = math.atan2(math.sin(visual_heading - heading), math.cos(visual_heading - heading))
+            if not use_imu or not self.heading_initialized:
                 heading = visual_heading
-            elif abs(visual_heading - self.heading) < .12:
-                heading += (.2 if timestamp < 2 else .025) * (visual_heading - heading)
+            elif abs(difference) < .12:
+                heading += (.2 if timestamp < 2 else .025) * difference
         elif not use_imu:
             return reject("Too little edge depth to estimate heading without IMU")
         measured_width = self.tape_width_m if self.guidance == 'blue_tape' else self.width_m
         offsets = -(centers[keep] + math.tan(heading)) / widths[keep] * measured_width
         self.debug["inliers"] = keep.tolist()
-        lateral = np.median(offsets) - self.camera_x * math.sin(heading)
+        # Edges locate the lens, while gait corrections act on the body origin.
+        # A high camera moves sideways as the robot rolls and forward as it
+        # pitches; removing only camera_x*sin(heading) mistakes that motion for
+        # body drift. Use the same body attitude as the image-ray projection.
+        camera_offset = rotation @ np.array([self.camera_x, self.camera_y, self.camera_z])
+        lateral = np.median(offsets) - (
+            camera_offset[0] * math.sin(heading) + camera_offset[1] * math.cos(heading))
         if abs(lateral) > self.width_m * .4 or np.median(np.abs(offsets-np.median(offsets))) > .015:
             return reject("Offset out of range or inconsistent edge pairs")
         self.heading = heading
+        self.heading_initialized = self.heading_initialized or heading_observed
         self.lateral += .3 * (lateral - self.lateral)
         self.last_seen = timestamp
         self.accepted += 1

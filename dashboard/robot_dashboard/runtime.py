@@ -11,7 +11,8 @@ from PIL import Image
 from robot_b91.navigation_debug import navigation_debug_image
 
 from . import devices
-from .walking import WALK_ACTIONS, Walking
+from .walking import WALK_ACTIONS, RAMP_PROFILES, Walking
+from .sidestep import SIDESTEP_PROFILES, check_sidestep
 from .navigation import CourseNavigation
 
 
@@ -147,7 +148,8 @@ class CameraPipeline:
 
 
 class Dashboard:
-    def __init__(self, config_path=None):
+    def __init__(self, config_path=None, *, auto_corridor=True, crest_assist=False, exit_clearance=False,
+                 adaptive_ramp_speed=False, crest_wave=False):
         self.lock = threading.RLock()
         self.servo_lock = threading.Lock()
         self.camera_settings_lock = threading.Lock()
@@ -162,7 +164,9 @@ class Dashboard:
         self.cache = {name: {'online': False, 'data': None, 'error': 'Connecting...', 'at': 0}
                       for name in ('servo', 'camera')}
         self.camera = CameraPipeline(self.stream_url)
-        self.walking = Walking()
+        self.walking = Walking(crest_assist=crest_assist, exit_clearance=exit_clearance,
+                               adaptive_ramp_speed=adaptive_ramp_speed, crest_wave=crest_wave)
+        self.auto_corridor = auto_corridor
         self.debug_lock = threading.Lock()
         self.debug_preview = CourseNavigation(time.monotonic(), use_imu=False)
         self.threads = []
@@ -208,6 +212,10 @@ class Dashboard:
                         devices.request(url, '/stop', {}, timeout=.15)
                         continue
                     devices.request(url, '/motion/adjust', frame, timeout=.15)
+                    sequence = self.walking.crest_sequence
+                    if sequence and sequence.requested:
+                        self._change_ramp_gait(url)
+                        continue
                     if getattr(self.walking.navigation, 'corridor_requested', False):
                         self._corridor_after_ramp(url)
                         continue
@@ -224,8 +232,36 @@ class Dashboard:
                     except devices.DeviceError:
                         pass
 
+    def _change_ramp_gait(self, url):
+        """Stop/confirm/restart, retaining navigation; never retry a partial switch."""
+        try:
+            params, settings = self.walking.transition_settings()
+            devices.request(url, '/stop', {}, timeout=.3)
+            status = devices.request(url, '/status', timeout=.3)
+            self.walking.prepare(status)
+            if (status.get('externalActive') or status.get('running') or status.get('manualActive') or
+                    status.get('signedYawBias') is not True):
+                raise devices.DeviceError('Cannot confirm idle signed-stance controller.', 409)
+            if self.walking.crest_wave and status.get('crestWaveGait') is not True:
+                raise devices.DeviceError('Crest wave needs the updated controller firmware.', 409)
+            if 'turn_limit' in settings and status.get('boundedSteering') is not True:
+                raise devices.DeviceError('Gentle ramp steering needs the updated controller firmware.', 409)
+            self._aim_camera(url, status, self.walking.camera_target(time.monotonic()))
+            result = devices.request(url, '/motion/start', settings, timeout=.3)
+            self.walking.resume_gait(result['session'], time.monotonic(), params)
+        except (devices.DeviceError, ValueError, KeyError, TypeError):
+            self.walking.stop('Ramp gait change failed; outputs off requested.')
+            try:
+                devices.request(url, '/stop', {}, timeout=.3)
+            except devices.DeviceError:
+                pass
+            raise
+
     def _corridor_after_ramp(self, url):
         devices.request(url, '/stop', {}, timeout=.15)
+        if not self.auto_corridor:
+            self.walking.stop('Ramp exit detected. Ramp-only trial stopped; verify completion visually.')
+            return
         self.walking.stop('Ramp ended. Starting corridor search.')
         status = devices.request(url, '/status', timeout=.15)
         self.walking.prepare(status)
@@ -252,6 +288,14 @@ class Dashboard:
             try:
                 status = devices.request(url, '/status', timeout=.15)
                 self.walking.prepare(status)
+                if action in SIDESTEP_PROFILES:
+                    check_sidestep(status)
+                if action == 'course' and self.walking.crest_assist and status.get('signedYawBias') is not True:
+                    raise devices.DeviceError('Crest assist needs signed-stance controller firmware.', 409)
+                if action == 'course' and self.walking.crest_wave and status.get('crestWaveGait') is not True:
+                    raise devices.DeviceError('Crest wave needs the updated controller firmware.', 409)
+                if action in RAMP_PROFILES and status.get('boundedSteering') is not True:
+                    raise devices.DeviceError('Gentle ramp steering needs the updated controller firmware.', 409)
                 if action == 'corridor' and status.get('corridorWallGait') is not True:
                     raise devices.DeviceError('Upload the updated controller firmware for corridor walking.', 409)
                 if action == 'corridor_search' and status.get('corridorSearchGait') is not True:
@@ -266,6 +310,8 @@ class Dashboard:
                 required_angles = ()
                 if profile in ('course', 'course_camera'):
                     required_angles = (self.walking.camera_settings['backward_servo_deg'],)
+                    if 'forward_search_servo_deg' in self.walking.camera_settings:
+                        required_angles += (self.walking.camera_settings['forward_search_servo_deg'],)
                 if profile == 'course':
                     required_angles += (self.walking.camera_settings['corridor_servo_deg'],)
                 self._aim_camera(url, status, self.walking.camera_start_angle(profile), required_angles)
@@ -329,10 +375,12 @@ class Dashboard:
             status['operator_alive'] = now - self.browser_heartbeat < 1.5
         status['pipeline'] = self.camera.state()
         status['walking'] = self.walking.state()
+        status['auto_corridor'] = self.auto_corridor
         return status
 
     def navigation_debug_frame(self):
         # Copy the actual decision under the control lock, then render outside it.
+        decision_time = None
         with self.servo_lock:
             navigation = self.walking.navigation
             live = self.walking.active and navigation is not None and navigation.use_camera
@@ -343,6 +391,7 @@ class Dashboard:
                     return output.getvalue()
                 estimate = copy(navigation.estimate)
                 elapsed = time.monotonic() - navigation.started
+                decision_time = navigation.updated_at - navigation.started
                 use_imu = navigation.use_imu
         if not live:
             # Preview has its own estimator and never starts or alters walking.
@@ -354,7 +403,7 @@ class Dashboard:
                 estimate = copy(self.debug_preview.estimate)
                 elapsed = now - self.debug_preview.started
                 use_imu = False
-        panel = navigation_debug_image(estimate, elapsed, use_imu=use_imu)
+        panel = navigation_debug_image(estimate, elapsed, use_imu=use_imu, decision_time=decision_time)
         output = BytesIO()
         Image.fromarray(panel).save(output, format='JPEG', quality=85)
         return output.getvalue()

@@ -15,15 +15,19 @@ class CourseNavigation:
     def __init__(self, started, use_camera=True, use_imu=True, guidance='ramp', scan_ramp=False):
         config = json.loads((ROOT / 'reference/b91_navigation.json').read_text())
         config.update(json.loads((ROOT / 'dashboard/navigation.json').read_text()))
+        self.camera_pivot = config.pop('camera_pivot_m', None)
         self.camera_calibration = load_camera_scan_settings()
         config['guidance'] = guidance
         self.scan_ramp = scan_ramp and use_camera and guidance == 'ramp'
         self.estimate = (RampScanNavigation(self.camera_calibration, use_imu=use_imu, **config)
                          if self.scan_ramp else Navigation(**config))
         self.camera_base_pitch = self.estimate.camera_pitch
+        self.camera_lens_position = np.array([
+            self.estimate.camera_x, self.estimate.camera_y, self.estimate.camera_z])
         self.camera_angle = None
         self.camera_changed = started
         self.started = started
+        self.updated_at = started
         self.use_camera = use_camera
         self.use_imu = use_imu
         self.imu_heading = 0.0
@@ -83,6 +87,7 @@ class CourseNavigation:
         return False
 
     def update(self, status, now, camera_frame):
+        self.updated_at = now
         elapsed = now - self.started
         if self.use_imu:
             try:
@@ -119,8 +124,16 @@ class CourseNavigation:
                 self.camera_angle = angle
                 self.camera_changed = now
                 self.estimate.last_seen = None
-            self.estimate.camera_pitch = self.camera_base_pitch + math.radians(
-                servo_to_cradle_deg(angle, self.camera_calibration))
+            cradle_angle = math.radians(servo_to_cradle_deg(angle, self.camera_calibration))
+            self.estimate.camera_pitch = self.camera_base_pitch + cradle_angle
+            if self.camera_pivot is not None:
+                # Lens and pivot are expressed in the body frame at cradle zero.
+                c, s = math.cos(cradle_angle), math.sin(cradle_angle)
+                displacement = self.camera_lens_position - self.camera_pivot
+                position = self.camera_pivot + np.array([
+                    c * displacement[0] + s * displacement[2], displacement[1],
+                    -s * displacement[0] + c * displacement[2]])
+                self.estimate.camera_x, self.estimate.camera_y, self.estimate.camera_z = map(float, position)
             self.estimate.view_sign = 1 if math.cos(self.estimate.camera_pitch) >= 0 else -1
             if self.checking_exit and not self.exit_aimed:
                 self.estimate.start_search(elapsed, math.radians(

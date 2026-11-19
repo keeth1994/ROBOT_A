@@ -1,5 +1,8 @@
 {
   "camera_pitch_deg": 40.0,
+  "camera_x_m": -0.0127163717,
+  "camera_z_m": 0.2436313333,
+  "camera_pivot_m": [-0.032, 0.0, 0.22065],
   "dark_max": 115,
   "max_blind_s": 10.0,
   "adaptive_surface": true,
