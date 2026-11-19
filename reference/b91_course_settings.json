@@ -49,8 +49,8 @@
     ],
     "yaw_deg": 0,
     "clear_width_m": 0.4,
-    "wall_height_m": 0.18,
-    "wall_thickness_m": 0.012,
+    "wall_height_m": 0.17,
+    "wall_thickness_m": 0.03,
     "centerline_xy_m": [
       [
         0.0,
