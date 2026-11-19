@@ -9,7 +9,7 @@ from robot_b91.paths import ROOT
 from robot_b91 import servo_properties
 from robot_b91.course import local_points
 from robot_b91.progress import CourseProgress, corridor_entry_score
-from robot_b91.gait import rocker_targets
+from robot_b91.gait import RAMP_SPEED_SCALE, rocker_targets
 from robot_b91.camera_calibration import load_camera_scan_settings
 
 LEGS = ["FL", "RL", "FR", "RR"]
@@ -136,8 +136,9 @@ class Robot:
                     lateral = local_points(self.d.qpos[:3], self.course)[1]
                     heading -= math.radians(self.course["yaw_deg"])
                     heading = math.atan2(math.sin(heading), math.cos(heading))
+            pace = RAMP_SPEED_SCALE if self.course else 1.0
             self.target = rocker_targets(
-                p, t, self.d.time - self.gait_time_origin,
+                p, t * pace, (self.d.time - self.gait_time_origin) * pace,
                 heading, lateral, self.joint_ranges,
             )
         if self.navigation and self.scan_enabled:
@@ -305,7 +306,7 @@ def main():
     ap.add_argument("--ramp", action="store_true")
     ap.add_argument('--find-corridor', action='store_true',
                     help='Continue after the ramp, find the corridor with camera/IMU/IR, and stop centered')
-    ap.add_argument("--seconds", type=float, help="duration (default: 300 with search, 120 on ramp, 20 on flat)")
+    ap.add_argument("--seconds", type=float, help="duration (default: 300 with search, 240 on ramp, 20 on flat)")
     ap.add_argument("--render")
     ap.add_argument(
         "--sensors", action="store_true",
@@ -321,7 +322,7 @@ def main():
     if args.find_corridor and (not args.ramp or args.feedback != 'sensors' or args.hold or args.render):
         ap.error('--find-corridor needs --ramp, sensor feedback and walking enabled')
     if args.seconds is None:
-        args.seconds = 300 if args.find_corridor else 120 if args.ramp else 20
+        args.seconds = 300 if args.find_corridor else 240 if args.ramp else 20
     print(
         "B10: mixed servos at 5 V; provisional joint assignment/masses; programmed gait."
     )

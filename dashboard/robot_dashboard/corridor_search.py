@@ -4,6 +4,7 @@ from collections import deque
 
 import numpy as np
 from PIL import Image, ImageDraw
+from scipy.ndimage import binary_opening
 
 from .corridor import ir_readings
 from .navigation import CourseNavigation
@@ -18,6 +19,7 @@ def wall_view(rgb, preferred_side=None, camera_pitch=None, fovy_deg=None):
     h, w = hsv.shape[:2]
     hue, saturation, value = hsv.transpose(2, 0, 1)
     mask = (hue >= 8) & (hue <= 36) & (saturation >= 45) & (value >= 65)
+    mask = binary_opening(mask, structure=np.ones((3, 3)))
     top = int(.40 * h)
     if camera_pitch is not None:
         f = h / (2 * math.tan(math.radians(fovy_deg) / 2))

@@ -64,11 +64,11 @@ def main(robust=False):
         ]
     if robust:
         with ProcessPoolExecutor(max_workers=4) as pool:
-            jobs = [pool.submit(evaluate, p | changes, seconds=120, ramp=True, **start)
+            jobs = [pool.submit(evaluate, p | changes, seconds=240, ramp=True, **start)
                     for _, changes, start in cases]
             reports = [dict(case=case[0], **job.result()) for case, job in zip(cases, jobs)]
     else:
-        reports = [dict(case="nominal", **evaluate(p, seconds=120, ramp=True))]
+        reports = [dict(case="nominal", **evaluate(p, seconds=240, ramp=True))]
     for result in reports:
         print(f"{result['case']}: completed={result['course_completed']}, "
               f"time={result['duration_s']:.3f}s, tilt={result['max_tilt_deg']:.2f}deg, "

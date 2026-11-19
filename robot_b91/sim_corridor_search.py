@@ -20,6 +20,7 @@ CASES = {
     'front': (4.15, -1.1, math.pi),
     'angled': (3.95, -.45, -1.2),
     'far_wall_first': (3.75, -.15, -2.2),
+    'ramp_exit': (3.55, 0, 0),
 }
 
 

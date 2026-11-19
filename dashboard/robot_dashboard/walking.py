@@ -7,6 +7,7 @@ from .navigation import CourseNavigation
 from .corridor_walls import IRWallNavigation, load_corridor_settings
 from .corridor_search import CorridorSearch
 from robot_b91.camera_calibration import load_camera_scan_settings
+from robot_b91.gait import RAMP_SPEED_SCALE
 
 ROOT = Path(__file__).resolve().parents[2]
 JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch'))
@@ -14,6 +15,7 @@ PROFILES = {'walk': (), 'course': ('camera', 'imu'), 'course_camera': ('camera',
             'course_tape': ('camera', 'imu'), 'course_imu': ('imu',),
             'corridor': ('ir', 'imu'), 'corridor_search': ('camera', 'ir', 'imu'), 'dance': ()}
 WALK_ACTIONS = tuple(PROFILES)
+RAMP_PROFILES = ('course', 'course_camera')
 
 
 class Walking:
@@ -31,10 +33,13 @@ class Walking:
         self.message = 'Stopped. Walking is not started automatically.'
 
     def state(self):
+        period = self.params['period']
+        if self.profile in RAMP_PROFILES:
+            period /= RAMP_SPEED_SCALE
         return dict(active=self.active, message=self.message,
                     profile=self.profile, mode='dance' if self.profile == 'dance' else 'walk',
                     controller='ESP32',
-                    speed=self.speed, period_s=(1.0 if self.profile == 'dance' else self.params['period']) / self.speed,
+                    speed=self.speed, period_s=(1.0 if self.profile == 'dance' else period) / self.speed,
                     camera_controlled=self.active and self.camera_start_angle(self.profile) is not None,
                     navigation=self.navigation.report() if self.navigation else None)
 
@@ -83,6 +88,8 @@ class Walking:
         names = ('period', 'duty', 'yaw_amplitude', 'pitch_lift', 'pitch_stance',
                  'pitch_min', 'heading_gain', 'lateral_gain', 'strafe_gain', 'pattern', 'yaw_bias')
         settings = defaults | self.params
+        if profile in RAMP_PROFILES:
+            settings['period'] /= RAMP_SPEED_SCALE
         if profile in ('corridor', 'corridor_search'):
             self.corridor_settings = load_corridor_settings()
             settings.update(self.corridor_settings['gait'])

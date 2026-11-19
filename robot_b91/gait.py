@@ -11,6 +11,7 @@ import math
 import numpy as np
 
 LEGS = ("FL", "RL", "FR", "RR")
+RAMP_SPEED_SCALE = 0.5
 
 
 def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
