@@ -3,6 +3,7 @@
 import math
 
 from robot_b91.navigation import Navigation
+from robot_b91.camera_calibration import servo_to_cradle_deg
 
 
 def flip_target(elapsed, start, end, settings):
@@ -23,6 +24,7 @@ class RampScanNavigation(Navigation):
         self.view_sign = 1
         self.walking = False
         self.view = 'forward'
+        self.shallow_forward = False
         self.searching = False
         self.move_started = None
         self.move_from = math.radians(settings['forward_deg'])
@@ -30,6 +32,8 @@ class RampScanNavigation(Navigation):
         self.reacquired_since = self.last_confirmation = None
 
     def view_target(self):
+        if self.shallow_forward:
+            return math.radians(servo_to_cradle_deg(self.settings['forward_search_servo_deg'], self.settings))
         return math.radians(self.settings[self.view + '_deg'])
 
     def camera_target(self, timestamp):
@@ -39,10 +43,15 @@ class RampScanNavigation(Navigation):
         return flip_target(timestamp - self.move_started, self.move_from, target, self.settings)
 
     def flip(self, timestamp, angle):
+        if (self.view == 'forward' and not self.shallow_forward and
+                'forward_search_servo_deg' in self.settings):
+            self.start_search(timestamp, angle, 'forward', shallow=True)
+            return
         self.start_search(timestamp, angle, 'backward' if self.view == 'forward' else 'forward')
 
-    def start_search(self, timestamp, angle, view):
+    def start_search(self, timestamp, angle, view, *, shallow=False):
         self.view = view
+        self.shallow_forward = shallow and view == 'forward'
         self.searching = True
         self.walking = False
         self.move_started = timestamp
@@ -125,6 +134,7 @@ class RampScanNavigation(Navigation):
             state = 'turning' if self.search_wait_since is None else 'searching'
         report.update(camera_pitch_deg=math.degrees(self.camera_pitch),
                       camera_view=self.view, camera_search_state=state,
+                      camera_shallow_forward=self.shallow_forward,
                       cache_age_s=age,
                       cache_confidence=0 if age is None else max(0, 1 - age / self.blind_timeout),
                       using_cached_ramp=bool(not self.searching and self.debug and not self.debug['accepted'] and

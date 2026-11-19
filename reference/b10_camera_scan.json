@@ -2,6 +2,7 @@
   "enabled": true,
   "backward_servo_deg": -4,
   "forward_servo_deg": -65,
+  "forward_search_servo_deg": -75,
   "corridor_servo_deg": -80,
   "forward_deg": -10,
   "backward_deg": 118,

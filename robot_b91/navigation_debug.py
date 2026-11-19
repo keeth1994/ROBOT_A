@@ -4,9 +4,15 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 
-def navigation_status(navigation, now, use_imu=True):
+def navigation_status(navigation, now, use_imu=True, decision_time=None):
     """Report readiness without calling ready(), which updates controller telemetry."""
     age = None if navigation.last_seen is None else max(0., now - navigation.last_seen)
+    if decision_time is not None:
+        if not 0 <= now - decision_time <= .35:
+            return "STALE CONTROL SNAPSHOT", (255, 200, 70), "Waiting for a recent control decision", age
+        # The dashboard renders between 10 Hz control updates. Judge the copied
+        # decision using the IMU age when that decision was actually made.
+        now = decision_time
     if navigation.debug and navigation.debug.get('held'):
         return "HOLD REQUIRED", (255, 100, 80), navigation.debug['reason'], age
     if use_imu and (navigation.last_imu is None or now - navigation.last_imu > .05):
@@ -21,7 +27,7 @@ def navigation_status(navigation, now, use_imu=True):
     return "USING LAST MEASUREMENT", (255, 200, 70), reason, age
 
 
-def navigation_debug_image(navigation, now, use_imu=True):
+def navigation_debug_image(navigation, now, use_imu=True, decision_time=None):
     """Return a 640x318 RGB panel. Only accepted rows receive a green midpoint."""
     panel = Image.new("RGB", (640, 318), (15, 18, 23))
     draw = ImageDraw.Draw(panel)
@@ -59,7 +65,8 @@ def navigation_debug_image(navigation, now, use_imu=True):
         panel.paste(mask.resize((320, 240)), (320, 22))
     else:
         draw.text((6, 60), "Waiting for a valid-size RGB frame", fill="white")
-    status, color, reason, age = navigation_status(navigation, now, use_imu=use_imu)
+    status, color, reason, age = navigation_status(
+        navigation, now, use_imu=use_imu, decision_time=decision_time)
     if debug and not debug['accepted']:
         reason = debug['reason']
     age_text = "never" if age is None else f"{age:.2f}s"

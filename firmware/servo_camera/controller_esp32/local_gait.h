@@ -14,18 +14,21 @@ struct Parameters {
   // A 125-degree lift reaches calibrated -80 degrees from +45 foot-down.
   double pitchStance = 0, pitchMin = -125 * pi / 180;
   double headingGain = .8, lateralGain = 5, strafeGain = 0;
-  double yawBias = 0;
-  bool crawl = false, corridor = false, search = false;
+  double turnLimit = -1; // Negative retains the legacy profile's limit.
+  double yawBias = 0; // Signed stance offset; final joint commands remain clamped to +/-45 degrees.
+  bool crawl = false, crest = false, corridor = false, search = false, sideways = false;
   double steeringTrim = 0.01;
 };
 
 // Same joint order and radians as robot_b91/gait.py: FL, RL, FR, RR.
 inline void targets(const Parameters &p, double elapsed, double gaitTime,
-                    double heading, double lateral, double angles[8], double forwardScale = 1) {
+                    double heading, double lateral, double angles[8], double forwardScale = 1,
+                    double sidewaysScale = 0) {
   const double trot[] = {0, .5, .5, 0}, crawl[] = {0, .5, .25, .75};
-  double turnLimit = p.corridor ? .95 : .5;
+  const double crest[] = {0, .25, .5, .75};
+  double turnLimit = p.turnLimit >= 0 ? p.turnLimit : p.corridor ? .95 : .5;
   double correction = clamp(
-    p.headingGain * (heading + std::atan(p.lateralGain * lateral))
+    p.headingGain * (heading + (p.sideways ? 0 : std::atan(p.lateralGain * lateral)))
     + p.steeringTrim,
     -turnLimit,
     turnLimit
@@ -35,16 +38,23 @@ inline void targets(const Parameters &p, double elapsed, double gaitTime,
   if (p.search) forward = clamp(forwardScale, 0, 1);
   // Limit sideways corrections to reduce overshoot.
   double strafe = clamp(p.strafeGain * lateral, -.3, .3);
+  if (p.sideways) {
+    forward = 0;
+    strafe = -clamp(sidewaysScale, -1, 1); // Positive = body left (+Y).
+  }
   for (int i = 0; i < 4; ++i) {
     double yaw = 0, lift = 0;
     if (elapsed > 0) {
-      double u = std::fmod(gaitTime / p.period + (p.crawl ? crawl[i] : trot[i]), 1.0);
+      double u = std::fmod(gaitTime / p.period + (p.crest ? crest[i] : p.crawl ? crawl[i] : trot[i]), 1.0);
       if (u < p.duty) yaw = p.yawAmplitude * (2 * u / p.duty - 1);
       else {
         double v = (u - p.duty) / (1 - p.duty);
-        yaw = p.yawAmplitude * (1 - 2 * v * v * (3 - 2 * v));
+        // Crest: lift, return, then plant. At duty >= .8, at most one
+        // foot is commanded off the surface, with all-down intervals.
+        double sweep = p.crest ? clamp((v - .2) / .6, 0, 1) : v;
+        yaw = p.yawAmplitude * (1 - 2 * sweep * sweep * (3 - 2 * sweep));
         // Lift early and hold clearance while the foot swings forward.
-        double height = clamp((v < .5 ? v : 1 - v) / .15, 0, 1);
+        double height = clamp((v < .5 ? v : 1 - v) / (p.crest ? .2 : .15), 0, 1);
         lift = -p.pitchLift * height * height * (3 - 2 * height);
       }
       double ramp = clamp(elapsed / p.period, 0, 1);
@@ -196,7 +206,8 @@ struct Gait {
   bool useImu = false, dance = false, ready = false, stopping = false;
   uint32_t started = 0, lastUpdate = 0, stopStarted = 0, settleMs = 0;
   double elapsed = 0, gaitTime = 0, speed = 1;
-  double headingOffset = 0, lateral = 0, forward = 1;
+  double headingOffset = 0, lateral = 0, forward = 1, sideways = 0;
+  bool sidestepComplete = false;
   double angles[8] = {}, stopAngles[8] = {};
   int danceTurnPhase = 0;
   bool danceTurnDone = false;
@@ -264,6 +275,9 @@ struct Gait {
     double dt = uint32_t(now - lastUpdate) / 1000.0;
     lastUpdate = now;
     if (stopping) {
+      // A completed sidestep ends with every foot down. Hold that placement
+      // until outputs turn off; sweeping all planted feet home would undo it.
+      if (sidestepComplete) return;
       double u = clamp(uint32_t(now - stopStarted) / 300.0, 0, 1);
       u = u * u * (3 - 2 * u);
       for (int i = 0; i < 8; ++i) {
@@ -293,8 +307,13 @@ struct Gait {
       return;
     }
     gaitTime += dt * speed;
+    if (params.sideways) gaitTime = std::fmin(gaitTime, params.period);
     if (dance) danceTargets(gaitTime, angles);
-    else targets(params, elapsed, gaitTime, headingOffset + (useImu ? heading : 0), lateral, angles, forward);
+    else targets(params, elapsed, gaitTime, headingOffset + (useImu ? heading : 0), lateral, angles, forward, sideways);
+    if (params.sideways && gaitTime >= params.period) {
+      sidestepComplete = true;
+      stop(now); // One cycle per explicit start, regardless of PC polling.
+    }
   }
 };
 }
