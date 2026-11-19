@@ -245,14 +245,15 @@ class CorridorSearch:
             tangent /= np.linalg.norm(tangent)
             self.approach_goal = middle - .25 * tangent
         else:
-            self.selected = min(reliable, key=lambda item: np.linalg.norm(item['point'] - self.position))
+            self.selected = min(reliable, key=lambda item: np.linalg.norm(item['point'] - self.position) +
+                                .3 / math.sqrt(item['samples']))
             tangent = self.selected['tangent'] / np.linalg.norm(self.selected['tangent'])
             normal = self.selected['normal'] / np.linalg.norm(self.selected['normal'])
             offset = self.position - self.selected['point']
             # From in front, stay on the visible face. A side approach crosses the end.
             visible_face = abs(offset @ tangent) > abs(offset @ normal)
             clearance = .19 * normal if visible_face else -.19 * normal
-            self.approach_goal = self.selected['point'] - .25 * tangent + clearance
+            self.approach_goal = self.selected['point'] - .18 * tangent + clearance
         self.wall_heading = math.atan2(tangent[1], tangent[0])
         self.entry_heading = self.wall_heading
         return True
@@ -261,6 +262,25 @@ class CorridorSearch:
         point = np.array(self.settings['sensor_positions'][side], dtype=float)
         point[1] += (1 if side == 0 else -1) * distance
         return self.position + self.rotation() @ point
+
+    def wall_before_goal(self):
+        mask = self.view['mask']
+        h, w = mask.shape
+        band = mask[:, int(.38 * w):int(.62 * w)]
+        band = band[:, band.any(axis=0)]
+        tops = band.argmax(axis=0)
+        bottoms = h - 1 - band[::-1].argmax(axis=0)
+        use_base = bottoms < h - 2
+        rows = np.where(use_base, bottoms, tops)
+        f = h / (2 * math.tan(math.radians(self.camera_geometry['fovy_deg']) / 2))
+        pitch = math.radians(self.camera_geometry['pitch_deg']) + self.estimate.pitch
+        down = pitch + np.arctan((rows - (h - 1) / 2) / f)
+        if np.any(down <= 0):
+            return True
+        heights = np.where(use_base, self.camera_geometry['height_m'],
+                           self.camera_geometry['height_m'] - self.camera_geometry['wall_height_m'])
+        distance = float(np.median(heights / np.tan(down))) + self.camera_geometry['forward_m']
+        return distance < np.linalg.norm(self.approach_goal - self.position) + .2
 
     def update_approach_side(self):
         side = self.view['wall_side']
@@ -385,7 +405,8 @@ class CorridorSearch:
             if self.drive_to(self.approach_goal):
                 self.change_stage('align_wall', now)
                 return self.hold('At the wall end. Aligning toward the inside of the maze.')
-            if self.forward and self.view['kind'] == 'wall' and self.view['target'] is None:
+            if (self.forward and self.view['kind'] == 'wall' and self.view['target'] is None and
+                    self.view['blocked'] and self.wall_before_goal()):
                 return self.hold('The entrance target is hidden by a wall. Holding before approaching farther.')
             wall_side = ('left', 'right')[side] if side is not None else 'unconfirmed'
             self.reason = f'Approaching the wall end; checking only the {wall_side} wall side for IR handover.'
