@@ -19,3 +19,15 @@ cad/B9_8/*.txt
 cad/B9_8/*_candidate.*
 
 tests/
+
+# Local ramp experiments and their dedicated tests; not dashboard dependencies.
+/dashboard/crest_recovery.py
+/dashboard/recover_heading.py
+/dashboard/rear_support_probe.py
+/dashboard/test_crest_recovery.py
+/dashboard/test_rear_placement.py
+/robot_b91/crest_experiment.py
+/robot_b91/rear_flare_experiment.py
+/robot_b91/rear_stride_experiment.py
+/robot_b91/rear_support_experiment.py
+/robot_b91/sidestep_experiment.py
