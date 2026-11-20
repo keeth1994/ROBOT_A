@@ -31,6 +31,12 @@ python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
 - Simulation gait: `reference/b91_gait.toml`
 - Generated reports and recordings: `results/` (ignored by Git)
 
+One-off recovery probes and simulation experiment scripts are local, Git-ignored
+tools. Historical experiment commands below require those local files and are
+not available in a fresh checkout. The dashboard regression tests, trial recorder
+(`dashboard/ramp_trial.py`) and stationary camera checker
+(`dashboard/capture_ramp_views.py`) remain tracked.
+
 ## Calibration and firmware
 
 1. Upload `servo_calibration/esp32_calibration/esp32_calibration.ino`.
