@@ -11,16 +11,18 @@ import numpy as np
 from PIL import Image
 
 from robot_b91.paths import ROOT
+from robot_b91.course import transform
 from robot_b91.progress import corridor_entry_score
 from robot_b91.run import Robot
 
 
 CASES = {
-    'side': (3.9, -.15, 0),
-    'front': (4.15, -1.1, math.pi),
-    'angled': (3.95, -.45, -1.2),
-    'far_wall_first': (3.75, -.15, -2.2),
-    'ramp_exit': (3.55, 0, 0),
+    # Positions and headings relative to the corridor entrance.
+    'side': (.35, .95, 0),
+    'front': (.60, 0, math.pi),
+    'angled': (.40, .65, -1.2),
+    'far_wall_first': (.20, .95, -2.2),
+    'ramp_exit': (0, 1.1, 0),
 }
 
 
@@ -31,7 +33,9 @@ def evaluate(case='side', seconds=300, output=None, observer=None):
     max_tilt = 0.0
     try:
         x, y, yaw = CASES[case]
-        robot.d.qpos[:2] = [x, y]
+        corridor = robot.course['corridor']
+        robot.d.qpos[:2] = transform([[x, y]], corridor['origin_xy_m'], corridor['yaw_deg'])[0]
+        yaw += math.radians(corridor['yaw_deg'])
         robot.d.qpos[3:7] = [math.cos(yaw / 2), 0, 0, math.sin(yaw / 2)]
         mujoco.mj_forward(robot.m, robot.d)
         robot.navigation.begin_corridor_search(0)
@@ -97,7 +101,9 @@ def run_interactive(case, seconds, output, sensors=False):
             nonlocal window, overlay, started, next_frame
             if window is None:
                 window = stack.enter_context(viewer.launch_passive(robot.m, robot.d))
-                window.cam.lookat[:] = [3.55, -.65, .1]
+                corridor = robot.course['corridor']
+                center = transform([[0, .45]], corridor['origin_xy_m'], corridor['yaw_deg'])[0]
+                window.cam.lookat[:] = [*center, .1]
                 window.cam.distance = 2.2
                 window.cam.azimuth = 100
                 window.cam.elevation = -55

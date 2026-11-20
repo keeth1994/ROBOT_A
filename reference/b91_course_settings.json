@@ -1,5 +1,5 @@
 {
-  "description": "Photo-inspired provisional course; positions, heights and tunnel width are adjustable, not measured from the photo.",
+  "description": "Extended randomized simulation course, not the 2-3 m physical ramp; width 29 cm, height at most 22.5 cm, assumed slopes 20-27 degrees.",
   "width_m": 0.29,
   "origin_xy_m": [
     0.4,
@@ -11,40 +11,80 @@
   "profile_xz_m": [
     [
       0.0,
-      0.009205048534524404
+      0.01
     ],
     [
-      0.6,
-      0.20415686627426816
+      0.5907076451827438,
+      0.225
     ],
     [
-      1.2,
-      0.20415686627426816
+      1.1512709641749006,
+      0.225
     ],
     [
-      1.8,
-      0.009205048534524404
+      1.7147767380446224,
+      0.01
     ],
     [
-      2.4004701417488215,
-      0.20430962458848173
+      2.259804484148266,
+      0.01
     ],
     [
-      3.0,
-      0.009510565162951536
+      2.744968506310799,
+      0.1937438559541707
+    ],
+    [
+      3.210887894712664,
+      0.01
+    ],
+    [
+      4.051527247892741,
+      0.01
+    ],
+    [
+      4.38745531048725,
+      0.17908786838295404
+    ],
+    [
+      4.780656259952476,
+      0.01
+    ],
+    [
+      5.559326971446682,
+      0.01
+    ],
+    [
+      5.987541618129376,
+      0.17384017583907477
+    ],
+    [
+      6.858243422915771,
+      0.17384017583907477
+    ],
+    [
+      7.17979787324135,
+      0.01
     ]
   ],
   "segment_names": [
-    "first_climb",
-    "raised_platform",
-    "first_descent",
-    "second_climb",
-    "final_descent"
+    "climb_1",
+    "platform_1",
+    "descent_1",
+    "valley_1",
+    "climb_2",
+    "descent_2",
+    "valley_2",
+    "climb_3",
+    "descent_3",
+    "valley_3",
+    "climb_4",
+    "platform_4",
+    "descent_4"
   ],
   "corridor": {
     "enabled": true,
     "origin_xy_m": [
-      3.55,
+      7.5797978732413505,
       -1.1
     ],
     "yaw_deg": 0,
@@ -119,6 +159,17 @@
       0.01,
       0.03,
       0
+    ]
+  },
+  "ramp_generation": {
+    "seed": 20261120,
+    "hills": 4,
+    "crests": 2,
+    "target_length_m": 7.179797873241349,
+    "max_height_m": 0.225,
+    "slope_range_deg": [
+      20.0,
+      27.0
     ]
   }
 }

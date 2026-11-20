@@ -188,7 +188,7 @@ def build_course(asset, world, cfg):
                     ".68 .49 .29 1",
                 )
     b = np.asarray(bounds + [[0, 0]])
-    return dict(
+    course = dict(
         description=cfg["description"],
         width_m=width,
         origin_xy_m=cfg["origin_xy_m"],
@@ -212,3 +212,6 @@ def build_course(asset, world, cfg):
             "Ramp completion is separate from corridor navigation",
         ],
     )
+    if 'ramp_generation' in cfg:
+        course['ramp_generation'] = cfg['ramp_generation']
+    return course
