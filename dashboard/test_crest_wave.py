@@ -64,12 +64,14 @@ class CrestWaveTests(unittest.TestCase):
                     pitch_lift=float(rng.uniform(.1, 1.1)), period=float(rng.uniform(.8, 2.5)))
                 if _ % 2:
                     p['turn_limit'] = .2
+                    p['rear_stride_scale'] = float(rng.uniform(0, 1))
                 elapsed, time, heading, lateral = rng.uniform([0, 0, -.4, -.05], [8, 15, .4, .05])
                 direction = float(rng.uniform(-1, 1))
                 keys = ('period','duty','yaw_amplitude','pitch_lift','pitch_stance','yaw_bias')
                 values = [p[k] for k in keys] + [p.get('pitch_min', math.radians(-125)),
                     p['heading_gain'], p.get('lateral_gain',0), p.get('strafe_gain',0),
-                    elapsed, time, heading, lateral, int(sideways), direction, p.get('turn_limit',-1)]
+                    elapsed, time, heading, lateral, int(sideways), direction, p.get('turn_limit',-1),
+                    p.get('rear_stride_scale', 1)]
                 lines.append(pattern+' '+' '.join(map(str,values)))
                 expected.append(rocker_targets(p, elapsed, time, heading, lateral, sideways_scale=direction))
         result = subprocess.run([os.environ['CREST_GAIT_TEST_EXE']], input='\n'.join(lines)+'\n',

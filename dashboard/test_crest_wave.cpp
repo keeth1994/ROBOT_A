@@ -57,7 +57,7 @@ int main() {
   double elapsed, time, heading, lateral, sideways;
   while (std::cin >> pattern >> p.period >> p.duty >> p.yawAmplitude >> p.pitchLift
          >> p.pitchStance >> p.yawBias >> p.pitchMin >> p.headingGain
-         >> p.lateralGain >> p.strafeGain >> elapsed >> time >> heading >> lateral >> p.sideways >> sideways >> p.turnLimit) {
+         >> p.lateralGain >> p.strafeGain >> elapsed >> time >> heading >> lateral >> p.sideways >> sideways >> p.turnLimit >> p.rearStrideScale) {
     p.crest = pattern == "crest"; p.crawl = pattern == "crawl";
     p.steeringTrim = 0; // Python caller accounts for trim separately.
     double target[8];

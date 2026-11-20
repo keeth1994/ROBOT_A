@@ -28,6 +28,9 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
     front/rear strides, so correcting drift need not turn the body off the ramp.
     """
     p = params
+    rear_stride = p.get('rear_stride_scale', 1.)
+    if not math.isfinite(rear_stride) or not 0 <= rear_stride <= 1:
+        raise ValueError('Rear stride scale must be between zero and one.')
     target = np.tile([0.0, p["pitch_stance"]], 4)
     if elapsed_s > 0:
         crest = p["pattern"] == "crest"
@@ -68,7 +71,8 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
                 lift = -p["pitch_lift"] * height * height * (3 - 2 * height)
             sign = 1 if i < 2 else -1
             fore = 1 if leg.startswith("F") else -1
-            target[2 * i] = yaw * ramp * (sign * forward + correction + fore * strafe)
+            stride_scale = rear_stride if fore < 0 else 1.
+            target[2 * i] = yaw * ramp * stride_scale * (sign * forward + correction + fore * strafe)
             target[2 * i + 1] = p["pitch_stance"] + lift * ramp
     target[1::2] = np.clip(target[1::2], p.get("pitch_min", math.radians(-125)), 0)
     if joint_ranges is None:

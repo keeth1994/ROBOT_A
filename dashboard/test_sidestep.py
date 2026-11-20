@@ -93,6 +93,33 @@ class SidestepTests(unittest.TestCase):
             self.assertFalse(walking.active)
             self.assertIn('complete',walking.message)
 
+    def test_completion_between_status_and_adjustment_is_confirmed_not_retried(self):
+        for active, session in ((True, 8), (False, 0)):
+            app = Dashboard()
+            app.walking.start_settings('sidestep_right')
+            app.walking.begin(status(), 8, 0, 'sidestep_right')
+            completed = status(sidestepComplete=True, externalActive=active, motionSession=session)
+            with patch('robot_dashboard.runtime.devices.request', side_effect=[
+                    DeviceError('Inactive, stale or mismatched walking session.', 409), completed]) as request:
+                app._adjust_walking('http://robot.test', {'session': 8})
+            self.assertEqual([c.args[1] for c in request.call_args_list], ['/motion/adjust', '/status'])
+            self.assertFalse(app.walking.active)
+            self.assertIn('complete', app.walking.message)
+
+    def test_unconfirmed_or_unrelated_step_does_not_hide_adjustment_error(self):
+        for changes in (dict(sidestepComplete=False), dict(motionSession=9),
+                        dict(manualActive=True), dict(running=True)):
+            app = Dashboard()
+            app.walking.start_settings('sidestep_right')
+            app.walking.begin(status(), 8, 0, 'sidestep_right')
+            completed = status(sidestepComplete=True) | changes
+            with patch('robot_dashboard.runtime.devices.request', side_effect=[
+                    DeviceError('session mismatch', 409), completed]) as request:
+                with self.assertRaisesRegex(DeviceError, 'session mismatch'):
+                    app._adjust_walking('http://robot.test', {'session': 8})
+            self.assertEqual(request.call_count, 2)
+            self.assertTrue(app.walking.active)
+
 
 if __name__ == '__main__':
     unittest.main()

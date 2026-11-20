@@ -15,17 +15,22 @@ def main():
                         help='Experiment: switch gait at the first crest using onboard pitch.')
     parser.add_argument('--crest-wave', action='store_true',
                         help='Experiment: single-foot crest gait at requested speed; requires updated firmware. Implies crest assist and adaptive speed.')
+    parser.add_argument('--start-at-crest', action='store_true',
+                        help='Assisted placement test: begin in the selected crest gait. Requires --crest-assist or --crest-wave, and --ramp-only.')
     parser.add_argument('--exit-clearance', action='store_true',
                         help='Clear the rear feet after ramp exit detection; also enabled by --crest-assist.')
     parser.add_argument('--adaptive-ramp-speed', action='store_true',
                         help='Limit speed to 50%% when roll, heading error or lateral drift increases.')
     args = parser.parse_args()
+    if args.start_at_crest and not ((args.crest_assist or args.crest_wave) and args.ramp_only):
+        parser.error('--start-at-crest requires --crest-assist or --crest-wave, and --ramp-only.')
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from robot_dashboard.runtime import Dashboard
     from robot_dashboard.server import DashboardServer
     app = Dashboard(args.config, auto_corridor=not args.ramp_only,
                     crest_assist=args.crest_assist, exit_clearance=args.exit_clearance,
-                    adaptive_ramp_speed=args.adaptive_ramp_speed, crest_wave=args.crest_wave)
+                    adaptive_ramp_speed=args.adaptive_ramp_speed, crest_wave=args.crest_wave,
+                    start_at_crest=args.start_at_crest)
     server = DashboardServer(('127.0.0.1', args.port), app)
     app.start()
     print(f'Robot dashboard: http://127.0.0.1:{server.server_port}', flush=True)

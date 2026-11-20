@@ -21,6 +21,60 @@ def status(session=1, yaw=0):
 
 
 class CrestSequenceTests(unittest.TestCase):
+    def test_assisted_crest_start_keeps_descent_gait_and_timeout(self):
+        walking = Walking(crest_wave=True, start_at_crest=True)
+        settings = walking.start_settings('course')
+        self.assertEqual(settings['pattern'], 'crest')
+        self.assertEqual(settings['turn_limit'], .2)
+        self.assertEqual(walking.base_params['pattern'], 'trot')
+        walking.begin(status(), 1, 10, 'course')
+        self.assertTrue(walking.state()['assisted_crest_start'])
+        self.assertEqual(walking.crest_sequence.phase, 'crest')
+        with self.assertRaisesRegex(ValueError, 'timed out'):
+            walking.crest_sequence.observe(51, 0, False)
+        walking.crest_sequence.requested = 'descent'
+        params, settings = walking.transition_settings()
+        self.assertEqual(params, walking.base_params)
+        self.assertEqual(settings['pattern'], 'trot')
+
+    def test_assisted_diagonal_start_retains_gentle_steering_speed_and_descent(self):
+        app = Dashboard(crest_assist=True, start_at_crest=True,
+                        adaptive_ramp_speed=True, auto_corridor=False)
+        walking = app.walking
+        settings = walking.start_settings('course')
+        self.assertEqual(settings['pattern'], 'trot')
+        self.assertEqual(settings['yaw_amplitude'], .75)
+        self.assertEqual(settings['duty'], .85)
+        self.assertEqual(settings['pitch_stance'], 0)
+        self.assertEqual(settings['yaw_bias'], -.25)
+        self.assertEqual(settings.get('rear_stride_scale', 1), 1)
+        self.assertEqual(settings['turn_limit'], .2)
+        self.assertEqual(settings['heading_gain'], 1.2)
+        self.assertEqual(settings['lateral_gain'], 0)
+        walking.begin(status(), 1, 10, 'course')
+        self.assertEqual(walking.crest_sequence.phase, 'crest')
+        walking.set_speed(.65)
+        self.assertEqual(walking.ramp_speed(11, True), .65)
+        walking.navigation.estimate.roll = math.radians(6)
+        self.assertEqual(walking.ramp_speed(12, True), .5)
+        walking.crest_sequence.requested = 'descent'
+        params, descent = walking.transition_settings()
+        self.assertEqual(params, walking.base_params)
+        self.assertEqual(descent['yaw_amplitude'], .55)
+        self.assertEqual(descent['pitch_stance'], -.2)
+        self.assertEqual(descent['turn_limit'], .2)
+
+    def test_assisted_crest_start_requires_explicit_gait_and_ramp_only(self):
+        with self.assertRaises(ValueError):
+            Walking(start_at_crest=True)
+        with self.assertRaises(ValueError):
+            Dashboard(start_at_crest=True, crest_wave=True)
+        with self.assertRaises(ValueError):
+            Dashboard(start_at_crest=True, crest_assist=True)
+        app = Dashboard(start_at_crest=True, crest_wave=True, auto_corridor=False)
+        self.assertEqual(app.walking.start_settings('walk')['pattern'], 'trot')
+        self.assertEqual(app.walking.start_settings('course_camera')['pattern'], 'trot')
+
     def test_wave_uses_requested_crest_speed_with_adaptive_fallback(self):
         walking = Walking(crest_wave=True)
         self.assertTrue(walking.crest_assist)
@@ -29,7 +83,11 @@ class CrestSequenceTests(unittest.TestCase):
         walking.start_settings('course')
         walking.begin(status(), 1, 0, 'course')
         walking.set_speed(.65)
-        self.assertEqual(walking.ramp_speed(0, True), .65)
+        for now in (0, .2, 1.4, 2.5, 10):
+            self.assertEqual(walking.ramp_speed(now, True), .5)
+        walking.set_speed(.4)
+        self.assertEqual(walking.ramp_speed(10.1, True), .4)
+        walking.set_speed(.65)
         walking.crest_sequence.requested = 'crest'
         params, settings = walking.transition_settings()
         self.assertEqual(settings['pattern'], 'crest')
@@ -104,10 +162,25 @@ class CrestSequenceTests(unittest.TestCase):
         self.assertEqual(nav.view, 'backward')
         self.assertFalse(nav.shallow_forward)
         nav.flip(11, nav.view_target())
+        self.assertEqual(nav.view, 'backward')
+        self.assertTrue(nav.steep_backward)
+        self.assertAlmostEqual(math.degrees(nav.view_target()), servo_to_cradle_deg(-20, settings))
+        self.assertFalse(nav.ready(11))
+        nav.flip(15, nav.view_target())
         self.assertEqual(nav.view, 'forward')
         self.assertFalse(nav.shallow_forward)
+        self.assertFalse(nav.steep_backward)
         self.assertAlmostEqual(nav.heading, -.07)
         self.assertTrue(nav.heading_initialized)
+
+    def test_legacy_search_without_downward_rear_view(self):
+        settings = load_camera_scan_settings()
+        settings.pop('backward_search_servo_deg')
+        nav = RampScanNavigation(settings)
+        nav.start_search(3, 0, 'backward')
+        nav.flip(7, nav.view_target())
+        self.assertEqual(nav.view, 'forward')
+        self.assertFalse(nav.steep_backward)
 
     def feed(self, seq, start, degrees, count, ready=True):
         for i in range(count):
@@ -132,6 +205,19 @@ class CrestSequenceTests(unittest.TestCase):
         seq.switched(12)
         self.feed(seq, 12, -22, 20)
         self.assertEqual(seq.phase, 'descent')  # Only first crest is assisted.
+
+    def test_crest_detection_uses_slope_sequence_at_different_times(self):
+        for slope in (20, 25, 30):
+            for delay in (0, 25, 90):
+                with self.subTest(slope=slope, delay=delay):
+                    seq = CrestSequence()
+                    self.feed(seq, delay, 0, 10)
+                    self.assertFalse(seq.climbed)
+                    self.feed(seq, delay+1, -slope, 20)
+                    self.assertTrue(seq.climbed)
+                    self.assertIsNone(seq.requested)
+                    self.feed(seq, delay+3, -5, 8)
+                    self.assertEqual(seq.requested, 'crest')
 
     def test_missing_guidance_cannot_trigger_or_evade_timeout(self):
         seq = CrestSequence()

@@ -92,12 +92,13 @@ def visual_pose(status, jpeg):
     return dict(heading_deg=math.degrees(estimate.heading), lateral_m=estimate.lateral/.3)
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+def main(*, plan_factory=plan, max_seconds=35, description=__doc__,
+         completion_message='Completed two compact returns and three short pushes; physical outcome requires observation'):
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
-    stages = plan()
+    stages = plan_factory()
     for _, duration, pose in stages:
         assert duration > 0 and all(-45 <= a <= 45 for a in pose[::2])
         assert all(-90 <= a <= 45 for a in pose[1::2])
@@ -121,6 +122,9 @@ def main():
     if abs(status['orientation'][0]) > math.radians(8) or abs(status['orientation'][1]) > math.radians(20):
         raise RuntimeError('Initial crest pose is outside the recovery envelope')
     mapping = {j['name']: j['channel'] for j in status['joints']}
+    rest = {j['name']: j.get('restAngle') for j in status['joints']}
+    if any(rest[name] != angle for name, angle in zip(JOINTS, stages[0][2])):
+        raise RuntimeError('First manual pose must match every calibrated neutral/foot-down angle; legs not enabled')
     (args.output/'plan.json').write_text(json.dumps(stages, indent=2))
     (args.output/'initial_status.json').write_text(json.dumps(status, indent=2))
     webcam = args.output/'webcam.jpg'
@@ -167,13 +171,18 @@ def main():
         reference=fit_heading_drift(samples)
         (args.output/'heading_calibration.json').write_text(json.dumps(dict(reference=reference,samples=samples),indent=2))
         print(json.dumps({'idle_heading_drift_deg_s':math.degrees(reference['rate_rad_s'])}),flush=True)
+        # Refuse a poorly aligned placement before enabling any leg outputs.
+        observed = visual_pose(sample, client.camera_frame())
+        (args.output/'initial_visual_pose.json').write_text(json.dumps(observed, indent=2))
+        if abs(observed['heading_deg']) > 8 or abs(observed['lateral_m']) > .015:
+            raise RuntimeError(f'Recovery initial visual alignment limit reached: {observed}')
         started = time.monotonic()
         with (args.output/'telemetry.jsonl').open('w') as log:
             def tick(pose, stage):
                 nonlocal last_image, peak_roll
                 now = time.monotonic()
                 elapsed = now-started
-                if elapsed > 35 or (args.output/'STOP').exists():
+                if elapsed > max_seconds or (args.output/'STOP').exists():
                     raise RuntimeError('Recovery time limit or operator stop')
                 if capture.poll() is not None or time.time()-webcam.stat().st_mtime > 3:
                     raise RuntimeError('Observation camera stopped updating')
@@ -221,7 +230,7 @@ def main():
                     tick([a+(b-a)*fraction for a,b in zip(previous,target)],label)
                 tick(target,label)
                 previous = target
-            reason = 'Completed two compact returns and three short pushes; physical outcome requires observation'
+            reason = completion_message
     except BaseException as error:
         reason = f'{type(error).__name__}: {error}'
         raise

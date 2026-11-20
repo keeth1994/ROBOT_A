@@ -33,8 +33,11 @@ def fmt(v):
     return ' '.join(f'{float(x):.12g}' for x in np.asarray(v).ravel())
 
 
-def build(slope_deg=25):
-    OUT.mkdir(parents=True,exist_ok=True)
+def build(slope_deg=25, crest_x=.6, output_dir=OUT):
+    output_dir = Path(output_dir)
+    if not 0 < slope_deg < 45 or crest_x <= .25:
+        raise ValueError('Use a positive slope below45 degrees and crest beyond25cm.')
+    output_dir.mkdir(parents=True,exist_ok=True)
     tree=E.parse(ROOT/'models/robot_b10.xml')
     xml=tree.getroot()
     xml.find('compiler').set('meshdir',str(ROOT/'models/robot_meshes_b10'))
@@ -88,35 +91,36 @@ def build(slope_deg=25):
         inertial.attrib.clear()
         inertial.set('mass',fmt(total)); inertial.set('pos',fmt(com))
         inertial.set('fullinertia',fmt([inertia[0,0],inertia[1,1],inertia[2,2],inertia[0,1],inertia[0,2],inertia[1,2]]))
-    height=.6*math.tan(math.radians(slope_deg))+.01
+    height=crest_x*math.tan(math.radians(slope_deg))+.01
     course=build_course(xml.find('asset'),xml.find('worldbody'),dict(
-        description='User-confirmed sharp first crest, 25-degree assumed slopes; local mechanics experiment',
+        description=f'Sharp first crest, {slope_deg}-degree assumed slopes; local mechanics experiment',
         width_m=.29,panel_thickness_m=.01,corner_rounding_m=0,
-        profile_xz_m=[[0,.01],[.6,height],[1.2,.01]],segment_names=['uphill','downhill'],
+        profile_xz_m=[[0,.01],[crest_x,height],[2*crest_x,.01]],segment_names=['uphill','downhill'],
         origin_xy_m=[0,0],yaw_deg=0,corridor={'enabled':False}))
-    tree.write(OUT/'model.xml',encoding='unicode')
-    model=mujoco.MjModel.from_xml_path(str(OUT/'model.xml'))
-    metadata=dict(course=course,slope_deg=slope_deg,crest_x_m=.6,crest_z_m=height,
+    tree.write(output_dir/'model.xml',encoding='unicode')
+    model=mujoco.MjModel.from_xml_path(str(output_dir/'model.xml'))
+    metadata=dict(course=course,slope_deg=slope_deg,crest_x_m=crest_x,crest_z_m=height,
                   restored_camera_mass_kg=restored_mass,removed_rubber_mass_kg=removed_mass,
                   total_mass_kg=float(model.body_mass.sum()),
                   assumptions=['Ideal steering isolates mechanics; not a sensor validation',
-                               'Slope 25 degrees approximated from physical IMU; dimensions not surveyed',
+                               'Slopes and crest positions are scenario assumptions; dimensions not surveyed',
                                'Friction is swept, not measured; CAD and servo models remain approximate',
                                'Contact softness is a sensitivity test, not measured foam deformation'])
-    (OUT/'model.json').write_text(json.dumps(metadata,indent=2))
+    (output_dir/'model.json').write_text(json.dumps(metadata,indent=2))
     print(json.dumps({k:v for k,v in metadata.items() if k not in ('course','assumptions')}),flush=True)
 
 
-def simulate(case,seconds,start_pose):
+def simulate(case,seconds,start_pose,model_dir=None, target_function=rocker_targets):
     name,changes,friction=case
-    metadata=json.loads((OUT/'model.json').read_text())
+    output_dir = Path(model_dir) if model_dir is not None else OUT
+    metadata=json.loads((output_dir/'model.json').read_text())
     changes=dict(changes)
-    initial_x=changes.pop('initial_x',.58)
+    initial_x=changes.pop('initial_x',metadata['crest_x_m']-.02)
     softness=changes.pop('softness',.02)
     speed=changes.pop('speed',.5)
     params=load_gait_parameters()|changes|{'friction':friction}
     params['period']/=.5  # Ramp profile period, before the dashboard 50% speed.
-    robot=Robot(params,feedback='ideal',model_path=OUT/'model.xml')
+    robot=Robot(params,feedback='ideal',model_path=output_dir/'model.xml')
     model,data=robot.m,robot.d
     # Higher-priority terrain parameters override geom mixing. Same contact
     # assumptions apply to feet AND underside. No added adhesion or grip pads.
@@ -131,7 +135,8 @@ def simulate(case,seconds,start_pose):
         data.qpos[:3]=[initial_x,0,metadata['crest_z_m']+.055]
         data.qpos[3:7]=[1,0,0,0]
     else:
-        data.qpos[:3]=[.43,0,.01+.43*math.tan(slope)+.047/math.cos(slope)]
+        initial_x=metadata['crest_x_m']-.17
+        data.qpos[:3]=[initial_x,0,.01+initial_x*math.tan(slope)+.047/math.cos(slope)]
         data.qpos[3:7]=[math.cos(slope/2),0,-math.sin(slope/2),0]
     mujoco.mj_forward(model,data)
     maximum_x=float(data.qpos[0]); max_roll=0; max_lateral=0; max_heading=0; contacts=0; frames=0; settled=None
@@ -146,7 +151,7 @@ def simulate(case,seconds,start_pose):
         if t<=0:
             target=np.tile([0,params['pitch_stance']],4)
         else:
-            target=rocker_targets(params,t,t*speed,heading+.01/max(params['heading_gain'],.01),float(data.qpos[1]),robot.joint_ranges)
+            target=target_function(params,t,t*speed,heading+.01/max(params['heading_gain'],.01),float(data.qpos[1]),robot.joint_ranges)
         robot.step_targets(target)
         if t>=0:
             if settled is None:
@@ -161,18 +166,19 @@ def simulate(case,seconds,start_pose):
             max_penetration=max(max_penetration,max((-c.dist for c in data.contact),default=0))
             if abs(roll)>math.radians(12) or abs(data.qpos[1])>.04:
                 reason='roll or lateral limit'; break
-            if data.qpos[0]>.82:
+            if data.qpos[0]>metadata['crest_x_m']+.22:
                 reason='body passed crest by 22 cm'; break
         if data.time-last_log>=.5:
             history.append(dict(t=float(data.time),xyz=data.qpos[:3].tolist(),roll_deg=math.degrees(roll)))
             last_log=data.time
     result=dict(case=name,friction=friction,start_pose=start_pose,reason=reason,seconds=float(data.time),
+                slope_deg=metadata['slope_deg'],crest_x_m=metadata['crest_x_m'],
                 softness_s=softness,speed=speed,initial_x=initial_x,max_penetration_m=max_penetration,
                 final_xyz=data.qpos[:3].tolist(),max_x=maximum_x,max_roll_deg=max_roll,
                 max_lateral_m=max_lateral,max_heading_deg=max_heading,
                 platform_contact_fraction=contacts/max(1,frames),wall_seconds=time.monotonic()-started,
                 changes=changes,params=params,warnings=int(sum(w.number for w in data.warning)))
-    (OUT/(name+'_'+str(friction)+'_'+start_pose+'.json')).write_text(json.dumps(dict(result=result,history=history,final_qpos=data.qpos.tolist()),indent=2))
+    (output_dir/(name+'_'+str(friction)+'_'+start_pose+'.json')).write_text(json.dumps(dict(result=result,history=history,final_qpos=data.qpos.tolist()),indent=2))
     print(json.dumps({k:result[k] for k in ('case','friction','softness_s','reason','seconds','max_x','max_roll_deg','platform_contact_fraction')}),flush=True)
     robot.close()
     return result

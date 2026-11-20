@@ -16,6 +16,7 @@ struct Parameters {
   double headingGain = .8, lateralGain = 5, strafeGain = 0;
   double turnLimit = -1; // Negative retains the legacy profile's limit.
   double yawBias = 0; // Signed stance offset; final joint commands remain clamped to +/-45 degrees.
+  double rearStrideScale = 1; // Reduce rear yaw stroke without changing support height or stance bias.
   bool crawl = false, crest = false, corridor = false, search = false, sideways = false;
   double steeringTrim = 0.01;
 };
@@ -59,7 +60,7 @@ inline void targets(const Parameters &p, double elapsed, double gaitTime,
       }
       double ramp = clamp(elapsed / p.period, 0, 1);
       lift *= ramp;
-      yaw *= ramp *
+      yaw *= ramp * (i % 2 ? p.rearStrideScale : 1) *
              ((i < 2 ? forward : -forward) + correction + (i % 2 == 0 ? 1 : -1) * strafe);
     }
     double bias = clamp(elapsed / p.period, 0, 1) * p.yawBias *

@@ -1,4 +1,4 @@
-"""Run one bounded, recorded ramp attempt through the existing dashboard API.
+"""Run one bounded, recorded ramp or sidestep trial through the dashboard API.
 
 The laptop webcam is recorded for the operator; it supplies no steering input.
 Create OUTPUT/STOP to end an attempt immediately. Every exit requests servo stop.
@@ -54,12 +54,19 @@ def main():
     parser.add_argument('--seconds', type=float, default=30)
     parser.add_argument('--speed', type=float, default=.5)
     parser.add_argument('--port', type=int, default=8765)
-    parser.add_argument('--profile', choices=('course', 'course_imu'), default='course')
+    parser.add_argument('--profile', choices=('course', 'course_imu', 'sidestep_left', 'sidestep_right'), default='course')
+    parser.add_argument('--assisted-crest-start', action='store_true',
+                        help='Require dashboard --start-at-crest; record assisted placement explicitly.')
     parser.add_argument('--roll-limit', type=float, default=15)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     if not 1 <= args.seconds <= 300 or not .25 <= args.speed <= 1 or not 5 <= args.roll_limit <= 15:
         parser.error('Use 1–300 seconds and speed 0.25–1.0.')
+    sidestep = args.profile in ('sidestep_left', 'sidestep_right')
+    if sidestep and (args.seconds > 12 or args.speed > .65):
+        parser.error('Sidestep trials allow at most 12 seconds and 65% speed.')
+    if args.assisted_crest_start and (args.profile != 'course' or args.seconds > 40):
+        parser.error('Assisted crest trials require course profile and at most 40 seconds.')
     args.output.mkdir(parents=True, exist_ok=True)
     if (args.output / 'telemetry.jsonl').exists() or (args.output / 'STOP').exists():
         parser.error('Choose a new output directory for each attempt.')
@@ -72,10 +79,14 @@ def main():
     client.token = state['token']
     if state.get('auto_corridor') is not False:
         raise RuntimeError('Start the dashboard with --ramp-only before a ramp trial.')
+    if not sidestep and bool(state['walking'].get('assisted_crest_start')) != args.assisted_crest_start:
+        raise RuntimeError('Assisted crest start differs between dashboard and recorder; movement was not started.')
     if state['walking']['active'] or (state['servo'].get('data') or {}).get('externalActive'):
         raise RuntimeError('An existing motion session is active; this trial did not take over.')
-    if not state['servo']['online'] or not state['camera']['online']:
-        raise RuntimeError('Both onboard devices must be online before a trial.')
+    if not state['servo']['online']:
+        raise RuntimeError('The servo controller must be online before a trial.')
+    if not sidestep and not state['camera']['online']:
+        raise RuntimeError('The onboard camera must be online before a ramp trial.')
     latest = args.output / 'webcam.jpg'
     capture_log = (args.output / 'webcam.log').open('w')
     capture = subprocess.Popen([
@@ -94,20 +105,21 @@ def main():
         if not latest.exists():
             raise RuntimeError('No laptop webcam frame; movement was not started.')
         client.request('/api/walk/speed', {'speed': args.speed})
-        client.request('/api/video', {'enabled': True})
-        deadline = time.monotonic() + 6
-        while time.monotonic() < deadline:
-            client.request('/api/heartbeat', {})
-            state = client.request('/api/state')
-            if state['pipeline']['fresh']:
-                break
-            time.sleep(.2)
-        if not state['pipeline']['fresh']:
-            raise RuntimeError('No fresh onboard camera frame; movement was not started.')
+        if not sidestep:
+            client.request('/api/video', {'enabled': True})
+            deadline = time.monotonic() + 6
+            while time.monotonic() < deadline:
+                client.request('/api/heartbeat', {})
+                state = client.request('/api/state')
+                if state['pipeline']['fresh']:
+                    break
+                time.sleep(.2)
+            if not state['pipeline']['fresh']:
+                raise RuntimeError('No fresh onboard camera frame; movement was not started.')
         client.request('/api/heartbeat', {})
         client.request('/api/walk/' + args.profile, {})
         started = time.monotonic()
-        print(f'Started ramp attempt at {args.speed:.0%}; maximum {args.seconds:g}s.', flush=True)
+        print(f'Started {args.profile} attempt at {args.speed:.0%}; maximum {args.seconds:g}s.', flush=True)
         next_sample = next_image = next_report = 0.0
         stop_reason = 'Trial time limit reached.'
         with (args.output / 'telemetry.jsonl').open('w', encoding='utf-8') as log:
@@ -158,10 +170,11 @@ def main():
                 if elapsed >= next_image:
                     stamp = f'{elapsed:06.1f}'
                     shutil.copyfile(latest, args.output / f'webcam_{stamp}.jpg')
-                    (args.output / f'camera_{stamp}.jpg').write_bytes(client.camera_frame())
-                    panel = client.request('/api/navigation-debug.jpg', binary=True)
-                    (args.output / 'navigation.jpg').write_bytes(panel)
-                    (args.output / f'navigation_{stamp}.jpg').write_bytes(panel)
+                    if not sidestep:
+                        (args.output / f'camera_{stamp}.jpg').write_bytes(client.camera_frame())
+                        panel = client.request('/api/navigation-debug.jpg', binary=True)
+                        (args.output / 'navigation.jpg').write_bytes(panel)
+                        (args.output / f'navigation_{stamp}.jpg').write_bytes(panel)
                     next_image = elapsed + 2
                 if elapsed >= next_report:
                     nav = state['walking'].get('navigation') or {}
@@ -192,6 +205,7 @@ def main():
                    'duration_s': round(time.monotonic() - started, 2) if started else 0,
                    'speed': args.speed, 'reason': stop_reason,
                    'profile': args.profile,
+                   'assisted_crest_start': args.assisted_crest_start,
                    'peak_roll_deg': round(peak_roll, 2), 'peak_pitch_deg': round(peak_pitch, 2),
                    'stop_response': stop_result}
         (args.output / 'summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')

@@ -346,7 +346,7 @@ void sendStatus()
   json += ",\"motionProtocol\":2,\"signedYawBias\":true,\"crestWaveGait\":true,\"corridorGait\":true,\"corridorWallGait\":true,\"corridorSearchGait\":true,\"externalActive\":";
   json += externalActive ? "true" : "false";
   json += ",\"motionSession\":"; json += String(motionSession);
-  json += ",\"boundedSteering\":true,\"sidestepGait\":true,\"sidestepComplete\":";
+  json += ",\"boundedSteering\":true,\"rearStrideScale\":true,\"sidestepGait\":true,\"sidestepComplete\":";
   json += gait.sidestepComplete ? "true" : "false";
   json += ",\"gaitStopping\":"; json += externalActive && gait.stopping ? "true" : "false";
   json += ",\"danceTurnDegrees\":";
@@ -570,6 +570,7 @@ void startExternal()
       (pattern == "crest" && p.duty < .8) ||
       !readNumber("yaw_amplitude", p.yawAmplitude, 0, walking::pi / 4) ||
       (server.hasArg("yaw_bias") && !readNumber("yaw_bias", p.yawBias, -walking::pi / 4, walking::pi / 4)) ||
+      (server.hasArg("rear_stride_scale") && !readNumber("rear_stride_scale", p.rearStrideScale, 0, 1)) ||
       !readNumber("pitch_lift", p.pitchLift, 0, 125 * walking::pi / 180) ||
       !readNumber("pitch_min", p.pitchMin, -125 * walking::pi / 180, 0) ||
       !readNumber("pitch_stance", p.pitchStance, p.pitchMin, 0) ||

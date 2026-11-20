@@ -5,9 +5,12 @@ import math
 CREST_GAIT = dict(duty=.85, yaw_amplitude=.75, pitch_lift=.7,
                   pitch_stance=0., yaw_bias=-.25, pattern='trot')
 
-# Experimental single-foot sequence, selected offline with bare-foot geometry.
+# Trial 34's front .45/rear 35% stayed grounded. Try a wider .55 front stroke
+# with rear 30%: front excursion increases 22%, rear stays near .16 rad.
+# Six 25-degree model cases crossed; five stayed within the 12-degree heading
+# bound. Steeper 30-degree cases remain blocked; contact is uncalibrated.
 # Keep the physically tested diagonal gait above available for comparison.
-CREST_WAVE_GAIT = dict(duty=.8, yaw_amplitude=.55, pitch_lift=.25,
+CREST_WAVE_GAIT = dict(duty=.8, yaw_amplitude=.55, rear_stride_scale=.30, pitch_lift=.25,
                        pitch_stance=0., yaw_bias=-.25, pattern='crest')
 
 

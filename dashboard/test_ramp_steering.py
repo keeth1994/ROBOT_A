@@ -19,12 +19,13 @@ class RampSteeringTests(unittest.TestCase):
         p = load_gait_parameters() | RAMP_STEERING | dict(yaw_bias=0, pattern='trot', yaw_amplitude=.4)
         # At t=0, the FL and RR diagonal have identical phase. Their sum
         # cancels forward and strafe components, isolating the turn command.
-        for heading in (-1., -.1, 0., .1, 1.):
-            for lateral in (-.05, 0., .05):
-                target = rocker_targets(p, 3, 0, heading, lateral)
-                turn = -(target[0]+target[6])/(2*p['yaw_amplitude'])
-                self.assertAlmostEqual(turn, float(np.clip(1.2*heading,-.2,.2)))
-                self.assertLessEqual(abs(turn), .2+1e-12)
+        for gain in (1.2, 3.0):
+            for heading in (-1., -.1, 0., .1, 1.):
+                for lateral in (-.05, 0., .05):
+                    target = rocker_targets(p | {'heading_gain': gain}, 3, 0, heading, lateral)
+                    turn = -(target[0]+target[6])/(2*p['yaw_amplitude'])
+                    self.assertAlmostEqual(turn, float(np.clip(gain*heading,-.2,.2)))
+                    self.assertLessEqual(abs(turn), .2+1e-12)
         forward = rocker_targets(p,3,0,0,0)
         shifted = rocker_targets(p,3,0,0,.02)
         self.assertFalse(np.allclose(forward,shifted)) # Strafe remains active.
@@ -34,6 +35,7 @@ class RampSteeringTests(unittest.TestCase):
         settings = walking.start_settings('course')
         self.assertEqual(settings['turn_limit'],.2)
         self.assertEqual(settings['lateral_gain'],0)
+        self.assertEqual(settings['heading_gain'],3.0)
         walking.begin(status(),1,0,'course')
         for phase in ('crest','descent'):
             walking.crest_sequence.requested = phase
@@ -42,6 +44,7 @@ class RampSteeringTests(unittest.TestCase):
             self.assertEqual(settings['heading_gain'],1.2)
         self.assertNotIn('turn_limit',walking.start_settings('walk'))
         self.assertNotIn('turn_limit',walking.start_settings('sidestep_left'))
+        self.assertEqual(walking.start_settings('course_camera')['heading_gain'], 1.2)
 
     def test_old_firmware_cannot_silently_ignore_the_cap(self):
         app = Dashboard()
