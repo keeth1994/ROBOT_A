@@ -521,8 +521,8 @@
     ],
     "yaw_deg": 0,
     "clear_width_m": 0.4,
-    "wall_height_m": 0.18,
-    "wall_thickness_m": 0.012,
+    "wall_height_m": 0.17,
+    "wall_thickness_m": 0.03,
     "centerline_xy_m": [
       [
         0.0,
@@ -595,7 +595,7 @@
   },
   "camera_lookat": [
     -0.050974500000000145,
-    -1.0161705,
+    -1.0251705000000002,
     0.08
   ],
   "camera_distance": 9.00243625,
