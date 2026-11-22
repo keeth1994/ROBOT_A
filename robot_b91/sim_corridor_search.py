@@ -22,7 +22,7 @@ CASES = {
     'front': (.60, 0, math.pi),
     'angled': (.40, .65, -1.2),
     'far_wall_first': (.20, .95, -2.2),
-    'ramp_exit': (0, 1.1, 0),
+    'ramp_exit': (.45, 1.1, 0),
 }
 
 
