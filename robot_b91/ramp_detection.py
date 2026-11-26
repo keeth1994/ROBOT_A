@@ -4,13 +4,16 @@ from PIL import Image
 from scipy import ndimage
 
 
-def detect_ramp(rgb, dark_min=3, dark_max=115, max_chroma=.28):
+def detect_ramp(rgb, dark_min=3, dark_max=115, max_chroma=.28, include_single_edges=False,
+                previous_mask=None):
     original_h, original_w = rgb.shape[:2]
     stride = max(1, int(np.ceil(max(original_w / 320, original_h / 240))))
     size = ((original_w + stride - 1) // stride, (original_h + stride - 1) // stride)
     pixels = np.asarray(Image.fromarray(rgb).resize(size, Image.Resampling.BOX)).astype(float)
     gray = pixels.mean(axis=2)
     h, w = gray.shape
+    previous = (None if previous_mask is None else
+                np.asarray(Image.fromarray(previous_mask).resize(size, Image.Resampling.NEAREST)))
     scale = max(w / 160, h / 120)
     smooth = ndimage.median_filter(gray, size=3)
     chroma = ndimage.median_filter(
@@ -34,47 +37,85 @@ def detect_ramp(rgb, dark_min=3, dark_max=115, max_chroma=.28):
             if np.median(mask.sum(axis=1)[mask.any(axis=1)]) < w * .18:
                 continue
             rows, contrasts = [], []
-            # Require real background on both sides, including near the image border.
+            # Image borders are missing edges, never measured ramp boundaries.
             margin = 2
             for y in range(int(ys.min()) + 2, int(ys.max()) - 1):
                 x = np.flatnonzero(mask[y])
                 if not len(x):
                     continue
                 left, right = int(x[0]), int(x[-1])
-                if right - left < w * .18 or left <= margin or right >= w - margin:
+                if right - left < w * .18:
                     continue
                 # Filling screw holes must not turn the floor between supports into mat.
                 if candidate[y, left:right + 1].mean() < .8:
                     continue
-                left_contrast = smooth[y, left - 2] - smooth[y, left + 2]
-                right_contrast = smooth[y, right + 2] - smooth[y, right - 2]
+                left_contrast = smooth[y, left - 2] - smooth[y, left + 2] if left > margin else 0
+                right_contrast = smooth[y, right + 2] - smooth[y, right - 2] if right < w - margin else 0
                 # Reject brightness variation inside the mat masquerading as edges.
-                if min(left_contrast, right_contrast) < 8:
+                left = left if left_contrast >= 8 else None
+                right = right if right_contrast >= 8 else None
+                if left is None and right is None:
                     continue
                 rows.append((y, left, right))
-                contrasts.extend((left_contrast, right_contrast))
+                contrasts.extend(c for c in (left_contrast, right_contrast) if c >= 8)
             ring = ndimage.binary_dilation(mask, iterations=3) & ~mask
             contrast = float(np.median(gray[ring]) - np.median(gray[mask])) if ring.any() else 0
             side_contrast = float(np.median(contrasts)) if contrasts else 0
             if abs(contrast) < 8 and side_contrast < 8:
                 continue
-            coherent_rows = continuous_edges(rows, h, scale)
+            paired_rows = [row for row in rows if row[1] is not None and row[2] is not None]
+            coherent_rows = continuous_edges(paired_rows, h, scale)
+            independent_rows = independent_edges(rows, h, scale)
             clipped = contrast >= 8 and clipped_surface(mask)
-            if not coherent_rows and not visible_crest(mask, smooth) and not clipped:
+            if not independent_rows and not visible_crest(mask, smooth) and not clipped:
                 continue
             roughness = (float(np.median(np.abs(np.diff(np.asarray(coherent_rows)[:, 1:], n=2, axis=0)))) / scale
                          if len(coherent_rows) > 2 else 0)
-            score = (2 * len(coherent_rows) / scale - 10 * roughness + .4 * min(side_contrast, 50) +
+            edge_count = sum((left is not None) + (right is not None) for _, left, right in independent_rows)
+            score = (edge_count / scale - 10 * roughness + .4 * min(side_contrast, 50) +
                      30 * np.sqrt(mask.mean()) + .15 * np.clip(contrast, 0, 60) -
                      .4 * np.std(smooth[mask]))
+            if include_single_edges:
+                score += 30 * mask[3 * h // 4:].mean()
+                if previous is not None:
+                    score += 40 * (2 * (mask & previous).sum() / max(1, mask.sum() + previous.sum()))
             if score > best_score:
-                best_score, best_mask, best_rows = score, mask, coherent_rows
+                best_score, best_mask = score, mask
+                best_rows = independent_rows if include_single_edges else coherent_rows
     mask = np.asarray(Image.fromarray(best_mask).resize((original_w, original_h), Image.Resampling.NEAREST))
     rows = [(round((y + .5) * original_h / h - .5),
-             round((left + .5) * original_w / w - .5),
-             round((right + .5) * original_w / w - .5))
+             None if left is None else round((left + .5) * original_w / w - .5),
+             None if right is None else round((right + .5) * original_w / w - .5))
             for y, left, right in best_rows]
     return mask, rows
+
+
+def detect_ramp_edges(rgb, dark_min=3, dark_max=115, max_chroma=.28, previous_mask=None):
+    """Return visible sides independently; None marks a missing side."""
+    return detect_ramp(rgb, dark_min, dark_max, max_chroma, include_single_edges=True,
+                       previous_mask=previous_mask)
+
+
+def independent_edges(rows, height, scale):
+    """Keep continuous sides, including bends where the ramp changes slope."""
+    kept = {}
+    for side in (1, 2):
+        runs = []
+        for row in rows:
+            y, x = row[0], row[side]
+            if x is None:
+                continue
+            if not runs or y - runs[-1][-1][0] > 8 * scale:
+                runs.append([])
+            elif abs(x - runs[-1][-1][1]) > 3 * (y - runs[-1][-1][0]) + 3 * scale:
+                runs.append([])
+            runs[-1].append((y, x))
+        for run in runs:
+            if len(run) < 6 * scale or run[-1][0] - run[0][0] < height * .06:
+                continue
+            for y, x in run:
+                kept.setdefault(y, [None, None])[side - 1] = x
+    return [(y, *sides) for y, sides in sorted(kept.items())]
 
 
 def clipped_surface(mask):

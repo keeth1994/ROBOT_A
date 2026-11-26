@@ -55,6 +55,14 @@ def navigation_debug_image(navigation, now, use_imu=True):
                 for x in [left, right]:
                     rgb_draw.line((x-2, y, x+2, y), fill=(255, 180, 40))
                     mask_draw.line((x-2, y, x+2, y), fill=(255, 180, 40))
+        if debug.get('edge_source') in ('left', 'right'):
+            color = (255, 70, 65) if debug['edge_source'] == 'left' else (60, 140, 255)
+            previous = None
+            for y, x in debug.get('single_edge_rows', []):
+                if previous is not None and y - previous[1] <= 4:
+                    rgb_draw.line((*previous, x, y), fill=color, width=3)
+                    mask_draw.line((*previous, x, y), fill=color, width=3)
+                previous = (x, y)
         panel.paste(rgb.resize((320, 240)), (0, 22))
         panel.paste(mask.resize((320, 240)), (320, 22))
     else:
@@ -67,6 +75,8 @@ def navigation_debug_image(navigation, now, use_imu=True):
     used = sum(debug["inliers"]) if debug and debug["accepted"] else 0
     surface = f'{target} found' if debug and debug.get('surface_detected') else f'no {target}'
     draw.text((6, 266), f"{status} | {surface} | age: {age_text} | rows: {used}/{rows}", fill=color)
-    draw.text((6, 282), f"Heading: {math.degrees(navigation.heading):+.2f} deg | lateral: {navigation.lateral*1000:+.1f} mm", fill="white")
+    source = debug.get('edge_source', 'none') if debug else 'none'
+    position = debug.get('lateral_source', 'held') if debug else 'held'
+    draw.text((6, 282), f"Heading: {math.degrees(navigation.heading):+.2f} deg | lateral: {navigation.lateral*1000:+.1f} mm ({position}) | {source}", fill="white")
     draw.text((6, 298), reason, fill=color)
     return np.array(panel)

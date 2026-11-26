@@ -187,8 +187,11 @@ class CourseNavigation:
             if self.estimate.debug and not self.estimate.debug['accepted']:
                 self.reason = f'Continuing briefly using the last valid {self.target} direction.'
             else:
-                self.reason = (f'Following {self.target} with camera and IMU.' if self.use_imu else
-                               f'Following {self.target} with camera only. No tilt compensation.')
+                if self.estimate.debug.get('edge_source') in ('left', 'right'):
+                    self.reason = self.estimate.debug['reason'] + '.'
+                else:
+                    self.reason = (f'Following {self.target} with camera and IMU.' if self.use_imu else
+                                   f'Following {self.target} with camera only. No tilt compensation.')
         else:
             detail = self.estimate.debug['reason'] if self.estimate.debug else f'Waiting for visible {self.target}'
             self.reason = 'Holding steps: ' + detail + '.'
