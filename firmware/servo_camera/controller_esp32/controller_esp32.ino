@@ -342,9 +342,10 @@ void sendStatus()
   json += running ? channelList(groupFirst, groupCount) : String("none");
   json += "\",\"manualActive\":";
   json += manualActive() ? "true" : "false";
-  json += ",\"motionProtocol\":2,\"corridorGait\":true,\"corridorWallGait\":true,\"corridorSearchGait\":true,\"externalActive\":";
+  json += ",\"motionProtocol\":2,\"signedYawBias\":true,\"crestWaveGait\":true,\"corridorGait\":true,\"corridorWallGait\":true,\"corridorSearchGait\":true,\"externalActive\":";
   json += externalActive ? "true" : "false";
   json += ",\"motionSession\":"; json += String(motionSession);
+  json += ",\"rearStrideScale\":true,\"frontPitchLift\":true";
   json += ",\"gaitStopping\":"; json += externalActive && gait.stopping ? "true" : "false";
   json += ",\"danceTurnDegrees\":";
   json += externalActive && gait.dance && gait.danceTurnPhase ?
@@ -559,12 +560,15 @@ void startExternal()
   walking::Parameters p;
   if ((profile != "walk" && profile != "course" && profile != "course_camera" &&
        profile != "course_imu" && profile != "corridor" && profile != "corridor_search" && profile != "dance") ||
-      (pattern != "trot" && pattern != "crawl") ||
+      (pattern != "trot" && pattern != "crawl" && pattern != "crest") ||
       !readNumber("period", p.period, .2, 10) ||
       !readNumber("duty", p.duty, .1, .9) ||
+      (pattern == "crest" && p.duty < .8) ||
       !readNumber("yaw_amplitude", p.yawAmplitude, 0, walking::pi / 4) ||
-      (server.hasArg("yaw_bias") && !readNumber("yaw_bias", p.yawBias, 0, walking::pi / 4)) ||
+      (server.hasArg("yaw_bias") && !readNumber("yaw_bias", p.yawBias, -walking::pi / 4, walking::pi / 4)) ||
+      (server.hasArg("rear_stride_scale") && !readNumber("rear_stride_scale", p.rearStrideScale, 0, 1)) ||
       !readNumber("pitch_lift", p.pitchLift, 0, 125 * walking::pi / 180) ||
+      (server.hasArg("front_pitch_lift") && !readNumber("front_pitch_lift", p.frontPitchLift, 0, 125 * walking::pi / 180)) ||
       !readNumber("pitch_min", p.pitchMin, -125 * walking::pi / 180, 0) ||
       !readNumber("pitch_stance", p.pitchStance, p.pitchMin, 0) ||
       !readNumber("heading_gain", p.headingGain, 0, 20) ||
@@ -576,6 +580,7 @@ void startExternal()
     respond(409, "text/plain", "This motion needs fresh IMU readings. Check the sensor."); return;
   }
   p.crawl = pattern == "crawl";
+  p.crest = pattern == "crest";
   p.search = profile == "corridor_search";
   p.corridor = profile == "corridor" || p.search;
   if (profile == "dance") p.pitchStance = 0;

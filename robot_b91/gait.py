@@ -24,9 +24,20 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
     front/rear strides, so correcting drift need not turn the body off the ramp.
     """
     p = params
+    front_lift = p.get('front_pitch_lift', p['pitch_lift'])
+    if not math.isfinite(front_lift) or not 0 <= front_lift <= math.radians(125):
+        raise ValueError('Front foot lift must be between zero and 125 degrees in radians.')
+    rear_stride = p.get('rear_stride_scale', 1.)
+    if not math.isfinite(rear_stride) or not 0 <= rear_stride <= 1:
+        raise ValueError('Rear stride scale must be between zero and one.')
     target = np.tile([0.0, p["pitch_stance"]], 4)
     if elapsed_s > 0:
-        offsets = [0, 0.5, 0.25, 0.75] if p["pattern"] == "crawl" else [0, 0.5, 0.5, 0]
+        crest = p["pattern"] == "crest"
+        if crest and not .8 <= p["duty"] <= .9:
+            raise ValueError('Crest gait duty must be between .8 and .9.')
+        # Rear-right, front-right, rear-left, front-left: one swing at a time.
+        offsets = ([0, .25, .5, .75] if crest else
+                   [0, .5, .25, .75] if p["pattern"] == "crawl" else [0, .5, .5, 0])
         error = heading_error_rad + math.atan(p.get("lateral_gain", 0) * lateral_error_m)
         turn_limit = .95 if p.get('corridor', False) else .5
         correction = np.clip(p["heading_gain"] * error, -turn_limit, turn_limit)
@@ -43,12 +54,18 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
                 lift = 0
             else:
                 v = (u - duty) / (1 - duty)
-                yaw = p["yaw_amplitude"] * (1 - 2 * v * v * (3 - 2 * v))
-                height = min(1, v / .15, (1 - v) / .15)
-                lift = -p["pitch_lift"] * height * height * (3 - 2 * height)
+                # Clear the surface before returning the foot, then lower it
+                # without sweeping. Ordinary trot/crawl retain their trajectory.
+                sweep = np.clip((v - .2) / .6, 0, 1) if crest else v
+                yaw = p["yaw_amplitude"] * (1 - 2 * sweep * sweep * (3 - 2 * sweep))
+                edge = .2 if crest else .15
+                height = min(1, v / edge, (1 - v) / edge)
+                pitch_lift = front_lift if crest and leg.startswith('F') else p['pitch_lift']
+                lift = -pitch_lift * height * height * (3 - 2 * height)
             sign = 1 if i < 2 else -1
             fore = 1 if leg.startswith("F") else -1
-            target[2 * i] = yaw * ramp * (sign * forward + correction + fore * strafe)
+            stride_scale = rear_stride if fore < 0 else 1.
+            target[2 * i] = yaw * ramp * stride_scale * (sign * forward + correction + fore * strafe)
             target[2 * i + 1] = p["pitch_stance"] + lift * ramp
     target[1::2] = np.clip(target[1::2], p.get("pitch_min", math.radians(-125)), 0)
     if joint_ranges is None:

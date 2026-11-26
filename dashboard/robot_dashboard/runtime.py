@@ -208,6 +208,9 @@ class Dashboard:
                         devices.request(url, '/stop', {}, timeout=.15)
                         continue
                     devices.request(url, '/motion/adjust', frame, timeout=.15)
+                    if self.walking.crest_sequence and self.walking.crest_sequence.requested:
+                        self._change_ramp_gait(url)
+                        continue
                     if getattr(self.walking.navigation, 'corridor_requested', False):
                         self._corridor_after_ramp(url)
                         continue
@@ -223,6 +226,33 @@ class Dashboard:
                         devices.request(url, '/stop', {}, timeout=.15)
                     except devices.DeviceError:
                         pass
+
+    def _change_ramp_gait(self, url):
+        """Stop/confirm/restart, retaining navigation; never retry a partial switch."""
+        try:
+            params, settings = self.walking.transition_settings()
+            devices.request(url, '/stop', {}, timeout=.3)
+            status = devices.request(url, '/status', timeout=.3)
+            self.walking.prepare(status)
+            if (status.get('externalActive') or status.get('running') or status.get('manualActive') or
+                    status.get('signedYawBias') is not True):
+                raise devices.DeviceError('Controller must be stopped and support the crest stance.', 409)
+            if status.get('crestWaveGait') is not True:
+                raise devices.DeviceError('Crest wave needs the updated controller firmware.', 409)
+            if settings.get('rear_stride_scale', 1) != 1 and status.get('rearStrideScale') is not True:
+                raise devices.DeviceError('Reduced rear stride needs the updated controller firmware.', 409)
+            if 'front_pitch_lift' in settings and status.get('frontPitchLift') is not True:
+                raise devices.DeviceError('Front foot lift needs the updated controller firmware.', 409)
+            self._aim_camera(url, status, self.walking.camera_target(time.monotonic()))
+            result = devices.request(url, '/motion/start', settings, timeout=.3)
+            self.walking.resume_gait(result['session'], time.monotonic(), params)
+        except (devices.DeviceError, ValueError, KeyError, TypeError):
+            self.walking.stop('Ramp gait change failed; outputs off requested.')
+            try:
+                devices.request(url, '/stop', {}, timeout=.3)
+            except devices.DeviceError:
+                pass
+            raise
 
     def _corridor_after_ramp(self, url):
         devices.request(url, '/stop', {}, timeout=.15)
@@ -252,6 +282,9 @@ class Dashboard:
             try:
                 status = devices.request(url, '/status', timeout=.15)
                 self.walking.prepare(status)
+                if action == 'course' and not all(status.get(name) is True for name in
+                        ('crestWaveGait', 'signedYawBias', 'rearStrideScale', 'frontPitchLift')):
+                    raise devices.DeviceError('Upload the updated controller firmware for automatic crest walking.', 409)
                 if action == 'corridor' and status.get('corridorWallGait') is not True:
                     raise devices.DeviceError('Upload the updated controller firmware for corridor walking.', 409)
                 if action == 'corridor_search' and status.get('corridorSearchGait') is not True:

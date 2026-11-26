@@ -11,11 +11,13 @@ inline double clamp(double x, double low, double high) {
 
 struct Parameters {
   double period = 1, duty = .6, yawAmplitude = .45, pitchLift = .65;
+  double frontPitchLift = -1; // Negative uses the shared foot lift.
   // A 125-degree lift reaches calibrated -80 degrees from +45 foot-down.
   double pitchStance = 0, pitchMin = -125 * pi / 180;
   double headingGain = .8, lateralGain = 5, strafeGain = 0;
-  double yawBias = 0;
-  bool crawl = false, corridor = false, search = false;
+  double yawBias = 0; // Signed stance offset; final joint commands remain clamped to +/-45 degrees.
+  double rearStrideScale = 1; // Reduce rear yaw stroke without changing support height or stance bias.
+  bool crawl = false, crest = false, corridor = false, search = false;
   double steeringTrim = 0.01;
 };
 
@@ -23,6 +25,7 @@ struct Parameters {
 inline void targets(const Parameters &p, double elapsed, double gaitTime,
                     double heading, double lateral, double angles[8], double forwardScale = 1) {
   const double trot[] = {0, .5, .5, 0}, crawl[] = {0, .5, .25, .75};
+  const double crest[] = {0, .25, .5, .75};
   double turnLimit = p.corridor ? .95 : .5;
   double correction = clamp(
     p.headingGain * (heading + std::atan(p.lateralGain * lateral))
@@ -38,18 +41,22 @@ inline void targets(const Parameters &p, double elapsed, double gaitTime,
   for (int i = 0; i < 4; ++i) {
     double yaw = 0, lift = 0;
     if (elapsed > 0) {
-      double u = std::fmod(gaitTime / p.period + (p.crawl ? crawl[i] : trot[i]), 1.0);
+      double u = std::fmod(gaitTime / p.period + (p.crest ? crest[i] : p.crawl ? crawl[i] : trot[i]), 1.0);
       if (u < p.duty) yaw = p.yawAmplitude * (2 * u / p.duty - 1);
       else {
         double v = (u - p.duty) / (1 - p.duty);
-        yaw = p.yawAmplitude * (1 - 2 * v * v * (3 - 2 * v));
+        // Crest: lift, return, then plant. At duty >= .8, at most one
+        // foot is commanded off the surface, with all-down intervals.
+        double sweep = p.crest ? clamp((v - .2) / .6, 0, 1) : v;
+        yaw = p.yawAmplitude * (1 - 2 * sweep * sweep * (3 - 2 * sweep));
         // Lift early and hold clearance while the foot swings forward.
-        double height = clamp((v < .5 ? v : 1 - v) / .15, 0, 1);
-        lift = -p.pitchLift * height * height * (3 - 2 * height);
+        double height = clamp((v < .5 ? v : 1 - v) / (p.crest ? .2 : .15), 0, 1);
+        double pitchLift = p.crest && i % 2 == 0 && p.frontPitchLift >= 0 ? p.frontPitchLift : p.pitchLift;
+        lift = -pitchLift * height * height * (3 - 2 * height);
       }
       double ramp = clamp(elapsed / p.period, 0, 1);
       lift *= ramp;
-      yaw *= ramp *
+      yaw *= ramp * (i % 2 ? p.rearStrideScale : 1) *
              ((i < 2 ? forward : -forward) + correction + (i % 2 == 0 ? 1 : -1) * strafe);
     }
     double bias = clamp(elapsed / p.period, 0, 1) * p.yawBias *
