@@ -7,7 +7,7 @@ let speedBusy = false;
 const rows = new Map();
 const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
   walkCourseTape:'course_tape', walkCourseImu:'course_imu', walkCorridor:'corridor',
-  searchCorridor:'corridor_search', dance:'dance', testCrest:'crest_test'};
+  searchCorridor:'corridor_search', dance:'dance', sidestepLeft:'sidestep_left', sidestepRight:'sidestep_right'};
 
 function showSpeed(speed) {
   el('walkSpeed').value = Math.round(speed * 100);
@@ -53,7 +53,8 @@ function renderControls() {
   el('cameraPitchRelease').disabled = pitchBlocked || pitch?.angle === null;
   el('cameraPitch').disabled = pitchBlocked || pitch?.angle === null;
   Object.keys(walkButtons).forEach(id => {
-    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2;
+    const sidestep = walkButtons[id].startsWith('sidestep_');
+    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2 || (sidestep && s?.sidestepGait !== true);
   });
   el('all').disabled = el('groups').disabled = blocked || !!s?.manualActive;
   rows.forEach(row => {
@@ -104,10 +105,14 @@ function render(state) {
   current = state; token = state.token || token;
   el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'course_tape', 'corridor_search'].includes(state.walking.profile)
     ? 'Live walking perception: the actual frame and decision used by the controller.'
-    : 'Camera + IMU preview; no walking starts.';
+    : 'Camera preview only; no walking starts.';
   el('walkMessage').textContent = state.walking?.message || 'ESP32 walking unavailable.';
   if (!speedBusy && document.activeElement !== el('walkSpeed')) {
     showSpeed(state.walking?.speed ?? 1);
+    if (state.walking?.active && Number.isFinite(state.walking.effective_speed)) {
+      el('walkSpeedValue').textContent += ' requested / ' +
+        Math.round(state.walking.effective_speed * 100) + '% commanded';
+    }
   }
   const nav = state.walking?.navigation;
   el('navigationStats').textContent = nav && nav.guidance !== 'corridor_search'
@@ -144,7 +149,7 @@ function render(state) {
     ? 'Upload the camera-pitch controller firmware to enable these controls.'
     : pitch.angle === null ? 'Camera servo released. Enable at 0° before adjusting.'
     : current?.walking?.camera_controlled ? 'Automatic camera control: ' + pitch.angle + '°. Stop walking to adjust manually.'
-    : 'Commanded position: ' + pitch.angle + '°';
+    : 'Commanded position: ' + pitch.angle + '°. Camera-guided walking pauses briefly after tilt changes.';
   renderIr(state.servo.online ? s : null);
   if (state.servo.online && s) {
     renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? s.message : 'Upload the calibrated controller firmware to enable these controls.';

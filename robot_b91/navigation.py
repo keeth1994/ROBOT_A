@@ -6,12 +6,6 @@ Calibration must be measured again on the physical robot.
 import math
 import numpy as np
 
-# Sample spacing differs from image age: control acknowledgements can take
-# 0.6 s while each newly processed camera image is less than 0.1 s old.
-EDGE_SAMPLE_MAX_GAP_S = .9
-# Four samples must fit even at the largest permitted spacing (3 * 0.9 s).
-EDGE_SAMPLE_WINDOW_S = 3.0
-
 
 class Navigation:
     def __init__(self, width_m=0.30, fovy_deg=42.9470936, camera_x_m=0.0626,
@@ -45,7 +39,6 @@ class Navigation:
         self.bias_samples = []
         self.initialized = False
         self.heading_initialized = False
-        self.require_visual_heading = False
         self.max_blind_s = 0.0
         self.debug = None
 
@@ -77,7 +70,7 @@ class Navigation:
             self.pitch += gain * (pitch - self.pitch)
             self.initialized = True
 
-    def frame(self, timestamp, rgb, use_imu=True):
+    def frame(self, timestamp, rgb, use_imu=True, *, surface=None):
         self.frames += 1
         # A fresh diagnostic snapshot for this exact input frame, including failures.
         # Display code must never re-run perception or annotate the sensor input.
@@ -104,7 +97,8 @@ class Navigation:
             # then put the edges back in raw camera coordinates for ray projection.
             rear = getattr(self, 'view_sign', 1) < 0
             upright = rgb[::-1, ::-1] if rear else rgb
-            dark, edges = self.surface_detector(upright, self.dark_min, self.dark_max, self.max_chroma)
+            dark, edges = (surface if surface is not None else
+                           self.surface_detector(upright, self.dark_min, self.dark_max, self.max_chroma))
             if rear:
                 dark = dark[::-1, ::-1]
                 edges = sorted((h - 1 - y, w - 1 - right, w - 1 - left) for y, left, right in edges)
@@ -202,20 +196,14 @@ class Navigation:
             # invalidates the heading already established and propagated by IMU.
             # A partial rear view must not reset it to an unrelated visual fit.
             difference = math.atan2(math.sin(visual_heading - heading), math.cos(visual_heading - heading))
-            if not use_imu or not self.heading_initialized or self.require_visual_heading:
+            if not use_imu or not self.heading_initialized:
                 heading = visual_heading
             elif abs(difference) < .12:
                 heading += (.2 if timestamp < 2 else .025) * difference
-        elif not use_imu or self.require_visual_heading:
+        elif not use_imu:
             return reject("Too little edge depth to estimate heading without IMU")
         measured_width = self.tape_width_m if self.guidance == 'blue_tape' else self.width_m
-        # The fitted edge intercept and slope jointly describe the ramp pose.
-        # Substituting a slowly corrected gyro heading into that fit mixes two
-        # different poses: a few degrees of yaw bias can reverse the side error.
-        # Keep gyro fusion for steering, but measure position from the complete
-        # edge fit whenever its depth supports an independent heading.
-        position_heading = visual_heading if heading_observed and self.guidance == 'ramp' else heading
-        offsets = -(centers[keep] + math.tan(position_heading)) / widths[keep] * measured_width
+        offsets = -(centers[keep] + math.tan(heading)) / widths[keep] * measured_width
         self.debug["inliers"] = keep.tolist()
         # Edges locate the lens, while gait corrections act on the body origin.
         # A high camera moves sideways as the robot rolls and forward as it
@@ -223,18 +211,25 @@ class Navigation:
         # body drift. Use the same body attitude as the image-ray projection.
         camera_offset = rotation @ np.array([self.camera_x, self.camera_y, self.camera_z])
         lateral = np.median(offsets) - (
-            camera_offset[0] * math.sin(position_heading) + camera_offset[1] * math.cos(position_heading))
+            camera_offset[0] * math.sin(heading) + camera_offset[1] * math.cos(heading))
         if abs(lateral) > self.width_m * .4 or np.median(np.abs(offsets-np.median(offsets))) > .015:
+            # Diagnostic only: a stale yaw prior can put two good edges outside
+            # the ramp. The dashboard may verify the independent fit while held.
+            if (self.adaptive_surface and self.guidance == 'ramp' and use_imu and heading_observed
+                    and keep.sum() >= 12 and keep.mean() >= .75 and np.ptp(widths[keep]) > depth_threshold):
+                alt = -(centers[keep] + math.tan(visual_heading)) / widths[keep] * measured_width
+                mid = np.median(alt)
+                body = mid - (camera_offset[0]*math.sin(visual_heading)
+                              + camera_offset[1]*math.cos(visual_heading))
+                if np.median(np.abs(alt-mid)) <= .006 and abs(body) <= .2*self.width_m:
+                    self.debug['edge_pose'] = (visual_heading, float(body))
             return reject("Offset out of range or inconsistent edge pairs")
         self.heading = heading
         self.heading_initialized = self.heading_initialized or heading_observed
         self.lateral += .3 * (lateral - self.lateral)
         self.last_seen = timestamp
         self.accepted += 1
-        self.debug.update(accepted=True, reason="Camera measurement accepted",
-                          measured_heading_rad=heading, measured_lateral_m=lateral,
-                          visual_heading_rad=visual_heading if heading_observed else None,
-                          lateral_source='paired_edges' if heading_observed and self.guidance == 'ramp' else 'tracked_heading')
+        self.debug.update(accepted=True, reason="Camera measurement accepted")
         return True
 
     def ready(self, timestamp):
@@ -255,7 +250,4 @@ class Navigation:
                     detection_reason=self.debug['reason'] if self.debug else 'Waiting for camera',
                     last_seen_s=self.last_seen, heading_rad=self.heading,
                     lateral_m=self.lateral, roll_rad=self.roll, pitch_rad=self.pitch,
-                    lateral_source=self.debug.get('lateral_source') if self.debug else None,
-                    edge_lateral_m=self.debug.get('measured_lateral_m') if self.debug else None,
-                    edge_heading_rad=self.debug.get('visual_heading_rad') if self.debug else None,
                     max_blind_s=self.max_blind_s)

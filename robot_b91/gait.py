@@ -12,8 +12,8 @@ import numpy as np
 
 LEGS = ("FL", "RL", "FR", "RR")
 RAMP_SPEED_SCALE = 0.5
-# Ramp steering corrects heading without commanding sideways movement.
-RAMP_STEERING = dict(heading_gain=1.2, lateral_gain=0., strafe_gain=0., turn_limit=.2)
+# Correct lateral offset with the configured strafe gain rather than a sharper turn.
+RAMP_STEERING = dict(heading_gain=1.2, lateral_gain=0., turn_limit=.2)
 
 
 def ramp_forward_scale(lateral_error_m):

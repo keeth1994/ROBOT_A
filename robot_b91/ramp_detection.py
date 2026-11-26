@@ -36,23 +36,22 @@ def detect_ramp(rgb, dark_min=3, dark_max=115, max_chroma=.28):
             rows, contrasts = [], []
             # Require real background on both sides, including near the image border.
             margin = 2
-            for y in range(int(ys.min()) + 2, int(ys.max()) - 1):
-                x = np.flatnonzero(mask[y])
-                if not len(x):
-                    continue
-                left, right = int(x[0]), int(x[-1])
-                if right - left < w * .18 or left <= margin or right >= w - margin:
-                    continue
-                # Filling screw holes must not turn the floor between supports into mat.
-                if candidate[y, left:right + 1].mean() < .8:
-                    continue
-                left_contrast = smooth[y, left - 2] - smooth[y, left + 2]
-                right_contrast = smooth[y, right + 2] - smooth[y, right - 2]
-                # Reject brightness variation inside the mat masquerading as edges.
-                if min(left_contrast, right_contrast) < 8:
-                    continue
-                rows.append((y, left, right))
-                contrasts.extend((left_contrast, right_contrast))
+            y = np.arange(int(ys.min()) + 2, int(ys.max()) - 1)
+            left = mask[y].argmax(axis=1)
+            right = w - 1 - mask[y, ::-1].argmax(axis=1)
+            valid = (right - left >= w * .18) & (left > margin) & (right < w - margin)
+            y, left, right = y[valid], left[valid], right[valid]
+            if len(y):
+                # Prefix sums count original surface pixels between the two edges,
+                # excluding holes filled when measuring the component's outline.
+                counts = np.cumsum(candidate[y], axis=1, dtype=np.int32)
+                i = np.arange(len(y))
+                filled = (counts[i, right] - counts[i, left - 1]) / (right - left + 1)
+                lc = smooth[y, left - 2] - smooth[y, left + 2]
+                rc = smooth[y, right + 2] - smooth[y, right - 2]
+                valid = (filled >= .8) & (np.minimum(lc, rc) >= 8)
+                rows = np.column_stack((y, left, right))[valid].tolist()
+                contrasts = np.column_stack((lc, rc))[valid].ravel().tolist()
             ring = ndimage.binary_dilation(mask, iterations=3) & ~mask
             contrast = float(np.median(gray[ring]) - np.median(gray[mask])) if ring.any() else 0
             side_contrast = float(np.median(contrasts)) if contrasts else 0

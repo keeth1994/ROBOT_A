@@ -1,4 +1,5 @@
 import http.client
+from concurrent.futures import ThreadPoolExecutor
 from copy import copy
 from io import BytesIO
 import json
@@ -12,9 +13,9 @@ from robot_b91.navigation_debug import navigation_debug_image
 
 from . import devices
 from .walking import WALK_ACTIONS, RAMP_PROFILES, Walking
+from .sidestep import SIDESTEP_PROFILES, check_sidestep
 from .crest import CREST_WAVE_GAIT
-from .navigation import CourseNavigation
-from .control_recording import ControlRecording
+from .navigation import CourseNavigation, RampObservation
 
 
 def orient_camera_frame(jpeg):
@@ -149,11 +150,10 @@ class CameraPipeline:
 
 
 class Dashboard:
-    def __init__(self, config_path=None, *, auto_corridor=True, exit_clearance=False,
-                 adaptive_ramp_speed=False, crest_wave=True, start_at_crest=False,
-                 ramp_drift_control=False, control_log=None):
-        if start_at_crest and (auto_corridor or not crest_wave):
-            raise ValueError('Assisted crest start requires the crest wave gait and ramp-only mode.')
+    def __init__(self, config_path=None, *, auto_corridor=True, crest_assist=False, exit_clearance=False,
+                 adaptive_ramp_speed=False, crest_wave=False, start_at_crest=False):
+        if start_at_crest and (auto_corridor or not (crest_assist or crest_wave)):
+            raise ValueError('Assisted crest start requires a selected crest gait and ramp-only mode.')
         self.lock = threading.RLock()
         self.servo_lock = threading.Lock()
         self.camera_settings_lock = threading.Lock()
@@ -168,14 +168,15 @@ class Dashboard:
         self.cache = {name: {'online': False, 'data': None, 'error': 'Connecting...', 'at': 0}
                       for name in ('servo', 'camera')}
         self.camera = CameraPipeline(self.stream_url)
-        self.walking = Walking(exit_clearance=exit_clearance,
+        self.vision_pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix='ramp-vision')
+        self.vision_pending = self.vision_key = None
+        self.walking = Walking(crest_assist=crest_assist, exit_clearance=exit_clearance,
                                adaptive_ramp_speed=adaptive_ramp_speed, crest_wave=crest_wave,
-                               start_at_crest=start_at_crest, ramp_drift_control=ramp_drift_control)
+                               start_at_crest=start_at_crest)
         self.auto_corridor = auto_corridor
         self.debug_lock = threading.Lock()
-        self.debug_preview = CourseNavigation(time.monotonic())
+        self.debug_preview = CourseNavigation(time.monotonic(), use_imu=False)
         self.threads = []
-        self.control_recording = ControlRecording(control_log) if control_log else None
 
     @staticmethod
     def _validate_config(values):
@@ -213,18 +214,16 @@ class Dashboard:
                     if not alive:
                         raise devices.DeviceError('Operator heartbeat lost; walking stopped.')
                     status = devices.request(url, '/status', timeout=.15)
-                    observed = time.monotonic()
-                    camera_frame = self.camera.navigation_frame()
-                    frame = self.walking.frame(status, observed, camera_frame)
+                    image = self._navigation_frame()
+                    frame = self.walking.frame(status, time.monotonic(), image)
                     if not self.walking.active:
                         devices.request(url, '/stop', {}, timeout=.15)
                         continue
-                    devices.request(url, '/motion/adjust', frame, timeout=.15)
-                    if self.control_recording:
-                        self.control_recording.submit(dict(
-                            event='adjusted', observed_s=observed, acknowledged_s=time.monotonic(),
-                            wall_time_s=time.time(), status=status, command=frame,
-                            walking=self.walking.state()), camera_frame)
+                    self._adjust_walking(url, frame)
+                    self.walking.last_confirmed_frame = time.monotonic()
+                    if not self.walking.active:
+                        devices.request(url, '/stop', {}, timeout=.15)
+                        continue
                     sequence = self.walking.crest_sequence
                     if sequence and sequence.requested:
                         self._change_ramp_gait(url)
@@ -234,11 +233,7 @@ class Dashboard:
                         continue
                     # Pause the gait before issuing a camera turn requested after ramp loss.
                     self._aim_camera(url, status, self.walking.camera_target(time.monotonic()))
-                    self.walking.last_confirmed_frame = time.monotonic()
                 except (devices.DeviceError, ValueError, KeyError, TypeError) as error:
-                    if self.control_recording:
-                        self.control_recording.submit(dict(event='control_error', wall_time_s=time.time(),
-                            monotonic_s=time.monotonic(), error=str(error), walking=self.walking.state()))
                     if (isinstance(error, devices.DeviceConnectionError) and self.walking.active and
                             time.monotonic() - self.walking.last_confirmed_frame <= 1.0):
                         continue
@@ -247,6 +242,58 @@ class Dashboard:
                         devices.request(url, '/stop', {}, timeout=.15)
                     except devices.DeviceError:
                         pass
+
+    def _navigation_frame(self):
+        raw = self.camera.navigation_frame()
+        nav = self.walking.navigation
+        if not isinstance(nav, CourseNavigation) or not nav.scan_ramp or not nav.estimate.adaptive_surface:
+            return raw
+        # Never queue up old frames or block motion updates waiting for an image.
+        result = None
+        rear = getattr(nav.estimate, 'view_sign', 1) < 0
+        if self.vision_pending is not None:
+            if not self.vision_pending.done():
+                return None
+            future, self.vision_pending = self.vision_pending, None
+            if self.vision_key[:3] == (nav, self.walking.session, rear):
+                try:
+                    result = future.result()
+                except Exception as error:
+                    raise devices.DeviceError(f'Ramp image processing failed: {error}') from error
+        if raw is None:
+            return None
+        key = (nav, self.walking.session, rear, raw[0])
+        if key != self.vision_key and time.monotonic() - raw[1] < .35:
+            self.vision_key = key
+            estimate = nav.estimate
+            def detect():
+                pixels = raw[2][::-1, ::-1] if rear else raw[2]
+                return RampObservation(raw, rear, estimate.surface_detector(
+                    pixels, estimate.dark_min, estimate.dark_max, estimate.max_chroma))
+            self.vision_pending = self.vision_pool.submit(detect)
+        return result
+
+    def _adjust_walking(self, url, frame):
+        try:
+            devices.request(url, '/motion/adjust', frame, timeout=.15)
+        except devices.DeviceError as error:
+            # A one-cycle step may finish between the status read and adjustment.
+            # Confirm completion from fresh status; never resend a motion command.
+            if error.status == 409 and self.walking.profile in RAMP_PROFILES:
+                age = time.monotonic() - self.walking.last_confirmed_frame
+                try:
+                    state = devices.request(url, '/status', timeout=.15)
+                    detail = (f"controller session={state.get('motionSession')}, "
+                              f"stopping={state.get('gaitStopping')}, {state.get('message')}")
+                except devices.DeviceError:
+                    detail = 'controller status unavailable'
+                raise devices.DeviceError(f"{error} Sent session={frame['session']}, sequence={frame['sequence']}, "
+                                          f"last acknowledgement {age:.2f}s ago; {detail}", 409) from error
+            if error.status != 409 or self.walking.profile not in SIDESTEP_PROFILES:
+                raise
+            status = devices.request(url, '/status', timeout=.15)
+            if not self.walking.finish_sidestep(status):
+                raise
 
     def _change_ramp_gait(self, url):
         """Stop/confirm/restart, retaining navigation; never retry a partial switch."""
@@ -306,39 +353,42 @@ class Dashboard:
             try:
                 status = devices.request(url, '/status', timeout=.15)
                 self.walking.prepare(status)
-                uses_crest = action == 'crest_test' or (action == 'course' and self.walking.crest_wave)
-                if uses_crest and status.get('signedYawBias') is not True:
-                    raise devices.DeviceError('Crest wave needs signed-stance controller firmware.', 409)
-                if uses_crest and status.get('crestWaveGait') is not True:
+                if action in SIDESTEP_PROFILES:
+                    check_sidestep(status)
+                if action == 'course' and self.walking.crest_assist and status.get('signedYawBias') is not True:
+                    raise devices.DeviceError('Crest assist needs signed-stance controller firmware.', 409)
+                if action == 'course' and self.walking.crest_wave and status.get('crestWaveGait') is not True:
                     raise devices.DeviceError('Crest wave needs the updated controller firmware.', 409)
-                if (action in RAMP_PROFILES or action == 'crest_test') and status.get('boundedSteering') is not True:
+                if action in RAMP_PROFILES and status.get('boundedSteering') is not True:
                     raise devices.DeviceError('Gentle ramp steering needs the updated controller firmware.', 409)
-                if action == 'course' and self.walking.ramp_drift_control and status.get('corridorSearchGait') is not True:
-                    raise devices.DeviceError('Ramp drift control needs variable-forward controller firmware.', 409)
                 if action == 'corridor' and status.get('corridorWallGait') is not True:
                     raise devices.DeviceError('Upload the updated controller firmware for corridor walking.', 409)
                 if action == 'corridor_search' and status.get('corridorSearchGait') is not True:
                     raise devices.DeviceError('Upload the updated controller firmware for corridor search.', 409)
                 if status.get('manualActive') or status.get('running') or status.get('externalActive'):
                     raise devices.DeviceError('Press Stop to release existing servo control first.', 409)
-                if (action == 'course' and self.walking.crest_wave and
+                profile = action
+                if (profile == 'course' and self.walking.crest_wave and
                         CREST_WAVE_GAIT.get('rear_stride_scale', 1) != 1 and
                         status.get('rearStrideScale') is not True):
                     raise devices.DeviceError('Reduced rear stride needs the updated controller firmware.', 409)
                 try:
-                    settings = self.walking.start_settings(action)
+                    settings = self.walking.start_settings(profile)
                 except ValueError as error:
                     raise devices.DeviceError(str(error), 409) from error
                 if settings.get('rear_stride_scale', 1) != 1 and status.get('rearStrideScale') is not True:
                     raise devices.DeviceError('Reduced rear stride needs the updated controller firmware.', 409)
                 required_angles = ()
-                if action in ('course', 'course_camera'):
+                if profile in ('course', 'course_camera'):
                     required_angles = (self.walking.camera_settings['backward_servo_deg'],)
-                if action == 'course':
+                    for name in ('forward_search_servo_deg', 'backward_search_servo_deg'):
+                        if name in self.walking.camera_settings:
+                            required_angles += (self.walking.camera_settings[name],)
+                if profile == 'course':
                     required_angles += (self.walking.camera_settings['corridor_servo_deg'],)
-                self._aim_camera(url, status, self.walking.camera_start_angle(action), required_angles)
+                self._aim_camera(url, status, self.walking.camera_start_angle(profile), required_angles)
                 result = devices.request(url, '/motion/start', settings, timeout=.15)
-                self.walking.begin(status, result['session'], time.monotonic(), profile=action)
+                self.walking.begin(status, result['session'], time.monotonic(), profile=profile)
                 if (self.walking.navigation and self.walking.navigation.use_camera and
                         not self.camera.enabled):
                     self.camera.enable(True)
@@ -418,17 +468,13 @@ class Dashboard:
         if not live:
             # Preview has its own estimator and never starts or alters walking.
             with self.debug_lock:
-                with self.lock:
-                    url = self.config['servo']
-                try:
-                    status = devices.request(url, '/status', timeout=.15)
-                except devices.DeviceError:
-                    status = {}
                 now = time.monotonic()
+                with self.lock:
+                    status = self.cache['servo']['data'] or {}
                 self.debug_preview.update(status, now, self.camera.navigation_frame())
                 estimate = copy(self.debug_preview.estimate)
                 elapsed = now - self.debug_preview.started
-                use_imu = self.debug_preview.use_imu
+                use_imu = False
         panel = navigation_debug_image(estimate, elapsed, use_imu=use_imu, decision_time=decision_time)
         output = BytesIO()
         Image.fromarray(panel).save(output, format='JPEG', quality=85)
@@ -534,5 +580,4 @@ class Dashboard:
         self.camera.close()
         for thread in self.threads:
             thread.join(timeout=2)
-        if self.control_recording:
-            self.control_recording.close()
+        self.vision_pool.shutdown(wait=False, cancel_futures=True)

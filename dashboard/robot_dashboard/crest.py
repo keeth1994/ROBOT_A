@@ -1,39 +1,33 @@
-"""First-crest wave gait, triggered only by onboard observations."""
+"""Opt-in first-crest gait experiment, triggered only by onboard observations."""
 import math
 
-from robot_b91.navigation import EDGE_SAMPLE_MAX_GAP_S
 
+CREST_GAIT = dict(duty=.85, yaw_amplitude=.75, pitch_lift=.7,
+                  pitch_stance=0., yaw_bias=-.25, pattern='trot')
 
 # Trial 34's front .45/rear 35% stayed grounded. Try a wider .55 front stroke
 # with rear 30%: front excursion increases 22%, rear stays near .16 rad.
 # Six 25-degree model cases crossed; five stayed within the 12-degree heading
 # bound. Steeper 30-degree cases remain blocked; contact is uncalibrated.
+# Keep the physically tested diagonal gait above available for comparison.
 CREST_WAVE_GAIT = dict(duty=.8, yaw_amplitude=.55, rear_stride_scale=.30, pitch_lift=.25,
                        pitch_stance=0., yaw_bias=-.25, pattern='crest')
 
 
 class RampSpeedGovernor:
-    """Slow early; observe an entire stable gait cycle before speeding up."""
+    """Slow early near the edge; require sustained centering before speeding up."""
     def __init__(self):
         self.slow = False
         self.centered_since = None
-        self.previous = None
 
-    def require_stability(self):
-        self.slow = True
-        self.centered_since = self.previous = None
-
-    def update(self, now, requested, roll, heading, lateral, *, ready, stable_cycle_s=1.):
-        if self.previous is not None and not 0 <= now - self.previous <= EDGE_SAMPLE_MAX_GAP_S:
-            self.centered_since = None
-        self.previous = now
+    def update(self, now, requested, roll, heading, lateral, *, ready):
         if abs(roll) >= math.radians(5) or abs(heading) >= math.radians(8) or abs(lateral) >= .02:
             self.slow = True
             self.centered_since = None
         elif (ready and abs(roll) < math.radians(3) and abs(heading) < math.radians(4) and
               abs(lateral) < .012):
             self.centered_since = now if self.centered_since is None else self.centered_since
-            if now - self.centered_since >= max(1., stable_cycle_s):
+            if now - self.centered_since >= 1:
                 self.slow = False
         else:
             self.centered_since = None
@@ -46,14 +40,18 @@ class CrestSequence:
         self.climbed = False
         self.since = self.previous = None
         self.moving_seconds = 0.
+        self.phase_started = None
         self.requested = None
+        self.exit_candidate = None
 
     def observe(self, now, pitch, ready):
         dt = 0 if self.previous is None else now - self.previous
         self.previous = now
-        if self.requested or self.phase == 'descent':
+        if self.requested or self.phase in ('descent', 'plateau'):
             return
-        if not ready or not 0 < dt <= EDGE_SAMPLE_MAX_GAP_S:
+        if self.phase == 'crest' and now - self.phase_started > 40:
+            raise ValueError('Crest gait timed out; stop and inspect the robot.')
+        if not ready or not 0 < dt <= .35:
             self.since = None
             return
         self.moving_seconds += dt
@@ -64,8 +62,18 @@ class CrestSequence:
         else:
             # Trial 21 established descent near +20 degrees. Require at least
             # one full 50%-speed gait cycle before switching back to baseline.
-            condition = degrees >= 14 and self.moving_seconds >= 4
-            duration = .6
+            candidate = None
+            if self.moving_seconds >= 4:
+                if degrees >= 14:
+                    candidate = 'descent'
+                elif self.climbed and abs(degrees) <= 4:
+                    candidate = 'plateau'
+            if candidate != self.exit_candidate:
+                self.since = None
+            self.exit_candidate = candidate
+            condition = candidate is not None
+            # A flat landing must outlast a complete slow gait cycle.
+            duration = 5.0 if candidate == 'plateau' else .6
         if not condition:
             self.since = None
             return
@@ -76,12 +84,13 @@ class CrestSequence:
         if self.phase == 'approach' and not self.climbed:
             self.climbed = True
         else:
-            self.requested = 'crest' if self.phase == 'approach' else 'descent'
+            self.requested = 'crest' if self.phase == 'approach' else self.exit_candidate
 
     def switched(self, now):
-        if self.requested not in ('crest', 'descent'):
+        if self.requested not in ('crest', 'descent', 'plateau'):
             raise ValueError('No slope-triggered gait change is pending.')
         self.phase = self.requested
         self.requested = None
+        self.phase_started = now
         self.moving_seconds = 0.
         self.since = self.previous = None
