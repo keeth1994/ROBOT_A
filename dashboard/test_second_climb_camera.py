@@ -88,14 +88,11 @@ class SecondClimbCameraTests(unittest.TestCase):
         self.assertIsNone(nav.move_started)
         self.assertFalse(nav.searching)
 
-    def test_dashboard_uses_elapsed_time_and_cancels_early_exit_check(self):
+    def test_dashboard_uses_elapsed_time_for_second_climb(self):
         nav = CourseNavigation(100, scan_ramp=True)
         self.feed(nav, 102, -15)
         self.feed(nav, 103, 15)
-        nav.checking_exit = nav.exit_aimed = True
         self.feed(nav, 104, -15)
-        self.assertFalse(nav.checking_exit)
-        self.assertFalse(nav.exit_aimed)
         self.assertEqual(nav.camera_target(110), nav.camera_calibration['backward_servo_deg'])
 
     def test_dashboard_reacquires_rear_image_and_resumes(self):

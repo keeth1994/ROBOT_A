@@ -1,7 +1,6 @@
-"""Top platform, descent and finished-ramp checks using synthetic camera frames."""
+"""Ramp completion from two climbs, a final descent and flat IMU readings."""
 import math
 import unittest
-from unittest.mock import patch
 
 import numpy as np
 
@@ -9,122 +8,119 @@ from dashboard.robot_dashboard.navigation import CourseNavigation
 from dashboard.robot_dashboard.walking import Walking
 from dashboard.test_crest_sequence import status
 from dashboard.test_ramp_edges import ramp_frame
-from robot_b91.camera_calibration import servo_to_cradle_deg
 
 
 class RampFlatSectionTests(unittest.TestCase):
     def setUp(self):
         self.nav = CourseNavigation(100, scan_ramp=True)
-        self.sequence = 0
 
-    def slope(self, start, degrees):
-        for i in range(8):
-            self.nav.observe_slope(100 + start + i * .1, math.radians(degrees))
-
-    def frame(self, time, angle=-4, pitch=0, ramp=True, missing=False, clipped=False):
-        self.sequence += 1
-        packet = status() | dict(imuAgeMs=0, orientation=[0, math.radians(pitch), 0],
-                                cameraPitch=dict(angle=angle, moving=False))
-        camera_pitch = 40 + servo_to_cradle_deg(angle, self.nav.camera_calibration)
-        image = (ramp_frame(camera_pitch, body_pitch=math.radians(pitch)) if ramp else
-                 np.full((240, 320, 3), 180, dtype=np.uint8))
-        if clipped:
-            image[:] = 70
-            image[:60] = 180
-        camera = None if missing else (self.sequence, 100 + time, image)
+    def sample(self, time, degrees, age=0, image=None):
+        packet = status() | dict(imuAgeMs=age, orientation=[0, math.radians(degrees), 0],
+                                cameraPitch=dict(angle=-4, moving=False))
+        camera = None if image is None else (time, 100 + time, image)
         return self.nav.update(packet, 100 + time, camera)
 
-    def top_check(self):
-        self.slope(2, -15)
-        self.slope(3, 15)
-        self.slope(4, -15)
+    def slope(self, start, degrees, count=8, step=.1, **kwargs):
+        for i in range(count):
+            ready = self.sample(start + i * step, degrees, **kwargs)
+        return ready
+
+    def two_climbs(self, **kwargs):
+        self.slope(2, -15, **kwargs)
+        self.slope(3, 15, **kwargs)
+        self.slope(4, -15, **kwargs)
         self.assertEqual(self.nav.estimate.climbs_seen, 2)
-        for time in (5, 5.1, 5.2, 5.3):
-            self.frame(time)
-        self.assertTrue(self.nav.checking_exit)
-        self.assertEqual(self.nav.camera_target(108), -65)
+        self.assertFalse(self.nav.downhill_seen)
 
-    def cross_platform(self, clipped=False):
-        self.top_check()
-        for time in (7.5, 7.7, 7.9, 8.1):
-            self.frame(time, angle=-65, clipped=clipped)
-        self.assertTrue(self.nav.top_checked)
-        self.assertFalse(self.nav.checking_exit)
+    def test_final_descent_and_flat_finish_without_camera_images(self):
+        self.two_climbs()
+        self.slope(5, 0)
         self.assertFalse(self.nav.ramp_finished)
-        self.assertEqual(self.nav.camera_target(111), -4)
-        for time in (10.3, 10.5, 10.7, 10.9):
-            ready = self.frame(time)
-        self.assertTrue(ready, self.nav.reason)
-
-    def ground_check(self):
-        self.cross_platform()
-        for time in (11, 11.1, 11.2, 11.3, 11.4, 11.5):
-            self.frame(time, pitch=15)
-        for time in (11.6, 11.7, 11.8, 11.9):
-            self.frame(time)
-        self.assertTrue(self.nav.checking_exit)
-        self.assertEqual(self.nav.camera_target(114), -65)
-
-    def test_platform_then_descent_then_flat_ground_finishes(self):
-        self.ground_check()
-        for time in (14.1, 14.3, 14.5, 14.7):
-            ready = self.frame(time, angle=-65, ramp=False)
-        self.assertFalse(ready)
+        self.slope(6, 15)
+        self.assertTrue(self.nav.downhill_seen)
+        self.assertFalse(self.nav.ramp_finished)
+        self.assertFalse(self.slope(7, 0))
         self.assertTrue(self.nav.ramp_finished)
         self.assertFalse(self.nav.corridor_requested)
-        self.assertIn('Ramp finished', self.nav.reason)
+        self.assertIn('two climbs, final descent and flat ground', self.nav.reason)
 
-    def test_staying_on_same_platform_does_not_flip_forward_again(self):
-        self.cross_platform()
-        for i in range(12):
-            self.assertTrue(self.frame(11 + i * .1))
-        self.assertFalse(self.nav.checking_exit)
-        self.assertEqual(self.nav.estimate.view, 'backward')
+    def test_top_platform_is_not_finished_and_keeps_rear_view(self):
+        self.two_climbs()
+        self.slope(5, 0, count=80)
+        self.assertFalse(self.nav.ramp_finished)
+        self.assertFalse(self.nav.downhill_seen)
+        self.assertEqual(self.nav.camera_target(113), -4)
 
-    def test_visible_mat_without_edges_is_still_a_platform(self):
-        self.cross_platform(clipped=True)
+    def test_first_descent_cannot_count_as_final_descent(self):
+        self.slope(2, -15)
+        self.slope(3, 15)
+        self.slope(4, 0)
+        self.assertEqual(self.nav.estimate.climbs_seen, 1)
+        self.assertFalse(self.nav.ramp_finished)
+        self.slope(5, -15)
+        self.slope(6, 0)
+        self.assertFalse(self.nav.ramp_finished)
 
-    def test_no_platform_after_sharp_crest_can_finish_at_first_flat(self):
-        self.top_check()
-        for time in (7.5, 7.7, 7.9, 8.1):
-            self.frame(time, angle=-65, ramp=False)
+    def test_sharp_crest_needs_no_platform_before_final_descent(self):
+        self.two_climbs()
+        self.slope(5, 15)
+        self.slope(6, 0)
         self.assertTrue(self.nav.ramp_finished)
 
-    def test_empty_forward_view_cannot_finish_while_robot_is_tilted(self):
-        self.top_check()
-        for time in (7.5, 7.7, 7.9, 8.1):
-            self.frame(time, angle=-65, pitch=15, ramp=False)
-        self.assertFalse(self.nav.ramp_finished)
-        self.assertIsNone(self.nav.exit_missing_since)
-
-    def test_missing_images_and_rear_images_cannot_finish_forward_check(self):
-        self.ground_check()
-        for time in (14.1, 14.3, 14.5, 14.7):
-            self.frame(time, angle=-4, ramp=False)
-        self.assertFalse(self.nav.ramp_finished)
-        self.frame(14.9, angle=-65, ramp=False)
-        for time in (15.1, 15.3, 15.5):
-            self.frame(time, angle=-65, missing=True)
+    def test_short_downhill_spike_does_not_finish(self):
+        self.two_climbs()
+        self.slope(5, 15, count=2)
+        self.slope(5.2, 0)
         self.assertFalse(self.nav.ramp_finished)
 
-    def test_ramp_visible_on_later_flat_returns_to_rear_view(self):
-        self.ground_check()
-        for time in (14.1, 14.3, 14.5, 14.7):
-            self.frame(time, angle=-65)
+    def test_stale_imu_cannot_confirm_flat_ground(self):
+        self.two_climbs()
+        self.slope(5, 15)
+        self.slope(6, 0, age=500)
         self.assertFalse(self.nav.ramp_finished)
-        self.assertFalse(self.nav.checking_exit)
-        self.assertEqual(self.nav.camera_target(118), -4)
+        self.sample(7, 0)
+        self.assertFalse(self.nav.ramp_finished)
+        self.slope(7.1, 0)
+        self.assertTrue(self.nav.ramp_finished)
 
-    def test_finished_ramp_stops_walking(self):
-        walking = Walking()
+    def test_gap_in_downhill_readings_resets_confirmation(self):
+        self.two_climbs()
+        self.slope(5, 15, count=2)
+        self.slope(7, 15, count=2)
+        self.slope(7.2, 0)
+        self.assertFalse(self.nav.ramp_finished)
+
+    def test_visible_ramp_or_empty_camera_does_not_change_completion(self):
+        for image in (ramp_frame(158), np.full((240, 320, 3), 180, dtype=np.uint8)):
+            with self.subTest(ramp_visible=bool(image.min() < 180)):
+                self.nav = CourseNavigation(100, scan_ramp=True)
+                self.two_climbs(image=image)
+                self.slope(5, 15, image=image)
+                self.slope(6, 0, image=image)
+                self.assertTrue(self.nav.ramp_finished)
+
+    def test_slow_fresh_imu_samples_can_complete_sequence(self):
+        for start, pitch in ((2, -15), (4, 15), (6, -15), (8, 0), (10, 15), (12, 0)):
+            self.slope(start, pitch, count=3, step=.6)
+        self.assertTrue(self.nav.ramp_finished)
+
+    def test_finished_ramp_stops_walking_without_starting_corridor(self):
+        walking = Walking(crest_enabled=False)
         walking.start_settings('course')
         walking.begin(status(), 1, 100, 'course')
-        walking.navigation.ramp_finished = True
-        walking.navigation.reason = 'Ramp finished: flat ground and no ramp ahead.'
-        with patch.object(walking.navigation, 'update', return_value=False):
-            frame = walking.frame(status(), 100.1)
+        for start, pitch in ((2, -15), (3, 15), (4, -15), (5, 0), (6, 15), (7, 0)):
+            for i in range(8):
+                now = 100 + start + i * .1
+                walking.last_confirmed_frame = now
+                packet = status() | dict(imuAgeMs=0, orientation=[0, math.radians(pitch), 0])
+                frame = walking.frame(packet, now)
+                if not walking.active:
+                    break
+            if not walking.active:
+                break
         self.assertEqual(frame['ready'], 0)
         self.assertFalse(walking.active)
+        self.assertTrue(walking.navigation.ramp_finished)
         self.assertFalse(walking.navigation.corridor_requested)
 
 
