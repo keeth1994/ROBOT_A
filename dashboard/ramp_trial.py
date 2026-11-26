@@ -54,14 +54,20 @@ def main():
     parser.add_argument('--seconds', type=float, default=30)
     parser.add_argument('--speed', type=float, default=.5)
     parser.add_argument('--port', type=int, default=8765)
-    parser.add_argument('--profile', choices=('course', 'course_imu'), default='course')
+    parser.add_argument('--profile', choices=('course', 'course_imu', 'ramp_align'), default='course')
     parser.add_argument('--assisted-crest-start', action='store_true',
                         help='Require dashboard --start-at-crest; record assisted placement explicitly.')
     parser.add_argument('--roll-limit', type=float, default=15)
+    parser.add_argument('--guidance-timeout', type=float, default=25,
+                        help='Stop after this many seconds held without camera guidance (3-60).')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    if not 3 <= args.guidance_timeout <= 60:
+        parser.error('Guidance timeout must be 3-60 seconds.')
     if not 1 <= args.seconds <= 300 or not .25 <= args.speed <= 1 or not 5 <= args.roll_limit <= 15:
         parser.error('Use 1–300 seconds and speed 0.25–1.0.')
+    if args.profile == 'ramp_align' and (args.seconds > 45 or args.speed > .5 or args.roll_limit > 8):
+        parser.error('Ramp alignment trials allow at most 45 seconds, 50% speed and 8-degree roll.')
     if args.assisted_crest_start and (args.profile != 'course' or args.seconds > 40):
         parser.error('Assisted crest trials require course profile and at most 40 seconds.')
     args.output.mkdir(parents=True, exist_ok=True)
@@ -158,8 +164,8 @@ def main():
                     message = state['walking']['message']
                     if message.startswith(('Holding steps', 'Walking paused')):
                         holding_since = elapsed if holding_since is None else holding_since
-                        if elapsed - holding_since >= 12:
-                            stop_reason = 'Navigation held for 12 seconds without reacquiring guidance.'
+                        if elapsed - holding_since >= args.guidance_timeout:
+                            stop_reason = f'Navigation held for {args.guidance_timeout:g} seconds without reacquiring guidance.'
                             break
                     else:
                         holding_since = None
@@ -199,6 +205,7 @@ def main():
         summary = {'timestamp': datetime.now().astimezone().isoformat(),
                    'duration_s': round(time.monotonic() - started, 2) if started else 0,
                    'speed': args.speed, 'reason': stop_reason,
+                   'guidance_timeout_s': args.guidance_timeout,
                    'profile': args.profile,
                    'assisted_crest_start': args.assisted_crest_start,
                    'peak_roll_deg': round(peak_roll, 2), 'peak_pitch_deg': round(peak_pitch, 2),

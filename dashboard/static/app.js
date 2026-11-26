@@ -7,7 +7,7 @@ let speedBusy = false;
 const rows = new Map();
 const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
   walkCourseTape:'course_tape', walkCourseImu:'course_imu', walkCorridor:'corridor',
-  searchCorridor:'corridor_search', dance:'dance', testCrest:'crest_test'};
+  searchCorridor:'corridor_search', dance:'dance', testCrest:'crest_test', alignRamp:'ramp_align'};
 
 function showSpeed(speed) {
   el('walkSpeed').value = Math.round(speed * 100);
@@ -53,7 +53,9 @@ function renderControls() {
   el('cameraPitchRelease').disabled = pitchBlocked || pitch?.angle === null;
   el('cameraPitch').disabled = pitchBlocked || pitch?.angle === null;
   Object.keys(walkButtons).forEach(id => {
-    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2;
+    const alignUnavailable = id === 'alignRamp' &&
+      (!s?.corridorSearchGait || !s?.crestWaveGait || !s?.boundedSteering);
+    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2 || alignUnavailable;
   });
   el('all').disabled = el('groups').disabled = blocked || !!s?.manualActive;
   rows.forEach(row => {
@@ -102,7 +104,7 @@ function renderIr(status) {
 }
 function render(state) {
   current = state; token = state.token || token;
-  el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'course_tape', 'corridor_search'].includes(state.walking.profile)
+  el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'course_tape', 'corridor_search', 'ramp_align'].includes(state.walking.profile)
     ? 'Live walking perception: the actual frame and decision used by the controller.'
     : 'Camera preview only; no walking starts.';
   el('walkMessage').textContent = state.walking?.message || 'ESP32 walking unavailable.';

@@ -119,7 +119,7 @@ class CrestSequenceTests(unittest.TestCase):
         self.assertEqual(settings['pattern'], 'crest')
         self.assertEqual(settings['duty'], .8)
         walking.resume_gait(2, 1, params)
-        self.assertEqual(walking.ramp_speed(3, True), .65)
+        self.assertEqual(walking.ramp_speed(3, True), .5)
         walking.navigation.estimate.roll = math.radians(6)
         self.assertEqual(walking.ramp_speed(3.1, True), .5)
         walking.set_speed(.4)
@@ -127,14 +127,18 @@ class CrestSequenceTests(unittest.TestCase):
         walking.set_speed(.65)
         walking.navigation.estimate.roll = 0
         self.assertEqual(walking.ramp_speed(3.3, True), .5)
-        self.assertEqual(walking.ramp_speed(4.4, True), .65)
+        for tick in range(34, 73):
+            self.assertEqual(walking.ramp_speed(tick/10, True), .5)
+        self.assertEqual(walking.ramp_speed(7.4, True), .65)
         walking.crest_sequence.requested = 'descent'
         params, settings = walking.transition_settings()
         self.assertEqual(params, walking.base_params)
         self.assertEqual(settings['pattern'], 'trot')
         walking.resume_gait(3, 10, params)
         walking.set_speed(.65)
-        self.assertEqual(walking.ramp_speed(12, True), .65)
+        for tick in range(120, 160):
+            self.assertEqual(walking.ramp_speed(tick/10, True), .5)
+        self.assertEqual(walking.ramp_speed(16.1, True), .65)
 
     def test_wave_rejects_old_firmware_before_climbing_or_switching(self):
         for initial in (True, False):
@@ -164,15 +168,34 @@ class CrestSequenceTests(unittest.TestCase):
                                    lateral, ready=ready)
         self.assertEqual(speed(0), .6)
         self.assertEqual(speed(.1, lateral=.025), .5)
-        self.assertEqual(speed(.2), .5)
-        self.assertEqual(speed(1), .5)
+        for tick in range(2, 12):
+            self.assertEqual(speed(tick/10), .5)
+        speed(1.2)
         self.assertEqual(speed(1.3), .6)
         self.assertEqual(speed(1.4, roll=5.1), .5)
         self.assertEqual(speed(3, ready=False), .5)
-        self.assertEqual(speed(4), .5)
+        for tick in range(40, 50):
+            self.assertEqual(speed(tick/10), .5)
+        speed(5)
         self.assertEqual(speed(5.1), .6)
         self.assertEqual(speed(6, heading=9), .5)
         self.assertEqual(speed(6.1, requested=.4), .4)
+
+    def test_full_cycle_and_fresh_samples_required_after_a_disturbance(self):
+        governor = RampSpeedGovernor()
+        governor.require_stability()
+        def stable(t):
+            return governor.update(t, .65, 0, 0, 0, ready=True, stable_cycle_s=4)
+        for tick in range(40):
+            self.assertEqual(stable(tick/10), .5)
+        self.assertEqual(stable(4), .65)
+        governor.update(4.1, .65, math.radians(6), 0, 0, ready=True, stable_cycle_s=4)
+        for tick in range(42, 57):
+            self.assertEqual(stable(tick/10), .5)  # Quiet support between lifts is insufficient.
+        self.assertEqual(stable(10), .5)  # A telemetry gap does not count as stability.
+        for tick in range(101, 140):
+            self.assertEqual(stable(tick/10), .5)
+        self.assertEqual(stable(14), .65)
 
     def test_search_alternates_views_without_changing_heading(self):
         settings = load_camera_scan_settings()
@@ -237,6 +260,42 @@ class CrestSequenceTests(unittest.TestCase):
         seq.observe(46, .3, False)
         self.assertEqual(seq.phase, 'crest')
         self.assertIsNone(seq.requested)
+
+    def test_crest_and_speed_confirmation_at_real_wifi_cadence(self):
+        for gap in (.4, .6, .85):
+            seq = CrestSequence()
+            for i in range(6):
+                seq.observe(i*gap, math.radians(-22), True)
+            self.assertTrue(seq.climbed)
+            for i in range(6, 9):
+                seq.observe(i*gap, math.radians(-5), True)
+            self.assertEqual(seq.requested, 'crest')
+            governor = RampSpeedGovernor()
+            governor.require_stability()
+            for i in range(math.ceil(4/gap)+1):
+                speed = governor.update(i*gap, .7, 0, 0, 0, ready=True, stable_cycle_s=4.)
+                if i*gap < 4:
+                    self.assertEqual(speed, .5)
+            self.assertEqual(speed, .7)
+
+    def test_large_control_gaps_do_not_arm_crest_or_restore_speed(self):
+        seq = CrestSequence()
+        governor = RampSpeedGovernor()
+        governor.require_stability()
+        for i in range(15):
+            seq.observe(i, math.radians(-22), True)
+            self.assertEqual(governor.update(i, .7, 0, 0, 0, ready=True), .5)
+        self.assertFalse(seq.climbed)
+
+    def test_slope_exit_confirmation_accepts_slow_fresh_imu_samples(self):
+        from robot_dashboard.navigation import CourseNavigation
+        nav = CourseNavigation(0, scan_ramp=True)
+        for t in (2., 2.4, 2.8):
+            nav.observe_slope(t, math.radians(15))
+        self.assertTrue(nav.downhill_seen)
+        for t in (3.2, 3.6):
+            nav.observe_slope(t, 0.)
+        self.assertTrue(nav.checking_exit)
 
     def test_restart_preserves_estimate_across_imu_zero_reset(self):
         walking = Walking()

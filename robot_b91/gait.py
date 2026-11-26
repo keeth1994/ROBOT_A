@@ -16,6 +16,14 @@ RAMP_SPEED_SCALE = 0.5
 RAMP_STEERING = dict(heading_gain=1.2, lateral_gain=0., strafe_gain=0., turn_limit=.2)
 
 
+def ramp_forward_scale(lateral_error_m):
+    """Give sideways correction more time as offset grows, without sharper turns."""
+    if not math.isfinite(lateral_error_m):
+        raise ValueError('Ramp offset must be finite.')
+    error = min(1., max(0., (abs(lateral_error_m) - .010) / .020))
+    return 1. - .50 * error * error * (3. - 2. * error)
+
+
 def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
                    lateral_error_m=0.0, joint_ranges=None, forward_scale=1.0):
     """Return eight bounded joint angles; call at the existing 50 Hz command rate.

@@ -2,7 +2,7 @@
 
 import math
 
-from robot_b91.navigation import Navigation
+from robot_b91.navigation import Navigation, EDGE_SAMPLE_MAX_GAP_S
 
 
 def flip_target(elapsed, start, end, settings):
@@ -51,7 +51,10 @@ class RampScanNavigation(Navigation):
         self.reacquired_since = self.last_confirmation = None
 
     def confirm_ramp(self, now, accepted):
-        if not accepted or (self.last_confirmation is not None and now - self.last_confirmation > .35):
+        if self.last_confirmation is not None and now <= self.last_confirmation:
+            return False  # Replaying an observation cannot confirm recovery.
+        if not accepted or (self.last_confirmation is not None and
+                            now - self.last_confirmation > EDGE_SAMPLE_MAX_GAP_S):
             self.reacquired_since = None
         self.last_confirmation = now
         if not accepted:
