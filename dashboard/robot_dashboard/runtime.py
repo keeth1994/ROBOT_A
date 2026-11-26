@@ -147,7 +147,7 @@ class CameraPipeline:
 
 
 class Dashboard:
-    def __init__(self, config_path=None, *, crest_enabled=True):
+    def __init__(self, config_path=None, *, crest_enabled=True, crest_position='first'):
         self.lock = threading.RLock()
         self.servo_lock = threading.Lock()
         self.camera_settings_lock = threading.Lock()
@@ -162,7 +162,8 @@ class Dashboard:
         self.cache = {name: {'online': False, 'data': None, 'error': 'Connecting...', 'at': 0}
                       for name in ('servo', 'camera')}
         self.camera = CameraPipeline(self.stream_url)
-        self.walking = Walking(crest_enabled=crest_enabled)
+        self.walking = Walking(crest_enabled=crest_enabled, crest_position=crest_position)
+        self.course_running = False
         self.debug_lock = threading.Lock()
         self.debug_preview = CourseNavigation(time.monotonic(), use_imu=False)
         self.threads = []
@@ -205,7 +206,8 @@ class Dashboard:
                     status = devices.request(url, '/status', timeout=.15)
                     frame = self.walking.frame(status, time.monotonic(), self.camera.navigation_frame())
                     if not self.walking.active:
-                        devices.request(url, '/stop', {}, timeout=.15)
+                        if not self._continue_course(url):
+                            devices.request(url, '/stop', {}, timeout=.15)
                         continue
                     devices.request(url, '/motion/adjust', frame, timeout=.15)
                     if self.walking.crest_sequence and self.walking.crest_sequence.requested:
@@ -222,6 +224,7 @@ class Dashboard:
                             time.monotonic() - self.walking.last_confirmed_frame <= 1.0):
                         continue
                     self.walking.stop(str(error))
+                    self.course_running = False
                     try:
                         devices.request(url, '/stop', {}, timeout=.15)
                     except devices.DeviceError:
@@ -255,18 +258,42 @@ class Dashboard:
             raise
 
     def _corridor_after_ramp(self, url):
+        self._start_course_stage(url, 'corridor_search')
+
+    def _continue_course(self, url):
+        if not self.course_running:
+            return False
+        profile = self.walking.profile
+        navigation = self.walking.navigation
+        if profile == 'course' and navigation.ramp_finished:
+            next_profile = 'corridor_search'
+        elif profile == 'corridor_search' and navigation.succeeded:
+            next_profile = 'corridor'
+        elif profile == 'corridor' and navigation.exit_complete:
+            next_profile = 'dance'
+        else:
+            self.course_running = False
+            return False
+        self._start_course_stage(url, next_profile)
+        if next_profile == 'dance':
+            self.course_running = False
+        return True
+
+    def _start_course_stage(self, url, profile):
         devices.request(url, '/stop', {}, timeout=.15)
-        self.walking.stop('Ramp ended. Starting corridor search.')
+        self.walking.stop(f'Starting {profile.replace("_", " ")}.')
         status = devices.request(url, '/status', timeout=.15)
         self.walking.prepare(status)
-        if status.get('corridorSearchGait') is not True:
+        if profile == 'corridor_search' and status.get('corridorSearchGait') is not True:
             raise devices.DeviceError('Upload the controller firmware for automatic corridor search.', 409)
+        if profile == 'corridor' and status.get('corridorWallGait') is not True:
+            raise devices.DeviceError('Upload the controller firmware for corridor walking.', 409)
         if status.get('externalActive') or status.get('running') or status.get('manualActive'):
-            raise devices.DeviceError('Controller did not stop the ramp gait. Corridor search was not started.', 409)
-        settings = self.walking.start_settings('corridor_search')
-        self._aim_camera(url, status, self.walking.camera_start_angle('corridor_search'))
+            raise devices.DeviceError('Controller did not stop. The next course stage was not started.', 409)
+        settings = self.walking.start_settings(profile)
+        self._aim_camera(url, status, self.walking.camera_start_angle(profile))
         result = devices.request(url, '/motion/start', settings, timeout=.15)
-        self.walking.begin(status, result['session'], time.monotonic(), profile='corridor_search')
+        self.walking.begin(status, result['session'], time.monotonic(), profile=profile)
 
     def walk_command(self, action):
         with self.servo_lock:
@@ -279,6 +306,10 @@ class Dashboard:
                 raise devices.DeviceError('Keep the dashboard visible to start walking.', 409)
             if self.walking.active:
                 raise devices.DeviceError('Already walking.', 409)
+            self.course_running = False
+            run_course = action == 'run_course'
+            if run_course:
+                action = 'course'
             try:
                 status = devices.request(url, '/status', timeout=.15)
                 self.walking.prepare(status)
@@ -289,6 +320,9 @@ class Dashboard:
                     raise devices.DeviceError('Upload the updated controller firmware for corridor walking.', 409)
                 if action == 'corridor_search' and status.get('corridorSearchGait') is not True:
                     raise devices.DeviceError('Upload the updated controller firmware for corridor search.', 409)
+                if run_course and not all(status.get(name) is True for name in
+                                          ('corridorSearchGait', 'corridorWallGait')):
+                    raise devices.DeviceError('Upload the updated controller firmware for the full course.', 409)
                 if status.get('manualActive') or status.get('running') or status.get('externalActive'):
                     raise devices.DeviceError('Press Stop to release existing servo control first.', 409)
                 profile = action
@@ -304,10 +338,12 @@ class Dashboard:
                 self._aim_camera(url, status, self.walking.camera_start_angle(profile), required_angles)
                 result = devices.request(url, '/motion/start', settings, timeout=.15)
                 self.walking.begin(status, result['session'], time.monotonic(), profile=profile)
+                self.course_running = run_course
                 if (self.walking.navigation and self.walking.navigation.use_camera and
                         not self.camera.enabled):
                     self.camera.enable(True)
             except (devices.DeviceError, KeyError, ValueError, TypeError) as error:
+                self.course_running = False
                 detail = str(error) if isinstance(error, (devices.DeviceError, ValueError)) else 'Invalid ESP32 walking response.'
                 self.walking.stop(f'Walking start failed: {detail} Outputs off requested.')
                 try:
@@ -362,6 +398,7 @@ class Dashboard:
             status['operator_alive'] = now - self.browser_heartbeat < 1.5
         status['pipeline'] = self.camera.state()
         status['walking'] = self.walking.state()
+        status['walking']['course_running'] = self.course_running
         return status
 
     def navigation_debug_frame(self):
@@ -410,6 +447,7 @@ class Dashboard:
         with self.servo_lock:
             if path == '/stop':
                 self.walking.stop()
+                self.course_running = False
             elif path == '/camera-pitch' and self.walking.state()['camera_controlled']:
                 raise devices.DeviceError('Stop camera-guided walking before adjusting the camera manually.', 409)
             elif self.walking.active and path not in ('/heartbeat', '/camera-pitch'):
@@ -438,6 +476,7 @@ class Dashboard:
         with self.camera_settings_lock, self.servo_lock:
             was_walking = self.walking.active
             self.walking.stop('Device address changed. Walking stopped.')
+            self.course_running = False
             with self.lock:
                 active = time.monotonic() - self.browser_heartbeat < 1.5
                 data = self.cache['servo']['data'] or {}

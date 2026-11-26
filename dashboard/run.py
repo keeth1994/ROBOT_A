@@ -11,11 +11,17 @@ def main():
     parser.add_argument('--config', type=Path, default=Path(__file__).with_name('config.local.json'))
     parser.add_argument('--no-crest', action='store_true',
                         help='Keep the normal gait at crests; retain ramp tracking and camera changes.')
+    crest = parser.add_mutually_exclusive_group()
+    crest.add_argument('--crest-first', dest='crest_position', action='store_const', const='first',
+                       help='Use the crest gait on the first climb (default).')
+    crest.add_argument('--crest-last', dest='crest_position', action='store_const', const='last',
+                       help='Use the crest gait on the second climb.')
+    parser.set_defaults(crest_position='first')
     args = parser.parse_args()
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from robot_dashboard.runtime import Dashboard
     from robot_dashboard.server import DashboardServer
-    app = Dashboard(args.config, crest_enabled=not args.no_crest)
+    app = Dashboard(args.config, crest_enabled=not args.no_crest, crest_position=args.crest_position)
     server = DashboardServer(('127.0.0.1', args.port), app)
     app.start()
     print(f'Robot dashboard: http://127.0.0.1:{server.server_port}', flush=True)

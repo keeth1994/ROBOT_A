@@ -7,7 +7,7 @@ let speedBusy = false;
 const rows = new Map();
 const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
   walkCourseTape:'course_tape', walkCourseImu:'course_imu', walkCorridor:'corridor',
-  searchCorridor:'corridor_search', dance:'dance'};
+  searchCorridor:'corridor_search', dance:'dance', runCourse:'run_course'};
 
 function showSpeed(speed) {
   el('walkSpeed').value = Math.round(speed * 100);

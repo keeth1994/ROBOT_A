@@ -15,12 +15,15 @@ JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in (
 PROFILES = {'walk': (), 'course': ('camera', 'imu'), 'course_camera': ('camera',),
             'course_tape': ('camera', 'imu'), 'course_imu': ('imu',),
             'corridor': ('ir', 'imu'), 'corridor_search': ('camera', 'ir', 'imu'), 'dance': ()}
-WALK_ACTIONS = tuple(PROFILES)
+WALK_ACTIONS = (*PROFILES, 'run_course')
 RAMP_PROFILES = ('course', 'course_camera')
 
 
 class Walking:
-    def __init__(self, *, crest_enabled=True):
+    def __init__(self, *, crest_enabled=True, crest_position='first'):
+        if crest_position not in ('first', 'last'):
+            raise ValueError('Crest position must be first or last.')
+        self.crest_position = crest_position
         with (ROOT / 'reference/b91_gait.toml').open('rb') as stream:
             self.params = tomllib.load(stream)
         self.active = False
@@ -48,6 +51,7 @@ class Walking:
                     camera_controlled=self.active and self.camera_start_angle(self.profile) is not None,
                     ramp_gait_phase=self.crest_sequence.phase if self.crest_sequence else None,
                     crest_enabled=self.crest_enabled,
+                    crest_position=self.crest_position,
                     navigation=self.navigation.report() if self.navigation else None)
 
     def camera_start_angle(self, profile):
@@ -122,7 +126,8 @@ class Walking:
         if profile not in PROFILES:
             raise ValueError('Unknown walking profile.')
         self.profile = profile
-        self.crest_sequence = CrestSequence() if profile == 'course' and self.crest_enabled else None
+        self.crest_sequence = (CrestSequence(self.crest_position)
+                               if profile == 'course' and self.crest_enabled else None)
         self.base_params = dict(self.params)
         self.resume_until = None
         sensors = PROFILES[profile]

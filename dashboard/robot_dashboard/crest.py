@@ -1,4 +1,4 @@
-"""First-crest wave gait, triggered only by onboard observations."""
+"""Wave gait for the selected crest, triggered by onboard observations."""
 import math
 
 MAX_SAMPLE_GAP_S = .9
@@ -10,7 +10,12 @@ CREST_WAVE_GAIT = dict(duty=.8, yaw_amplitude=.55, rear_stride_scale=.30, pitch_
 
 
 class CrestSequence:
-    def __init__(self):
+    def __init__(self, position='first'):
+        if position not in ('first', 'last'):
+            raise ValueError('Crest position must be first or last.')
+        self.target_climb = 1 if position == 'first' else 2
+        self.climbs_seen = 0
+        self.waiting_descent = False
         self.phase = 'approach'
         self.climbed = False
         self.since = self.previous = None
@@ -28,7 +33,10 @@ class CrestSequence:
             return
         self.moving_seconds += dt
         degrees = math.degrees(pitch)
-        if self.phase == 'approach':
+        if self.waiting_descent:
+            condition = degrees >= 14
+            duration = .6
+        elif self.phase == 'approach':
             condition = degrees <= -15 if not self.climbed else degrees >= -10
             duration = 1.0 if not self.climbed else .4
         else:
@@ -52,8 +60,14 @@ class CrestSequence:
         if now - self.since < duration:
             return
         self.since = None
-        if self.phase == 'approach' and not self.climbed:
+        if self.waiting_descent:
+            self.waiting_descent = False
+            self.climbed = False
+        elif self.phase == 'approach' and not self.climbed:
             self.climbed = True
+            self.climbs_seen += 1
+        elif self.phase == 'approach' and self.climbs_seen < self.target_climb:
+            self.waiting_descent = True
         else:
             self.requested = 'crest' if self.phase == 'approach' else self.exit_candidate
 
