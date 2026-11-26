@@ -171,7 +171,7 @@ class Dashboard:
                                start_at_crest=start_at_crest)
         self.auto_corridor = auto_corridor
         self.debug_lock = threading.Lock()
-        self.debug_preview = CourseNavigation(time.monotonic(), use_imu=False)
+        self.debug_preview = CourseNavigation(time.monotonic())
         self.threads = []
 
     @staticmethod
@@ -404,13 +404,17 @@ class Dashboard:
         if not live:
             # Preview has its own estimator and never starts or alters walking.
             with self.debug_lock:
-                now = time.monotonic()
                 with self.lock:
-                    status = self.cache['servo']['data'] or {}
+                    url = self.config['servo']
+                try:
+                    status = devices.request(url, '/status', timeout=.15)
+                except devices.DeviceError:
+                    status = {}
+                now = time.monotonic()
                 self.debug_preview.update(status, now, self.camera.navigation_frame())
                 estimate = copy(self.debug_preview.estimate)
                 elapsed = now - self.debug_preview.started
-                use_imu = False
+                use_imu = self.debug_preview.use_imu
         panel = navigation_debug_image(estimate, elapsed, use_imu=use_imu, decision_time=decision_time)
         output = BytesIO()
         Image.fromarray(panel).save(output, format='JPEG', quality=85)

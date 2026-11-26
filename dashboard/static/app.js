@@ -104,7 +104,7 @@ function render(state) {
   current = state; token = state.token || token;
   el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'course_tape', 'corridor_search'].includes(state.walking.profile)
     ? 'Live walking perception: the actual frame and decision used by the controller.'
-    : 'Camera preview only; no walking starts.';
+    : 'Camera + IMU preview; no walking starts.';
   el('walkMessage').textContent = state.walking?.message || 'ESP32 walking unavailable.';
   if (!speedBusy && document.activeElement !== el('walkSpeed')) {
     showSpeed(state.walking?.speed ?? 1);
