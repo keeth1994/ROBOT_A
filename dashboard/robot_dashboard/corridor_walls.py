@@ -108,8 +108,6 @@ class IRWallNavigation(CourseNavigation):
             self.voltages = volts
             distances = self.ir_scale_mv_m / np.maximum(np.asarray(volts) - self.ir_offset_mv, .001)
             weak = distances > .30
-            if min(distances) < .04 or max(volts) >= 3200:
-                raise ValueError('A wall is too close for a valid IR reading.')
             if any(weak) and self.continue_past_walls(weak, now):
                 return True
             if self.exit_complete:
