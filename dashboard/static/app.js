@@ -145,7 +145,7 @@ function render(state) {
     ? 'Upload the camera-pitch controller firmware to enable these controls.'
     : pitch.angle === null ? 'Camera servo released. Enable at 0° before adjusting.'
     : current?.walking?.camera_controlled ? 'Automatic camera control: ' + pitch.angle + '°. Stop walking to adjust manually.'
-    : 'Commanded position: ' + pitch.angle + '°. Camera-guided walking pauses briefly after tilt changes.';
+    : 'Commanded position: ' + pitch.angle + '°';
   renderIr(state.servo.online ? s : null);
   if (state.servo.online && s) {
     renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? s.message : 'Upload the calibrated controller firmware to enable these controls.';

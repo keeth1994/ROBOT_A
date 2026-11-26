@@ -1611,7 +1611,7 @@
           <geom name="collision_242_1" type="mesh" mesh="collision_242_1" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
           <geom name="collision_242_2" type="mesh" mesh="collision_242_2" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
           <geom name="collision_242_3" type="mesh" mesh="collision_242_3" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
-          <inertial mass="1e-06" pos="0 0 0" fullinertia="1e-12 1e-12 1e-12 0 0 0" />
+          <inertial mass="0.00190559198" pos="0.00124999999 0 0.0255" fullinertia="4.89010415e-07 5.03171188e-07 1.82768519e-08 1.90175071e-21 -2.31307561e-08 0" />
         </body>
         <geom type="mesh" mesh="cad_210" rgba=".2 .5 .3 1" contype="0" conaffinity="0" group="1" mass="0" />
         <geom type="mesh" mesh="cad_211" rgba=".2 .5 .3 1" contype="0" conaffinity="0" group="1" mass="0" />
@@ -1628,7 +1628,7 @@
         <geom name="collision_216_5" type="mesh" mesh="collision_216_5" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
         <geom type="mesh" mesh="cad_217" rgba=".75 .8 .87 1" contype="0" conaffinity="0" group="1" mass="0" />
         <geom name="collision_217_0" type="mesh" mesh="collision_217_0" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
-        <inertial mass="1e-06" pos="0 0 0" fullinertia="1e-12 1e-12 1e-12 0 0 0" />
+        <inertial mass="0.0117405116" pos="-0.00559888187 -0.00298325436 0.00231913281" fullinertia="6.35247007e-07 2.12746577e-06 1.80361648e-06 -2.13414939e-08 5.84184738e-07 8.83993622e-09" />
       </body>
       <body name="upper_rocker" pos="-0.032 -0.061 0.183">
         <joint name="upper_rocker" axis="0 1 0" damping=".0005" armature=".000001" />
@@ -1649,7 +1649,7 @@
         <geom name="collision_220_11" type="mesh" mesh="collision_220_11" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
         <geom type="mesh" mesh="cad_221" rgba=".75 .8 .87 1" contype="0" conaffinity="0" group="1" mass="0" />
         <geom name="collision_221_0" type="mesh" mesh="collision_221_0" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
-        <inertial mass="1e-06" pos="0 6.9388939e-18 0" fullinertia="1e-12 1e-12 1e-12 0 0 0" />
+        <inertial mass="0.00802740271" pos="-0.00775188224 0.000812591793 0.00321093485" fullinertia="1.33951911e-06 3.47031503e-06 2.28768858e-06 1.36254994e-07 4.74084731e-07 -5.64386658e-08" />
       </body>
       <body name="camera_cradle" pos="-0.032 0 0.22065">
         <joint name="camera_cradle" axis="0 1 0" damping=".035" armature=".000001" range="-0.872664626 2.44346095" />
@@ -1702,7 +1702,7 @@
         <geom name="collision_241_20" type="mesh" mesh="collision_241_20" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
         <geom name="collision_241_21" type="mesh" mesh="collision_241_21" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
         <geom name="collision_241_22" type="mesh" mesh="collision_241_22" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
-        <inertial mass="1e-06" pos="0 0 0" fullinertia="1e-12 1e-12 1e-12 0 0 0" />
+        <inertial mass="0.0400924471" pos="-0.000391276968 -0.0135691832 0.0103569065" fullinertia="7.13907242e-05 7.05486678e-06 6.82764324e-05 -2.94660168e-07 -7.42298965e-07 -4.73327367e-06" />
         <camera name="project_camera" pos="0.0192836283 0 0.0229813333" xyaxes="0 -1 0 0.64278761 0 0.766044443" fovy="42.9470936" />
       </body>
       <geom type="mesh" mesh="cad_0" rgba=".08 .09 .11 1" contype="0" conaffinity="0" group="1" mass="0" />
@@ -2258,7 +2258,7 @@
       <geom name="collision_129_22" type="mesh" mesh="collision_129_22" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
       <geom name="collision_129_23" type="mesh" mesh="collision_129_23" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
       <geom name="collision_129_24" type="mesh" mesh="collision_129_24" mass="0" group="3" rgba=".1 .8 .6 .3" contype="2" conaffinity="3" friction=".8 .002 .0001" solref=".006 1" />
-      <inertial mass="0.670075108" pos="-0.0060653327 0.000918465495 0.0383634352" fullinertia="0.00168177431 0.00197816657 0.00206470677 -8.71303894e-06 0.000142989525 -3.12416494e-05" />
+      <inertial mass="0.7990719" pos="-0.0115026981 -0.001957037 0.0537481982" fullinertia="0.00322767913 0.00330738999 0.00258986026 -7.54496217e-05 0.000478471724 0.000132682553" />
       <site name="imu_site" pos="0 0 0.0901" size=".001" />
       <site name="ir_left_site" pos="0.004 0.0716 0.06455" xyaxes="1 0 0 0 0 -1" size=".001" />
       <site name="ir_right_site" pos="0.004 -0.0716 0.06455" xyaxes="-1 0 0 0 0 -1" size=".001" />

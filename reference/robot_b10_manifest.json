@@ -6,12 +6,12 @@
   "simulated_bodies": 243,
   "excluded_components": [],
   "collision_hulls": 854,
-  "total_mass_kg": 0.9892412544735989,
+  "total_mass_kg": 1.18,
   "reference_total_mass_kg": 1.18,
-  "camera_mass_enabled": false,
+  "camera_mass_enabled": true,
   "camera_assembly_mass_kg": 0.19076274552640107,
-  "removed_camera_mass_kg": 0.19076274552640107,
-  "numerical_camera_mass_kg": 4e-06,
+  "removed_camera_mass_kg": 0,
+  "numerical_camera_mass_kg": 0,
   "estimated_total_mass_kg": 1.4331123261082537,
   "mass_scale": 0.823382772238375,
   "neutral_bounds_m": [
@@ -910,7 +910,7 @@
       "component": "Camera backing strip L",
       "link": "platform",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.001060948518520883,
       "volume_m3": 1.0391323122324826e-06,
       "camera_assembly": true,
       "reference_mass_kg": 0.001060948518520883
@@ -919,7 +919,7 @@
       "component": "Camera backing strip R",
       "link": "platform",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.0010609485185209848,
       "volume_m3": 1.0391323122325822e-06,
       "camera_assembly": true,
       "reference_mass_kg": 0.0010609485185209848
@@ -928,7 +928,7 @@
       "component": "Camera foot bolt 0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0010327916445130245,
       "volume_m3": 1.608112164334234e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0010327916445130245
@@ -937,7 +937,7 @@
       "component": "Camera foot nut 0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.000294844299601219,
       "volume_m3": 4.590884398536091e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.000294844299601219
@@ -946,7 +946,7 @@
       "component": "Camera foot bolt 1",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0010327916445130245,
       "volume_m3": 1.608112164334234e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0010327916445130245
@@ -955,7 +955,7 @@
       "component": "Camera foot nut 1",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.00029484429960121905,
       "volume_m3": 4.590884398536092e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.00029484429960121905
@@ -964,7 +964,7 @@
       "component": "Camera foot bolt 2",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0010327916445130251,
       "volume_m3": 1.6081121643342352e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0010327916445130251
@@ -973,7 +973,7 @@
       "component": "Camera foot nut 2",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.00029484429960177004,
       "volume_m3": 4.590884398544671e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.00029484429960177004
@@ -982,7 +982,7 @@
       "component": "Camera foot bolt 3",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.001032791644513026,
       "volume_m3": 1.6081121643342367e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.001032791644513026
@@ -991,7 +991,7 @@
       "component": "Camera foot nut 3",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.00029484429960177015,
       "volume_m3": 4.5908843985446724e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.00029484429960177015
@@ -1000,7 +1000,7 @@
       "component": "Camera Parallax 900-00005",
       "link": "platform",
       "kind": "servo",
-      "mass_kg": 0,
+      "mass_kg": 0.036228841978488496,
       "volume_m3": 2.997093352969855e-05,
       "camera_assembly": true,
       "servo_model": "Parallax",
@@ -1010,7 +1010,7 @@
       "component": "Slide M3 nut -31",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0002948442996017702,
       "volume_m3": 4.590884398544674e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0002948442996017702
@@ -1019,7 +1019,7 @@
       "component": "Slide M3x8 -31",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645567,
       "volume_m3": 1.3234995778822686e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645567
@@ -1028,7 +1028,7 @@
       "component": "Slide M3 nut -16",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0002948442996017702,
       "volume_m3": 4.590884398544673e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0002948442996017702
@@ -1037,7 +1037,7 @@
       "component": "Slide M3x8 -16",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645567,
       "volume_m3": 1.3234995778822686e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645567
@@ -1046,7 +1046,7 @@
       "component": "Parallax ear M3x8 -69.6 127.0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645554,
       "volume_m3": 1.3234995778822667e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645554
@@ -1055,7 +1055,7 @@
       "component": "Parallax ear M3 nut -69.6 127.0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.00029484429960177026,
       "volume_m3": 4.5908843985446744e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.00029484429960177026
@@ -1064,7 +1064,7 @@
       "component": "Parallax ear M3x8 -69.6 137.0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645572,
       "volume_m3": 1.3234995778822694e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645572
@@ -1073,7 +1073,7 @@
       "component": "Parallax ear M3 nut -69.6 137.0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.00029484429960177,
       "volume_m3": 4.5908843985446704e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.00029484429960177
@@ -1082,7 +1082,7 @@
       "component": "Parallax ear M3x8 -19.1 127.0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645554,
       "volume_m3": 1.3234995778822667e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645554
@@ -1091,7 +1091,7 @@
       "component": "Parallax ear M3 nut -19.1 127.0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.00029484429960177037,
       "volume_m3": 4.590884398544676e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.00029484429960177037
@@ -1100,7 +1100,7 @@
       "component": "Parallax ear M3x8 -19.1 137.0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645572,
       "volume_m3": 1.3234995778822694e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645572
@@ -1109,7 +1109,7 @@
       "component": "Parallax ear M3 nut -19.1 137.0",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0002948442996017699,
       "volume_m3": 4.5908843985446684e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0002948442996017699
@@ -1118,7 +1118,7 @@
       "component": "Upper journal M3 nut",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0002948442996017696,
       "volume_m3": 4.5908843985446645e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0002948442996017696
@@ -1127,7 +1127,7 @@
       "component": "Upper journal M3x12",
       "link": "platform",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.001029178029871798,
       "volume_m3": 1.6024855718916583e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.001029178029871798
@@ -1136,7 +1136,7 @@
       "component": "Camera pivot bearing -1",
       "link": "platform",
       "kind": "bearing4",
-      "mass_kg": 0,
+      "mass_kg": 0.002470148316715125,
       "volume_m3": 6.008295949990476e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.002470148316715125
@@ -1145,7 +1145,7 @@
       "component": "Camera pivot bearing 1",
       "link": "platform",
       "kind": "bearing4",
-      "mass_kg": 0,
+      "mass_kg": 0.002470148316715125,
       "volume_m3": 6.008295949990468e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.002470148316715125
@@ -1154,7 +1154,7 @@
       "component": "Parallax low servo mount",
       "link": "platform",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.0053985665978324646,
       "volume_m3": 5.287556270277478e-06,
       "camera_assembly": true,
       "reference_mass_kg": 0.0053985665978324646
@@ -1163,7 +1163,7 @@
       "component": "Upper journal cap",
       "link": "platform",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.00020706013446280004,
       "volume_m3": 2.0280237215983537e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.00020706013446280004
@@ -1172,7 +1172,7 @@
       "component": "Upper journal washer",
       "link": "platform",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 5.4194752174667356e-05,
       "volume_m3": 5.3080349475053225e-08,
       "camera_assembly": true,
       "reference_mass_kg": 5.4194752174667356e-05
@@ -1181,7 +1181,7 @@
       "component": "Drive tower",
       "link": "platform",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.03722384129864356,
       "volume_m3": 3.645841019011998e-05,
       "camera_assembly": true,
       "reference_mass_kg": 0.03722384129864356
@@ -1190,7 +1190,7 @@
       "component": "Idler tower",
       "link": "platform",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.029318447023755873,
       "volume_m3": 2.871557395577938e-05,
       "camera_assembly": true,
       "reference_mass_kg": 0.029318447023755873
@@ -1923,7 +1923,7 @@
       "component": "Horn M3x8 0",
       "link": "camera_input",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645588,
       "volume_m3": 1.323499577882272e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645588
@@ -1932,7 +1932,7 @@
       "component": "Horn M3x8 1",
       "link": "camera_input",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645579,
       "volume_m3": 1.3234995778822704e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645579
@@ -1941,7 +1941,7 @@
       "component": "M3 metal horn",
       "link": "camera_input",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.004334799109863003,
       "volume_m3": 6.749515466696821e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.004334799109863003
@@ -1950,7 +1950,7 @@
       "component": "Horn retaining screw head",
       "link": "camera_input",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.00028337921628171996,
       "volume_m3": 4.412366881966858e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.00028337921628171996
@@ -1959,7 +1959,7 @@
       "component": "Link M3x12 0",
       "link": "camera_input",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0010291780298717977,
       "volume_m3": 1.6024855718916575e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0010291780298717977
@@ -1968,7 +1968,7 @@
       "component": "Link M3 nut 0",
       "link": "camera_input",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.00029484429960055514,
       "volume_m3": 4.590884398525754e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.00029484429960055514
@@ -1977,7 +1977,7 @@
       "component": "Parallax M3 crank",
       "link": "camera_input",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.004012077434666205,
       "volume_m3": 3.929577381711947e-06,
       "camera_assembly": true,
       "reference_mass_kg": 0.004012077434666205
@@ -1986,7 +1986,7 @@
       "component": "Link flanged bushing 1",
       "link": "camera_input",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 8.622854656200159e-05,
       "volume_m3": 8.445543530645431e-08,
       "camera_assembly": true,
       "reference_mass_kg": 8.622854656200159e-05
@@ -1995,7 +1995,7 @@
       "component": "Link M3x12 1",
       "link": "upper_rocker",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0010291780298717975,
       "volume_m3": 1.6024855718916573e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0010291780298717975
@@ -2004,7 +2004,7 @@
       "component": "Link M3 nut 1",
       "link": "upper_rocker",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0002948442996005553,
       "volume_m3": 4.5908843985257565e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0002948442996005553
@@ -2013,7 +2013,7 @@
       "component": "Upper 40T gear and lever",
       "link": "upper_rocker",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.006617151833537881,
       "volume_m3": 6.481083827482893e-06,
       "camera_assembly": true,
       "reference_mass_kg": 0.006617151833537881
@@ -2022,7 +2022,7 @@
       "component": "Link flanged bushing 2",
       "link": "upper_rocker",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 8.62285465620015e-05,
       "volume_m3": 8.445543530645423e-08,
       "camera_assembly": true,
       "reference_mass_kg": 8.62285465620015e-05
@@ -2031,7 +2031,7 @@
       "component": "Lens",
       "link": "camera_cradle",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 6.523834425206677e-05,
       "volume_m3": 6.389685298149974e-08,
       "camera_assembly": true,
       "reference_mass_kg": 6.523834425206677e-05
@@ -2040,7 +2040,7 @@
       "component": "TimerCamera-X housing",
       "link": "camera_cradle",
       "kind": "camera",
-      "mass_kg": 0,
+      "mass_kg": 0.01152735881133725,
       "volume_m3": 1.8221464602986136e-05,
       "camera_assembly": true,
       "reference_mass_kg": 0.01152735881133725
@@ -2049,7 +2049,7 @@
       "component": "Camera ear screw -16.0",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0010364173650665616,
       "volume_m3": 1.613757606333689e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0010364173650665616
@@ -2058,7 +2058,7 @@
       "component": "Camera ear nut -16.0",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0002948442996021702,
       "volume_m3": 4.590884398550902e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0002948442996021702
@@ -2067,7 +2067,7 @@
       "component": "Camera ear screw 16.0",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0010364173650665616,
       "volume_m3": 1.613757606333689e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0010364173650665616
@@ -2076,7 +2076,7 @@
       "component": "Camera ear nut 16.0",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0002948442996016199,
       "volume_m3": 4.590884398542333e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0002948442996016199
@@ -2085,7 +2085,7 @@
       "component": "Camera inner sleeve 1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.000473341147310013,
       "volume_m3": 7.370176365321624e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.000473341147310013
@@ -2094,7 +2094,7 @@
       "component": "Camera outer washer 1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 6.1740149649133e-05,
       "volume_m3": 9.613273519984862e-09,
       "camera_assembly": true,
       "reference_mass_kg": 6.1740149649133e-05
@@ -2103,7 +2103,7 @@
       "component": "Camera shoulder axle 1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.002463088970168994,
       "volume_m3": 3.8351620637228055e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.002463088970168994
@@ -2112,7 +2112,7 @@
       "component": "Camera pivot nut 1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0006138541698102994,
       "volume_m3": 9.558039734768462e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0006138541698102994
@@ -2121,7 +2121,7 @@
       "component": "Camera inner sleeve -1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.00046305112236849074,
       "volume_m3": 7.209955139988542e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.00046305112236849074
@@ -2130,7 +2130,7 @@
       "component": "Camera outer washer -1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 6.174014964913151e-05,
       "volume_m3": 9.613273519984632e-09,
       "camera_assembly": true,
       "reference_mass_kg": 6.174014964913151e-05
@@ -2139,7 +2139,7 @@
       "component": "Camera shoulder axle -1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0032620993186184342,
       "volume_m3": 5.079264170470897e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0032620993186184342
@@ -2148,7 +2148,7 @@
       "component": "Camera pivot nut -1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0006138541698102994,
       "volume_m3": 9.558039734768462e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0006138541698102994
@@ -2157,7 +2157,7 @@
       "component": "Output M3x8 0",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645563,
       "volume_m3": 1.323499577882268e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645563
@@ -2166,7 +2166,7 @@
       "component": "Output M3 nut 0",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0002948442996010595,
       "volume_m3": 4.5908843985336074e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.0002948442996010595
@@ -2175,7 +2175,7 @@
       "component": "Output M3x8 1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.0008500024661645568,
       "volume_m3": 1.3234995778822688e-07,
       "camera_assembly": true,
       "reference_mass_kg": 0.0008500024661645568
@@ -2184,7 +2184,7 @@
       "component": "Output M3 nut 1",
       "link": "camera_cradle",
       "kind": "steel",
-      "mass_kg": 0,
+      "mass_kg": 0.000294844299601776,
       "volume_m3": 4.590884398544764e-08,
       "camera_assembly": true,
       "reference_mass_kg": 0.000294844299601776
@@ -2193,7 +2193,7 @@
       "component": "Camera 20T output gear",
       "link": "camera_cradle",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.0022514050828269724,
       "volume_m3": 2.2051096058379636e-06,
       "camera_assembly": true,
       "reference_mass_kg": 0.0022514050828269724
@@ -2202,7 +2202,7 @@
       "component": "Centred camera cradle",
       "link": "camera_cradle",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.013283458817310453,
       "volume_m3": 1.3010312031464581e-05,
       "camera_assembly": true,
       "reference_mass_kg": 0.013283458817310453
@@ -2211,7 +2211,7 @@
       "component": "Camera pushrod",
       "link": "camera_link",
       "kind": "PLA",
-      "mass_kg": 0,
+      "mass_kg": 0.0019055919773144083,
       "volume_m3": 1.8664074297582548e-06,
       "camera_assembly": true,
       "reference_mass_kg": 0.0019055919773144083

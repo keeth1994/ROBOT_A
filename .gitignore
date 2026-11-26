@@ -31,3 +31,4 @@ tests/
 /robot_b91/rear_stride_experiment.py
 /robot_b91/rear_support_experiment.py
 /robot_b91/sidestep_experiment.py
+*.png

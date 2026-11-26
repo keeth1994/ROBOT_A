@@ -16,5 +16,5 @@
   },
   "extra_wiring_fasteners_kg": 0.05,
   "measured_total_mass_kg": 1.18,
-  "exclude_camera_mass": true
+  "exclude_camera_mass": false
 }
