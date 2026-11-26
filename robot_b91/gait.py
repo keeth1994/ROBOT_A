@@ -12,14 +12,12 @@ import numpy as np
 
 LEGS = ("FL", "RL", "FR", "RR")
 RAMP_SPEED_SCALE = 0.5
-# Ramp-only steering: retain forward progress, reduce yaw asymmetry, and use
-# the existing strafe term for sideways offset instead of aiming into a turn.
-RAMP_STEERING = dict(heading_gain=1.2, lateral_gain=0., turn_limit=.2)
+# Ramp steering corrects heading without commanding sideways movement.
+RAMP_STEERING = dict(heading_gain=1.2, lateral_gain=0., strafe_gain=0., turn_limit=.2)
 
 
 def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
-                   lateral_error_m=0.0, joint_ranges=None, forward_scale=1.0,
-                   sideways_scale=0.0):
+                   lateral_error_m=0.0, joint_ranges=None, forward_scale=1.0):
     """Return eight bounded joint angles; call at the existing 50 Hz command rate.
 
     elapsed_s is time since walking began; gait_time_s preserves phase when
@@ -39,20 +37,13 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
         # Rear-right, front-right, rear-left, front-left: one swing at a time.
         offsets = ([0, .25, .5, .75] if crest else
                    [0, .5, .25, .75] if p["pattern"] == "crawl" else [0, .5, .5, 0])
-        sideways = p.get('sideways', False)
-        # Sidestepping holds yaw; lateral position must not command a turn.
-        error = heading_error_rad + (0 if sideways else math.atan(p.get("lateral_gain", 0) * lateral_error_m))
+        error = heading_error_rad + math.atan(p.get("lateral_gain", 0) * lateral_error_m)
         turn_limit = p.get('turn_limit', .95 if p.get('corridor', False) else .5)
         correction = np.clip(p["heading_gain"] * error, -turn_limit, turn_limit)
         forward = max(.25, 1 - abs(correction)) if p.get('corridor', False) else 1
         if p.get('search', False):
             forward = np.clip(forward_scale, 0, 1)
         strafe = np.clip(p.get("strafe_gain", 0) * lateral_error_m, -0.3, 0.3)
-        if sideways:
-            forward = 0
-            # Positive command moves the body left (+Y). Front and rear yaw
-            # strokes oppose, cancelling their average fore/aft movement.
-            strafe = -np.clip(sideways_scale, -1, 1)
         for i, leg in enumerate(LEGS):
             u = (gait_time_s / p["period"] + offsets[i]) % 1
             duty = p["duty"]

@@ -1,15 +1,11 @@
-"""Opt-in first-crest gait experiment, triggered only by onboard observations."""
+"""First-crest wave gait, triggered only by onboard observations."""
 import math
 
-
-CREST_GAIT = dict(duty=.85, yaw_amplitude=.75, pitch_lift=.7,
-                  pitch_stance=0., yaw_bias=-.25, pattern='trot')
 
 # Trial 34's front .45/rear 35% stayed grounded. Try a wider .55 front stroke
 # with rear 30%: front excursion increases 22%, rear stays near .16 rad.
 # Six 25-degree model cases crossed; five stayed within the 12-degree heading
 # bound. Steeper 30-degree cases remain blocked; contact is uncalibrated.
-# Keep the physically tested diagonal gait above available for comparison.
 CREST_WAVE_GAIT = dict(duty=.8, yaw_amplitude=.55, rear_stride_scale=.30, pitch_lift=.25,
                        pitch_stance=0., yaw_bias=-.25, pattern='crest')
 
@@ -40,7 +36,6 @@ class CrestSequence:
         self.climbed = False
         self.since = self.previous = None
         self.moving_seconds = 0.
-        self.phase_started = None
         self.requested = None
 
     def observe(self, now, pitch, ready):
@@ -48,8 +43,6 @@ class CrestSequence:
         self.previous = now
         if self.requested or self.phase == 'descent':
             return
-        if self.phase == 'crest' and now - self.phase_started > 40:
-            raise ValueError('Crest gait timed out; stop and inspect the robot.')
         if not ready or not 0 < dt <= .35:
             self.since = None
             return
@@ -80,6 +73,5 @@ class CrestSequence:
             raise ValueError('No slope-triggered gait change is pending.')
         self.phase = self.requested
         self.requested = None
-        self.phase_started = now
         self.moving_seconds = 0.
         self.since = self.previous = None

@@ -11,25 +11,21 @@ def main():
     parser.add_argument('--config', type=Path, default=Path(__file__).with_name('config.local.json'))
     parser.add_argument('--ramp-only', action='store_true',
                         help='Stop after the ramp instead of automatically starting corridor search.')
-    parser.add_argument('--crest-assist', action='store_true',
-                        help='Experiment: switch gait at the first crest using onboard pitch.')
-    parser.add_argument('--crest-wave', action='store_true',
-                        help='Experiment: single-foot crest gait at requested speed; requires updated firmware. Implies crest assist and adaptive speed.')
     parser.add_argument('--start-at-crest', action='store_true',
-                        help='Assisted placement test: begin in the selected crest gait. Requires --crest-assist or --crest-wave, and --ramp-only.')
+                        help='Assisted placement test: begin in the crest wave gait. Requires --ramp-only.')
     parser.add_argument('--exit-clearance', action='store_true',
-                        help='Clear the rear feet after ramp exit detection; also enabled by --crest-assist.')
+                        help='Clear the rear feet after ramp exit detection; enabled by default for ramp runs.')
     parser.add_argument('--adaptive-ramp-speed', action='store_true',
-                        help='Limit speed to 50%% when roll, heading error or lateral drift increases.')
+                        help='Limit speed to 50%% when roll, heading error or lateral drift increases; enabled by default for ramp runs.')
     args = parser.parse_args()
-    if args.start_at_crest and not ((args.crest_assist or args.crest_wave) and args.ramp_only):
-        parser.error('--start-at-crest requires --crest-assist or --crest-wave, and --ramp-only.')
+    if args.start_at_crest and not args.ramp_only:
+        parser.error('--start-at-crest requires --ramp-only.')
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from robot_dashboard.runtime import Dashboard
     from robot_dashboard.server import DashboardServer
     app = Dashboard(args.config, auto_corridor=not args.ramp_only,
-                    crest_assist=args.crest_assist, exit_clearance=args.exit_clearance,
-                    adaptive_ramp_speed=args.adaptive_ramp_speed, crest_wave=args.crest_wave,
+                    exit_clearance=args.exit_clearance,
+                    adaptive_ramp_speed=args.adaptive_ramp_speed,
                     start_at_crest=args.start_at_crest)
     server = DashboardServer(('127.0.0.1', args.port), app)
     app.start()

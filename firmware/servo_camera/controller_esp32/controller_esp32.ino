@@ -202,7 +202,6 @@ void updateMotion()
     if (gait.danceError) message = gait.danceError;
     if (!writeGait()) return;
     if (gait.stopped(now)) stopTest(gait.danceError ? gait.danceError :
-                                  gait.sidestepComplete ? "Side step complete. Outputs off." :
                                   "Navigation connection lost. Outputs off; restart explicitly.");
     return;
   }
@@ -346,8 +345,7 @@ void sendStatus()
   json += ",\"motionProtocol\":2,\"signedYawBias\":true,\"crestWaveGait\":true,\"corridorGait\":true,\"corridorWallGait\":true,\"corridorSearchGait\":true,\"externalActive\":";
   json += externalActive ? "true" : "false";
   json += ",\"motionSession\":"; json += String(motionSession);
-  json += ",\"boundedSteering\":true,\"rearStrideScale\":true,\"sidestepGait\":true,\"sidestepComplete\":";
-  json += gait.sidestepComplete ? "true" : "false";
+  json += ",\"boundedSteering\":true,\"rearStrideScale\":true";
   json += ",\"gaitStopping\":"; json += externalActive && gait.stopping ? "true" : "false";
   json += ",\"danceTurnDegrees\":";
   json += externalActive && gait.dance && gait.danceTurnPhase ?
@@ -558,12 +556,10 @@ void startExternal()
   }
   String profile = server.arg("profile"), pattern = server.arg("pattern");
   bool useImu = profile == "course" || profile == "course_imu" || profile == "corridor" ||
-                profile == "corridor_search" || profile == "dance" || profile == "sidestep";
+                profile == "corridor_search" || profile == "dance";
   walking::Parameters p;
-  double sideways = 0;
   if ((profile != "walk" && profile != "course" && profile != "course_camera" &&
-       profile != "course_imu" && profile != "corridor" && profile != "corridor_search" && profile != "dance" && profile != "sidestep") ||
-      (profile == "sidestep" && (pattern != "crest" || !readNumber("sideways", sideways, -1, 1) || std::abs(sideways) != 1)) ||
+       profile != "course_imu" && profile != "corridor" && profile != "corridor_search" && profile != "dance") ||
       (pattern != "trot" && pattern != "crawl" && pattern != "crest") ||
       !readNumber("period", p.period, .2, 10) ||
       !readNumber("duty", p.duty, .1, .9) ||
@@ -587,13 +583,10 @@ void startExternal()
   p.crest = pattern == "crest";
   p.search = profile == "corridor_search";
   p.corridor = profile == "corridor" || p.search;
-  p.sideways = profile == "sidestep";
-  if (p.sideways) p.steeringTrim = 0; // Hold the measured start heading.
   if (profile == "dance") p.pitchStance = 0;
   uint32_t now = millis();
   gait.begin(now, p, useImu, profile == "walk" ? 0 : 2000,
              profile == "dance");
-  gait.sideways = sideways;
   orientation.reset(now);
   if (!writeGait()) { respond(503, "text/plain", message); return; }
   stream.begin(esp_random(), now);
@@ -612,7 +605,7 @@ void receiveAdjustment()
   double speed, heading, reference, lateral, forward = 1;
   String ready = server.arg("ready");
   if ((ready != "0" && ready != "1") ||
-      !readNumber("speed", speed, .25, gait.params.sideways ? .65 : 2) ||
+      !readNumber("speed", speed, .25, 2) ||
       !readNumber("heading", heading, -1000000, 1000000) ||
       !readNumber("heading_reference", reference, -1000000, 1000000) ||
       !readNumber("lateral", lateral, -.5, .5) ||

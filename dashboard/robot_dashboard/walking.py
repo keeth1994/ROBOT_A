@@ -6,26 +6,24 @@ from .devices import DeviceError
 from .navigation import CourseNavigation
 from .corridor_walls import IRWallNavigation, load_corridor_settings
 from .corridor_search import CorridorSearch
-from .crest import CrestSequence, CREST_GAIT, CREST_WAVE_GAIT, RampSpeedGovernor
-from .sidestep import SIDESTEP_PROFILES, SIDESTEP_GAIT, check_sidestep
+from .crest import CrestSequence, CREST_WAVE_GAIT, RampSpeedGovernor
 from robot_b91.camera_calibration import load_camera_scan_settings
 from robot_b91.gait import RAMP_SPEED_SCALE, RAMP_STEERING
 
 ROOT = Path(__file__).resolve().parents[2]
 JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch'))
 PROFILES = {'walk': (), 'course': ('camera', 'imu'), 'course_camera': ('camera',),
-            'course_tape': ('camera', 'imu'), 'course_imu': ('imu',),
+            'course_tape': ('camera', 'imu'), 'course_imu': ('imu',), 'crest_test': ('imu',),
             'corridor': ('ir', 'imu'), 'corridor_search': ('camera', 'ir', 'imu'), 'dance': ()}
-PROFILES.update({name: ('imu',) for name in SIDESTEP_PROFILES})
 WALK_ACTIONS = tuple(PROFILES)
 RAMP_PROFILES = ('course', 'course_camera')
 
 
 class Walking:
-    def __init__(self, *, crest_assist=False, exit_clearance=False, adaptive_ramp_speed=False,
-                 crest_wave=False, start_at_crest=False):
-        if start_at_crest and not (crest_assist or crest_wave):
-            raise ValueError('Assisted crest start requires a selected crest gait.')
+    def __init__(self, *, exit_clearance=False, adaptive_ramp_speed=False,
+                 crest_wave=True, start_at_crest=False):
+        if start_at_crest and not crest_wave:
+            raise ValueError('Assisted crest start requires the crest wave gait.')
         with (ROOT / 'reference/b91_gait.toml').open('rb') as stream:
             self.params = tomllib.load(stream)
         self.active = False
@@ -40,8 +38,7 @@ class Walking:
                         if start_at_crest else 'Stopped. Walking is not started automatically.')
         self.crest_wave = crest_wave
         self.start_at_crest = start_at_crest
-        self.crest_assist = crest_assist or crest_wave
-        self.exit_clearance_enabled = exit_clearance or self.crest_assist
+        self.exit_clearance_enabled = exit_clearance or self.crest_wave
         self.crest_sequence = None
         self.resume_until = None
         self.base_params = None
@@ -52,7 +49,7 @@ class Walking:
 
     def state(self):
         period = self.params['period']
-        if self.profile in RAMP_PROFILES:
+        if self.profile in RAMP_PROFILES or self.profile == 'crest_test':
             period /= RAMP_SPEED_SCALE
         return dict(active=self.active, message=self.message,
                     profile=self.profile, mode='dance' if self.profile == 'dance' else 'walk',
@@ -86,9 +83,7 @@ class Walking:
                 not math.isfinite(speed) or not .25 <= speed <= 2):
             raise ValueError('Walking speed must be between 25% and 200%.')
         self.speed = float(speed)
-        if self.active and self.profile in SIDESTEP_PROFILES:
-            self.effective_speed = min(self.speed, .65)
-        elif not self.active or not self.speed_governor:
+        if not self.active or not self.speed_governor:
             self.effective_speed = self.speed
 
     def controller_check(self, status):
@@ -112,18 +107,11 @@ class Walking:
         self.camera_settings = load_camera_scan_settings()
         with (ROOT / 'reference/b91_gait.toml').open('rb') as stream:
             self.params = tomllib.load(stream)
-        if profile in SIDESTEP_PROFILES:
-            self.params.update(SIDESTEP_GAIT)
-        elif profile in RAMP_PROFILES:
+        if profile in RAMP_PROFILES or profile == 'crest_test':
             self.params.update(RAMP_STEERING)
         self.base_params = dict(self.params)
-        if self.start_at_crest and profile == 'course':
-            self.params.update(CREST_WAVE_GAIT if self.crest_wave else CREST_GAIT)
-        elif self.crest_assist and profile == 'course':
-            # Trials 41/42 drifted on the first incline with gain 1.2. Test
-            # the earlier gain before yaw builds, retaining the .2 turn cap.
-            # Keep base_params unchanged for the proven crest/descent setup.
-            self.params['heading_gain'] = 3.0
+        if profile == 'crest_test' or (self.start_at_crest and profile == 'course'):
+            self.params.update(CREST_WAVE_GAIT)
         return self.controller_settings(profile, self.params)
 
     def controller_settings(self, profile, params):
@@ -131,7 +119,7 @@ class Walking:
         names = ('period', 'duty', 'yaw_amplitude', 'pitch_lift', 'pitch_stance',
                  'pitch_min', 'heading_gain', 'lateral_gain', 'strafe_gain', 'pattern', 'yaw_bias')
         settings = defaults | params
-        if profile in RAMP_PROFILES:
+        if profile in RAMP_PROFILES or profile == 'crest_test':
             settings['period'] /= RAMP_SPEED_SCALE
         if profile in ('corridor', 'corridor_search'):
             self.corridor_settings = load_corridor_settings()
@@ -140,13 +128,13 @@ class Walking:
             settings['pitch_stance'] = 0.0
         # Guidance runs on the PC; these modes share the ESP32's existing IMU gait.
         controller_profile = 'course' if profile in ('course_tape', 'corridor') else profile
+        if profile == 'crest_test':
+            controller_profile = 'course_imu'
         result = {'profile': controller_profile, **{name: settings[name] for name in names}}
         if 'turn_limit' in params:
             result['turn_limit'] = params['turn_limit']
         if 'rear_stride_scale' in params:
             result['rear_stride_scale'] = params['rear_stride_scale']
-        if profile in SIDESTEP_PROFILES:
-            result.update(profile='sidestep', sideways=SIDESTEP_PROFILES[profile])
         return result
 
     def begin(self, status, session, now, profile='walk'):
@@ -156,7 +144,7 @@ class Walking:
         if profile not in PROFILES:
             raise ValueError('Unknown walking profile.')
         self.profile = profile
-        self.crest_sequence = CrestSequence() if self.crest_assist and profile == 'course' else None
+        self.crest_sequence = CrestSequence() if self.crest_wave and profile == 'course' else None
         if self.start_at_crest and self.crest_sequence:
             self.crest_sequence.requested = 'crest'
             self.crest_sequence.switched(now)
@@ -164,8 +152,6 @@ class Walking:
         self.exit_cycles = self.exit_started = self.exit_updated = None
         self.speed_governor = RampSpeedGovernor() if self.adaptive_ramp_speed and profile == 'course' else None
         self.effective_speed = self.speed
-        if profile in SIDESTEP_PROFILES:
-            self.effective_speed = min(self.speed, .65)
         sensors = PROFILES[profile]
         if profile in ('corridor', 'corridor_search'):
             self.corridor_settings = self.corridor_settings or load_corridor_settings()
@@ -187,7 +173,7 @@ class Walking:
         phase = self.crest_sequence.requested if self.crest_sequence else None
         if phase not in ('crest', 'descent') or self.base_params is None:
             raise DeviceError('No ramp gait change is pending.', 409)
-        crest_params = CREST_WAVE_GAIT if self.crest_wave else CREST_GAIT
+        crest_params = CREST_WAVE_GAIT
         params = self.base_params | (crest_params if phase == 'crest' else {})
         return params, self.controller_settings(self.profile, params)
 
@@ -214,8 +200,6 @@ class Walking:
         # The pitch-triggered crest phase can still use the requested speed.
         if self.crest_sequence and self.crest_sequence.phase == 'approach':
             speed = min(speed, .5)
-        if self.profile in SIDESTEP_PROFILES:
-            speed = min(speed, .65)
         if self.speed_governor:
             estimate = self.navigation.estimate
             speed = self.speed_governor.update(now, speed, estimate.roll, estimate.heading,
@@ -224,7 +208,7 @@ class Walking:
         return speed
 
     def clear_exit_frame(self, status, now):
-        """Advance just beyond visual ramp loss; require fresh, nearly level IMU."""
+        """Advance just beyond visual ramp loss using fresh IMU readings."""
         attitude = status.get('orientation')
         if (not status.get('orientationValid') or status.get('imuAgeMs', 999) > 50 or
                 not isinstance(attitude, (list, tuple)) or len(attitude) != 3 or
@@ -238,10 +222,8 @@ class Walking:
         nav.estimate.last_imu = now - nav.started - status['imuAgeMs'] / 1000
         nav.updated_at = now
         dt = now - self.exit_updated
-        if (not 0 <= dt <= .35 or now - self.exit_started > 12 or
-                abs(roll) > math.radians(10) or abs(pitch) > math.radians(10) or
-                abs(nav.estimate.heading) > math.radians(15)):
-            raise DeviceError('Ramp exit clearance exceeded its timing or attitude limit.', 409)
+        if not 0 <= dt <= .35:
+            raise DeviceError('Ramp exit clearance lost timely control updates.', 409)
         self.exit_updated = now
         period = self.params['period'] / RAMP_SPEED_SCALE
         previous_speed = self.effective_speed if self.speed_governor else self.speed
@@ -258,37 +240,16 @@ class Walking:
                     ready=int(not nav.corridor_requested), heading=nav.estimate.heading,
                     heading_reference=heading, lateral=0)
 
-    def finish_sidestep(self, status):
-        """Confirm this step's MCU completion, including the already-idle state."""
-        if (self.active and self.profile in SIDESTEP_PROFILES and
-                status.get('sidestepGait') is True and status.get('sidestepComplete') is True and
-                not status.get('running') and not status.get('manualActive') and
-                (status.get('motionSession') == self.session or
-                 (not status.get('externalActive') and status.get('motionSession') == 0))):
-            self.stop('Side step complete. Outputs off requested.')
-            return True
-        return False
-
     def frame(self, status, now, camera_frame=None):
         if not self.active:
             raise DeviceError('Walking is stopped.', 409)
         self.controller_check(status)
         if now - self.last_confirmed_frame > 1.0:
             raise DeviceError('PC/network control overrun; restart walking explicitly.', 409)
-        if self.profile in SIDESTEP_PROFILES:
-            if self.finish_sidestep(status):
-                return {}
-            check_sidestep(status)
-            if now - self.started > 12:
-                raise DeviceError('Side-step trial timed out; outputs off requested.', 409)
         if not status.get('externalActive') or status.get('motionSession') != self.session:
             raise DeviceError('ESP32 motion session ended; restart explicitly.', 409)
         if status.get('gaitStopping'):
             raise DeviceError('ESP32 is stopping after losing navigation; restart explicitly.', 409)
-        if self.profile == 'course' and self.exit_clearance_enabled and status.get('orientationValid'):
-            roll, pitch, _ = status['orientation']
-            if abs(roll) > math.radians(12) or abs(pitch) > math.radians(35):
-                raise DeviceError(f'Ramp tilt limit: roll {math.degrees(roll):.1f}, pitch {math.degrees(pitch):.1f} degrees; outputs off requested.', 409)
         if self.exit_cycles is not None:
             return self.clear_exit_frame(status, now)
         if self.profile in ('corridor', 'corridor_search'):
@@ -306,11 +267,6 @@ class Walking:
             self.navigation.imu_heading = attitude[2]
             self.resume_until = None
         ready = self.navigation.update(status, now, camera_frame) if self.navigation else True
-        if (self.profile in RAMP_PROFILES and ready and
-                abs(self.navigation.estimate.heading) > math.radians(12)):
-            raise DeviceError('Ramp heading exceeded 12 degrees; stop and recenter before restarting.', 409)
-        if self.profile in SIDESTEP_PROFILES and abs(self.navigation.estimate.heading) > math.radians(10):
-            raise DeviceError('Side step exceeded heading limit; outputs off requested.', 409)
         if (self.exit_clearance_enabled and self.profile == 'course' and self.navigation.corridor_requested):
             # Trial 23 left one rear foot on the ramp. Trial 24 cleared it with
             # roughly 1.125 gait cycles at 50%; count cycles so other speeds scale.
@@ -325,11 +281,11 @@ class Walking:
             self.message = 'Settling for 2 seconds; keep the robot still.'
         elif self.profile == 'dance' and status.get('danceTurnDegrees') is not None:
             self.message = f"Turning while dancing: {abs(status['danceTurnDegrees']):.0f}° / 360°."
+        elif self.profile == 'crest_test':
+            self.message = ('Testing crest gait with IMU heading. Press Stop to finish.' if ready else
+                            self.navigation.reason)
         elif self.navigation:
             self.message = self.navigation.reason
-            if self.profile in SIDESTEP_PROFILES:
-                direction = 'left' if SIDESTEP_PROFILES[self.profile] > 0 else 'right'
-                self.message = f'Side step {direction}: holding heading; stops after one cycle.'
         else:
             self.message = 'Dancing on the ESP32.' if self.profile == 'dance' else 'Walking on the ESP32.'
         self.sequence += 1

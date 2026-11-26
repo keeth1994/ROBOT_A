@@ -28,14 +28,14 @@ class RampSteeringTests(unittest.TestCase):
                     self.assertLessEqual(abs(turn), .2+1e-12)
         forward = rocker_targets(p,3,0,0,0)
         shifted = rocker_targets(p,3,0,0,.02)
-        self.assertFalse(np.allclose(forward,shifted)) # Strafe remains active.
+        np.testing.assert_array_equal(forward, shifted)
 
     def test_settings_survive_crest_switch_and_do_not_change_other_modes(self):
         walking = Walking(crest_wave=True)
         settings = walking.start_settings('course')
         self.assertEqual(settings['turn_limit'],.2)
         self.assertEqual(settings['lateral_gain'],0)
-        self.assertEqual(settings['heading_gain'],3.0)
+        self.assertEqual(settings['heading_gain'],1.2)
         walking.begin(status(),1,0,'course')
         for phase in ('crest','descent'):
             walking.crest_sequence.requested = phase
@@ -43,27 +43,52 @@ class RampSteeringTests(unittest.TestCase):
             self.assertEqual(settings['turn_limit'],.2)
             self.assertEqual(settings['heading_gain'],1.2)
         self.assertNotIn('turn_limit',walking.start_settings('walk'))
-        self.assertNotIn('turn_limit',walking.start_settings('sidestep_left'))
         self.assertEqual(walking.start_settings('course_camera')['heading_gain'], 1.2)
+
+    def test_ramp_strokes_ignore_lateral_offset_through_crest_and_descent(self):
+        walking = Walking()
+        for profile in ('course', 'course_camera'):
+            settings = walking.start_settings(profile)
+            walking.begin(status(), 1, 0, profile)
+            phases = ('approach', 'crest', 'descent') if profile == 'course' else ('approach',)
+            for phase in phases:
+                if phase != 'approach':
+                    walking.crest_sequence.requested = phase
+                    params, settings = walking.transition_settings()
+                    walking.resume_gait(2, 3, params)
+                self.assertEqual(settings['strafe_gain'], 0)
+                self.assertEqual(settings['lateral_gain'], 0)
+                for t in np.linspace(0, 2, 41):
+                    for offset in (-.1, .02, .1):
+                        np.testing.assert_array_equal(
+                            rocker_targets(settings, 4, t, .08, offset),
+                            rocker_targets(settings, 4, t, .08, 0))
+
+    def test_side_step_profiles_are_not_available(self):
+        for profile in ('sidestep_left', 'sidestep_right'):
+            with self.assertRaisesRegex(ValueError, 'Unknown walking profile'):
+                Walking().start_settings(profile)
 
     def test_old_firmware_cannot_silently_ignore_the_cap(self):
         app = Dashboard()
         app.browser_heartbeat = time.monotonic()
         with patch('robot_dashboard.runtime.devices.request',return_value=status() | {
-                'boundedSteering':False,'externalActive':False}) as request:
+                'boundedSteering':False,'externalActive':False,'crestWaveGait':True}) as request:
             with self.assertRaisesRegex(DeviceError,'Gentle ramp steering'):
                 app.walk_command('course')
         self.assertNotIn('/motion/start',[call.args[1] for call in request.call_args_list])
 
-    def test_large_heading_error_stops_instead_of_requesting_recovery_turn(self):
+    def test_large_heading_error_keeps_ramp_steering_active(self):
         walking = Walking()
         walking.start_settings('course')
         walking.begin(status(),1,0,'course')
         walking.navigation.estimate.heading = math.radians(13)
         walking.last_confirmed_frame = 3
         with patch.object(walking.navigation,'update',return_value=True):
-            with self.assertRaisesRegex(DeviceError,'12 degrees'):
-                walking.frame(status(),3)
+            frame = walking.frame(status(),3)
+        self.assertTrue(walking.active)
+        self.assertEqual(frame['ready'], 1)
+        self.assertAlmostEqual(frame['heading'], math.radians(13))
 
 
 if __name__ == '__main__':

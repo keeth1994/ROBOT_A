@@ -12,7 +12,6 @@ from robot_b91.navigation_debug import navigation_debug_image
 
 from . import devices
 from .walking import WALK_ACTIONS, RAMP_PROFILES, Walking
-from .sidestep import SIDESTEP_PROFILES, check_sidestep
 from .crest import CREST_WAVE_GAIT
 from .navigation import CourseNavigation
 
@@ -149,10 +148,10 @@ class CameraPipeline:
 
 
 class Dashboard:
-    def __init__(self, config_path=None, *, auto_corridor=True, crest_assist=False, exit_clearance=False,
-                 adaptive_ramp_speed=False, crest_wave=False, start_at_crest=False):
-        if start_at_crest and (auto_corridor or not (crest_assist or crest_wave)):
-            raise ValueError('Assisted crest start requires a selected crest gait and ramp-only mode.')
+    def __init__(self, config_path=None, *, auto_corridor=True, exit_clearance=False,
+                 adaptive_ramp_speed=False, crest_wave=True, start_at_crest=False):
+        if start_at_crest and (auto_corridor or not crest_wave):
+            raise ValueError('Assisted crest start requires the crest wave gait and ramp-only mode.')
         self.lock = threading.RLock()
         self.servo_lock = threading.Lock()
         self.camera_settings_lock = threading.Lock()
@@ -167,7 +166,7 @@ class Dashboard:
         self.cache = {name: {'online': False, 'data': None, 'error': 'Connecting...', 'at': 0}
                       for name in ('servo', 'camera')}
         self.camera = CameraPipeline(self.stream_url)
-        self.walking = Walking(crest_assist=crest_assist, exit_clearance=exit_clearance,
+        self.walking = Walking(exit_clearance=exit_clearance,
                                adaptive_ramp_speed=adaptive_ramp_speed, crest_wave=crest_wave,
                                start_at_crest=start_at_crest)
         self.auto_corridor = auto_corridor
@@ -215,10 +214,7 @@ class Dashboard:
                     if not self.walking.active:
                         devices.request(url, '/stop', {}, timeout=.15)
                         continue
-                    self._adjust_walking(url, frame)
-                    if not self.walking.active:
-                        devices.request(url, '/stop', {}, timeout=.15)
-                        continue
+                    devices.request(url, '/motion/adjust', frame, timeout=.15)
                     sequence = self.walking.crest_sequence
                     if sequence and sequence.requested:
                         self._change_ramp_gait(url)
@@ -238,18 +234,6 @@ class Dashboard:
                         devices.request(url, '/stop', {}, timeout=.15)
                     except devices.DeviceError:
                         pass
-
-    def _adjust_walking(self, url, frame):
-        try:
-            devices.request(url, '/motion/adjust', frame, timeout=.15)
-        except devices.DeviceError as error:
-            # A one-cycle step may finish between the status read and adjustment.
-            # Confirm completion from fresh status; never resend a motion command.
-            if error.status != 409 or self.walking.profile not in SIDESTEP_PROFILES:
-                raise
-            status = devices.request(url, '/status', timeout=.15)
-            if not self.walking.finish_sidestep(status):
-                raise
 
     def _change_ramp_gait(self, url):
         """Stop/confirm/restart, retaining navigation; never retry a partial switch."""
@@ -309,13 +293,12 @@ class Dashboard:
             try:
                 status = devices.request(url, '/status', timeout=.15)
                 self.walking.prepare(status)
-                if action in SIDESTEP_PROFILES:
-                    check_sidestep(status)
-                if action == 'course' and self.walking.crest_assist and status.get('signedYawBias') is not True:
-                    raise devices.DeviceError('Crest assist needs signed-stance controller firmware.', 409)
-                if action == 'course' and self.walking.crest_wave and status.get('crestWaveGait') is not True:
+                uses_crest = action == 'crest_test' or (action == 'course' and self.walking.crest_wave)
+                if uses_crest and status.get('signedYawBias') is not True:
+                    raise devices.DeviceError('Crest wave needs signed-stance controller firmware.', 409)
+                if uses_crest and status.get('crestWaveGait') is not True:
                     raise devices.DeviceError('Crest wave needs the updated controller firmware.', 409)
-                if action in RAMP_PROFILES and status.get('boundedSteering') is not True:
+                if (action in RAMP_PROFILES or action == 'crest_test') and status.get('boundedSteering') is not True:
                     raise devices.DeviceError('Gentle ramp steering needs the updated controller firmware.', 409)
                 if action == 'corridor' and status.get('corridorWallGait') is not True:
                     raise devices.DeviceError('Upload the updated controller firmware for corridor walking.', 409)
@@ -337,9 +320,6 @@ class Dashboard:
                 required_angles = ()
                 if profile in ('course', 'course_camera'):
                     required_angles = (self.walking.camera_settings['backward_servo_deg'],)
-                    for name in ('forward_search_servo_deg', 'backward_search_servo_deg'):
-                        if name in self.walking.camera_settings:
-                            required_angles += (self.walking.camera_settings[name],)
                 if profile == 'course':
                     required_angles += (self.walking.camera_settings['corridor_servo_deg'],)
                 self._aim_camera(url, status, self.walking.camera_start_angle(profile), required_angles)

@@ -7,7 +7,7 @@ let speedBusy = false;
 const rows = new Map();
 const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
   walkCourseTape:'course_tape', walkCourseImu:'course_imu', walkCorridor:'corridor',
-  searchCorridor:'corridor_search', dance:'dance', sidestepLeft:'sidestep_left', sidestepRight:'sidestep_right'};
+  searchCorridor:'corridor_search', dance:'dance', testCrest:'crest_test'};
 
 function showSpeed(speed) {
   el('walkSpeed').value = Math.round(speed * 100);
@@ -53,8 +53,7 @@ function renderControls() {
   el('cameraPitchRelease').disabled = pitchBlocked || pitch?.angle === null;
   el('cameraPitch').disabled = pitchBlocked || pitch?.angle === null;
   Object.keys(walkButtons).forEach(id => {
-    const sidestep = walkButtons[id].startsWith('sidestep_');
-    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2 || (sidestep && s?.sidestepGait !== true);
+    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2;
   });
   el('all').disabled = el('groups').disabled = blocked || !!s?.manualActive;
   rows.forEach(row => {

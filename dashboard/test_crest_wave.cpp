@@ -32,36 +32,16 @@ int main() {
   assert(gait.stopped(3380));
   for (int leg = 0; leg < 4; ++leg) assert(gait.angles[2*leg+1] == 0);
 
-  // Exactly one lateral cycle, even if speed changes, observations pause or
-  // polling would overshoot the boundary. Completed feet never sweep home.
-  p.sideways = true; p.period = 2; p.yawBias = 0;
-  gait.begin(0, p, true, 2000);
-  gait.sideways = 1; gait.ready = true; gait.speed = .65;
-  for (uint32_t now = 20; now < 7000 && !gait.stopping; now += 20) {
-    bool fresh = now < 2600 || now >= 3000;
-    if (now > 4000) gait.speed = .5;
-    gait.update(now, fresh, 0);
-  }
-  assert(gait.sidestepComplete && gait.stopping);
-  assert(gait.gaitTime == p.period);
-  for (int i = 0; i < 8; ++i) before[i] = gait.angles[i];
-  for (int leg = 0; leg < 4; ++leg) assert(gait.angles[2*leg+1] == 0);
-  gait.update(7500, true, 0);
-  assert(gait.stopped(7500));
-  for (int i = 0; i < 8; ++i) assert(gait.angles[i] == before[i]);
-  gait.begin(8000, p, true, 2000);
-  assert(!gait.sidestepComplete && !gait.stopping && gait.gaitTime == 0);
-
   std::cout << std::setprecision(17);
   std::string pattern;
-  double elapsed, time, heading, lateral, sideways;
+  double elapsed, time, heading, lateral;
   while (std::cin >> pattern >> p.period >> p.duty >> p.yawAmplitude >> p.pitchLift
          >> p.pitchStance >> p.yawBias >> p.pitchMin >> p.headingGain
-         >> p.lateralGain >> p.strafeGain >> elapsed >> time >> heading >> lateral >> p.sideways >> sideways >> p.turnLimit >> p.rearStrideScale) {
+         >> p.lateralGain >> p.strafeGain >> elapsed >> time >> heading >> lateral >> p.turnLimit >> p.rearStrideScale) {
     p.crest = pattern == "crest"; p.crawl = pattern == "crawl";
     p.steeringTrim = 0; // Python caller accounts for trim separately.
     double target[8];
-    walking::targets(p, elapsed, time, heading, lateral, target, 1, sideways);
+    walking::targets(p, elapsed, time, heading, lateral, target);
     for (double angle : target) std::cout << angle << ' ';
     std::cout << '\n';
   }
