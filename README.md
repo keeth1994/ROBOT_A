@@ -23,6 +23,7 @@ python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
 | Dashboard | `python dashboard/run.py` |
 | Servo calibration | `python servo_calibration/gui.py` |
 | Course simulation | `python robot.py walk --ramp` or `.\start.ps1` |
+| Foam crest simulation | `python robot.py crest --help` |
 | Simulation options | `python robot.py walk --help` |
 | Checks | `python robot.py check all` |
 
@@ -30,6 +31,44 @@ python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
 - Dashboard gait: `dashboard/walking.toml` (no camera/IMU feedback)
 - Simulation gait: `reference/b91_gait.toml`
 - Generated reports and recordings: `results/` (ignored by Git)
+
+### Foam crest trials
+
+Compare the dashboard's current crest wave and the simulation candidate on identical starts:
+
+```powershell
+python robot.py crest --suite all --gait both --seed 20261127 --workers 4 --output results/ramp_trials/foam_crest_20261126.json
+```
+
+The default suite uses 10, 14, 18 and 22.5 cm crests. Supply `--heights-cm 12 16 20`
+to test other finished heights. The full suite adds alternate slopes, approach
+distances and offsets, then 24 seeded randomized starts. Each run starts from rest
+near one sharp crest on a 29 cm wide deck. Printed feet contact a compliant 10 mm layer
+over rigid backing. Sliding friction (0.9 to 1.3) and compliance are assumptions,
+not measurements. The candidate blends the climbing gait into the crest wave from
+body pitch, using ideal attitude with a pitch error in the perturbed cases.
+
+A pass requires the body to stay 22 cm past the crest for 0.2 s, all four feet
+to have loaded the downhill panel, at least two to be supporting the robot at
+finish, and no chassis support at finish. Roll or heading beyond 12 degrees,
+drift beyond 4 cm, floor contact, excess penetration, and timeout fail a run.
+The command exits nonzero for any failure of the selected gait (the candidate
+when running both). It does not connect to the robot or change its installed gait.
+
+On 2026-11-26 with MuJoCo 3.13.0 and seed `20261127`:
+
+| Crossings completed | Dashboard wave | Foam candidate |
+|---|---:|---:|
+| Standard heights and starts | 3/12 | 11/12 |
+| Alternative slopes and starts | 4/15 | 15/15 |
+| Randomized starts reserved for the final run | 8/24 | 22/24 |
+
+All 15 baseline successes were retained. Their median crossing time fell from 23.47 s
+to 10.47 s. The failures were the left start at 22.5 cm and random case 8 at
+19.75 cm (lateral drift), and random case 15 at 20.38 cm (heading). Limits are
+evaluated before report values are rounded. Above the course design height,
+`python robot.py crest --heights-cm 25 30` crossed 1/3 starts at 25 cm and 0/3
+at 30 cm. These are isolated crest trials, not a full-course or hardware qualification.
 
 One-off recovery probes and simulation experiment scripts are local, Git-ignored
 tools. Historical experiment commands below require those local files and are

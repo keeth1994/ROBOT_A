@@ -82,3 +82,51 @@ def rocker_targets(params, elapsed_s, gait_time_s, heading_error_rad=0.0,
     ramp = max(0, min(1, elapsed_s / p['period']))
     target[::2] += ramp * p.get('yaw_bias', 0) * np.array([-1, 1, 1, -1])
     return np.clip(target, joint_ranges[:, 0], joint_ranges[:, 1])
+
+
+FOAM_CREST_GAIT = dict(pattern='crest', period=.8, duty=.8, yaw_amplitude=.75,
+                       rear_stride_scale=1., pitch_lift=.5, pitch_stance=0., yaw_bias=0.)
+
+
+class FoamCrestController:
+    """Simulation candidate. Start a fresh instance when entering a crest trial."""
+
+    def __init__(self, wave, climb):
+        # 'search' lets the existing target generator scale forward stride separately from turn.
+        self.wave = wave | {'search': True}
+        self.climb = climb | {'search': True, 'period': wave['period']}
+        self.previous_s = 0.
+        self.filtered_pitch_deg = None
+        self.level_s = 0.
+
+    def targets(self, elapsed_s, gait_time_s, pitch_rad, heading_rad, joint_ranges=None, *, trim=0.):
+        if not all(map(math.isfinite, (elapsed_s, gait_time_s, pitch_rad, heading_rad, trim))):
+            raise ValueError('Crest gait needs finite time, pitch, heading and trim.')
+        if elapsed_s < self.previous_s:
+            raise ValueError('Crest gait time went backwards. Start a new controller for a new trial.')
+        dt = elapsed_s - self.previous_s
+        self.previous_s = elapsed_s
+        degrees = math.degrees(pitch_rad)
+        if self.filtered_pitch_deg is None:
+            self.filtered_pitch_deg = degrees
+        self.filtered_pitch_deg += dt / (dt + .5) * (degrees - self.filtered_pitch_deg)
+
+        # Move the feet inward as the chassis tips downhill. If it remains near
+        # level for many cycles, gradually tuck further to free a grounded belly.
+        self.level_s = max(0., self.level_s + dt * (1 if -8 <= self.filtered_pitch_deg <= 12 else -2))
+        recovery = max(0., min(1., (self.level_s - 20.) / 3.))
+        bias = -.4 * max(0., min(1., (degrees + 10.) / 16.))
+        self.wave['yaw_bias'] = bias + (-.72 - bias) * recovery
+        correction = max(0., min(1., (abs(math.degrees(heading_rad)) - 6.) / 4.))
+        forward = 1. - .5 * correction
+        heading = heading_rad + trim / self.wave['heading_gain']
+        wave = rocker_targets(self.wave, elapsed_s, gait_time_s, heading, 0., joint_ranges, forward)
+
+        # Negative pitch is nose-up. Keep climbing on a steep approach and
+        # crossfade into the one-foot-at-a-time wave without restarting the clock.
+        mix = max(0., min(1., (-self.filtered_pitch_deg - 10.) / 8.)) * min(1., elapsed_s / .5)
+        if not mix:
+            return wave
+        climb = rocker_targets(self.climb, elapsed_s, gait_time_s, heading_rad + trim / self.climb['heading_gain'],
+                               0., joint_ranges, forward)
+        return wave + (climb - wave) * mix
