@@ -402,15 +402,17 @@ class CrestSequenceTests(unittest.TestCase):
         self.assertEqual(walking.frame(sample, .1)['ready'], 1)
         sample['joints'][1]['angle'] = 33.5
         self.assertEqual(walking.frame(sample, .2)['ready'], 0)
-        for invalid in ('stale', 'overrun'):
-            walking, sample = self.clearance(.5)
-            now = .1
-            if invalid == 'stale':
-                sample['imuAgeMs'] = 100
-            else:
-                now = .5
-            with self.assertRaises(DeviceError):
-                walking.frame(sample, now)
+        walking, sample = self.clearance(.5)
+        sample['imuAgeMs'] = 100
+        with self.assertRaises(DeviceError):
+            walking.frame(sample, .1)
+
+    def test_exit_accepts_delayed_updates_until_the_actual_link_watchdog_expires(self):
+        walking, sample = self.clearance(.5)
+        self.assertEqual(walking.frame(sample, .6)['ready'], 1)
+        self.assertLess(walking.exit_cycles, 1.125)
+        with self.assertRaisesRegex(DeviceError, 'control overrun'):
+            walking.frame(sample, 1.1)
 
     def test_exit_distance_counts_the_speed_actually_commanded(self):
         walking, sample = self.clearance(.6)

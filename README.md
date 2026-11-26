@@ -37,7 +37,7 @@ python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
 Compare the dashboard's current crest wave and the simulation candidate on identical starts:
 
 ```powershell
-python robot.py crest --suite all --gait both --seed 20261127 --workers 4 --output results/ramp_trials/foam_crest_20261126.json
+python robot.py crest --suite all --gait both --seed 20261127 --workers 4 --output results/ramp_trials/foam_crest_no_cutoffs_20261126.json
 ```
 
 The default suite uses 10, 14, 18 and 22.5 cm crests. Supply `--heights-cm 12 16 20`
@@ -51,22 +51,24 @@ body pitch, using ideal attitude with a pitch error in the perturbed cases.
 A pass requires the body to stay 22 cm past the crest for 0.2 s, all four feet
 to have loaded the downhill panel, at least two to be supporting the robot at
 finish, and no chassis support at finish. Roll or heading beyond 12 degrees,
-drift beyond 4 cm, floor contact, excess penetration, and timeout fail a run.
-The command exits nonzero for any failure of the selected gait (the candidate
-when running both). It does not connect to the robot or change its installed gait.
+drift beyond 4 cm, floor contact and excess foam penetration are diagnostics.
+They do not end a run. The report records the first time of each excursion in
+`first_excursion_s` (negative during settling), and whether the robot crossed
+without any excursion in `clean_crossing`. Each case ends at a crossing, the
+requested simulation duration, or invalid physics. The command exits nonzero
+if the selected gait fails to cross. It never connects to the physical robot.
 
 On 2026-11-26 with MuJoCo 3.13.0 and seed `20261127`:
 
-| Crossings completed | Dashboard wave | Foam candidate |
+| Crossings (within the old limits) | Dashboard wave | Foam candidate |
 |---|---:|---:|
-| Standard heights and starts | 3/12 | 11/12 |
-| Alternative slopes and starts | 4/15 | 15/15 |
-| Randomized starts reserved for the final run | 8/24 | 22/24 |
+| Standard heights and starts | 7/12 (3) | 11/12 (11) |
+| Alternative slopes and starts | 7/15 (4) | 15/15 (15) |
+| Randomized starts | 15/24 (8) | 24/24 (22) |
 
-All 15 baseline successes were retained. Their median crossing time fell from 23.47 s
-to 10.47 s. The failures were the left start at 22.5 cm and random case 8 at
-19.75 cm (lateral drift), and random case 15 at 20.38 cm (heading). Limits are
-evaluated before report values are rounded. Above the course design height,
+The foam candidate crossed 50/51; 48/51 stayed within the former limits. The
+22.5 cm left start still timed out. Random cases 8 and 15 crossed after an
+excursion. Above the course design height,
 `python robot.py crest --heights-cm 25 30` crossed 1/3 starts at 25 cm and 0/3
 at 30 cm. These are isolated crest trials, not a full-course or hardware qualification.
 
@@ -76,7 +78,25 @@ not available in a fresh checkout. The dashboard regression tests, trial recorde
 (`dashboard/ramp_trial.py`) and stationary camera checker
 (`dashboard/capture_ramp_views.py`) remain tracked.
 
-### Manual ramp testing — 2026-11-20 handoff
+### Running the ramp
+
+Start `python dashboard/run.py --ramp-only --ramp-drift-control` and select
+**Follow ramp (camera + IMU)**. The approach starts directly, with no entrance
+alignment or stationary pose verification. Normal sensor settling and camera
+guidance still apply. Large roll, pitch, heading and offset can affect steering
+or speed but do not shut down a run. Drift recovery has no deadline. Without
+`--ramp-only`, the course continues to corridor search after the ramp exit.
+
+**Stop all servos**, the operator heartbeat, the controller/link watchdog and
+hardware fault handling remain active. Missing guidance can pause steps and
+resume on fresh data. `dashboard/ramp_trial.py` records until course completion
+or operator Stop (including the `STOP` file), unless an explicit `--seconds`
+duration is supplied. Peak roll and pitch are recorded. No firmware update is needed.
+
+### Historical handoff (2026-11-20)
+
+The observations below describe older revisions. Entrance alignment and the
+course cutoffs described in these trial notes are no longer available.
 
 The dashboard was left running at http://127.0.0.1:8765 with outputs off and
 the operator's requested speed retained. Place the robot on flat floor at the ramp entrance, clear
@@ -139,13 +159,7 @@ existing 12-degree roll/35-degree pitch envelope. Operator Stop and connection
 watchdogs remain immediate. Crest transitions wait during recovery. This is
 tested offline but not yet validated as a successful physical recovery.
 
-To run the current crest wave with the recorded alignment and drift options:
-
-```powershell
-.\.venv\Scripts\python.exe dashboard/run.py --ramp-only --adaptive-ramp-speed --align-ramp --ramp-drift-control
-```
-
-The current session additionally records controls and onboard images under
+That session additionally recorded controls and onboard images under
 `results/ramp_trials/manual_heading_recovery/`. Repeated GUI runs can be
 distinguished by their motion-session IDs and timestamps. For a fresh recording
 after restarting, append `--control-log results/ramp_trials/NEW/control.jsonl`,
@@ -172,9 +186,9 @@ pass. The robot's full-ramp repeatability is still unresolved.
 - Pitch angles: -90 to +45 degrees; +45 means foot down
 - Stop: disables PWM; servo power remains on
 
-### Experimental first-crest gait
+### Historical first-crest experiments
 
-Current physical candidate:
+Physical candidate at the time of trial 45:
 `python dashboard/run.py --ramp-only --crest-assist --adaptive-ramp-speed`.
 Trial 45 completed the full ramp automatically in 226.46 seconds on 2026-11-19.
 It started at the entrance, crossed both crests, recovered camera guidance,
@@ -262,8 +276,8 @@ passed 78 dashboard tests, including 200 additional comparisons with MCU gait ma
 the required forward command during gait restarts and exit clearance.
 Monitored comparisons use a five-minute overall ceiling, allowing completion
 instead of the earlier 35-second cutoff.
-The recorder's guidance-hold timeout is now 25 seconds, configurable with
-`--guidance-timeout`; heading, tilt and connection-loss stops remain active.
+At that point, a 25-second guidance timeout and heading and tilt cutoffs were
+still used. The current recorder has no such course cutoffs.
 
 The user requested a full entrance start for trial 54. Alignment completed in
 about 12 seconds, then the robot climbed at 50% and entered the crest gait at
@@ -470,30 +484,7 @@ This begins directly in the selected crest gait, retains the heading/tilt guards
 and restores the normal gait on descent. These tests are recorded as assisted
 and do not establish a full ramp traversal.
 
-### Ramp entrance alignment
-
-**Align with ramp** uses the onboard camera and IMU to center and straighten
-the robot on flat floor before the ramp. It commands sideways movement and
-heading correction with zero forward stride, at up to 50% speed. The entrance
-must be visible in the calibrated forward camera view, with floor visible
-between the robot and ramp. The laptop webcam remains operator feedback only.
-
-The capture range is 10 cm lateral offset and 20 degrees of heading error.
-Alignment requires an estimate within 12 mm and 3 degrees, followed by a
-stationary check with all feet planted. It stops at 8 degrees of roll/pitch,
-after three seconds without fresh camera guidance, after 18 seconds without
-measurable improvement, or after 45 seconds overall. Actual displacement can
-include fore/aft drift even though forward stride is zero.
-
-The standalone button stops after alignment. Add `--align-ramp` to the dashboard
-command to align automatically when **Follow ramp (camera + IMU)** is started, then
-confirm the controller is stopped before beginning the normal ramp program.
-The option cannot be combined with `--start-at-crest`. Installed firmware already
-supports this motion through `corridorSearchGait`, `crestWaveGait` and
-`boundedSteering`; no USB upload is needed. The existing climbing and crest gait
-settings are unchanged. Alignment requires a fresh visual heading on each
-accepted image, with IMU roll/pitch compensation. This avoids treating an old
-heading estimate as evidence that the body is centered.
+### Retired ramp alignment trials
 
 Physical trial 47 declared success during initial settling, but an independent
 stationary check disagreed; it is not counted as successful alignment. After

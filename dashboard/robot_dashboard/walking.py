@@ -7,7 +7,6 @@ from .navigation import CourseNavigation
 from .corridor_walls import IRWallNavigation, load_corridor_settings
 from .corridor_search import CorridorSearch
 from .crest import CrestSequence, CREST_WAVE_GAIT, RampSpeedGovernor
-from .ramp_alignment import ALIGNMENT_GAIT, RampAlignment
 from .ramp_recovery import RampHeadingRecovery
 from robot_b91.camera_calibration import load_camera_scan_settings
 from robot_b91.gait import RAMP_SPEED_SCALE, RAMP_STEERING, ramp_forward_scale
@@ -17,7 +16,6 @@ JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in (
 PROFILES = {'walk': (), 'course': ('camera', 'imu'), 'course_camera': ('camera',),
             'course_tape': ('camera', 'imu'), 'course_imu': ('imu',), 'crest_test': ('imu',),
             'corridor': ('ir', 'imu'), 'corridor_search': ('camera', 'ir', 'imu'), 'dance': ()}
-PROFILES['ramp_align'] = ('camera', 'imu')
 WALK_ACTIONS = tuple(PROFILES)
 RAMP_PROFILES = ('course', 'course_camera')
 
@@ -49,7 +47,6 @@ class Walking:
         self.adaptive_ramp_speed = adaptive_ramp_speed or crest_wave
         self.speed_governor = None
         self.effective_speed = self.speed
-        self.alignment_then_course = False
         self.ramp_drift_control = ramp_drift_control
         self.forward_scale = 1.
         self.heading_recovery = RampHeadingRecovery()
@@ -77,7 +74,7 @@ class Walking:
     def camera_start_angle(self, profile):
         if profile == 'corridor_search':
             return self.camera_settings['corridor_servo_deg']
-        if profile in ('course', 'course_camera', 'course_tape', 'ramp_align'):
+        if profile in ('course', 'course_camera', 'course_tape'):
             return self.camera_settings['forward_servo_deg']
         return None
 
@@ -93,9 +90,7 @@ class Walking:
                 not math.isfinite(speed) or not .25 <= speed <= 2):
             raise ValueError('Walking speed must be between 25% and 200%.')
         self.speed = float(speed)
-        if self.active and self.profile == 'ramp_align':
-            self.effective_speed = min(self.speed, .5)
-        elif not self.active or not self.speed_governor:
+        if not self.active or not self.speed_governor:
             self.effective_speed = self.speed
 
     def controller_check(self, status):
@@ -119,9 +114,7 @@ class Walking:
         self.camera_settings = load_camera_scan_settings()
         with (ROOT / 'reference/b91_gait.toml').open('rb') as stream:
             self.params = tomllib.load(stream)
-        if profile == 'ramp_align':
-            self.params.update(ALIGNMENT_GAIT)
-        elif profile in RAMP_PROFILES or profile == 'crest_test':
+        if profile in RAMP_PROFILES or profile == 'crest_test':
             self.params.update(RAMP_STEERING)
         if profile == 'course' and self.ramp_drift_control:
             self.params['strafe_gain'] = 12.
@@ -146,9 +139,6 @@ class Walking:
         controller_profile = 'course' if profile in ('course_tape', 'corridor') else profile
         if profile == 'crest_test':
             controller_profile = 'course_imu'
-        elif profile == 'ramp_align':
-            # Existing firmware supports independent strafe/yaw with forward=0.
-            controller_profile = 'corridor_search'
         elif profile == 'course' and self.ramp_drift_control:
             # The installed search protocol also supports continuous forward
             # scaling. Perception and ramp gait phases remain on the PC.
@@ -169,7 +159,6 @@ class Walking:
         self.profile = profile
         self.forward_scale = 1.
         self.heading_recovery = RampHeadingRecovery()
-        self.alignment_then_course = False
         self.crest_sequence = CrestSequence() if self.crest_wave and profile == 'course' else None
         if self.start_at_crest and self.crest_sequence:
             self.crest_sequence.requested = 'crest'
@@ -178,12 +167,8 @@ class Walking:
         self.exit_cycles = self.exit_started = self.exit_updated = None
         self.speed_governor = RampSpeedGovernor() if self.adaptive_ramp_speed and profile == 'course' else None
         self.effective_speed = self.speed
-        if profile == 'ramp_align':
-            self.effective_speed = min(self.speed, .5)
         sensors = PROFILES[profile]
-        if profile == 'ramp_align':
-            self.navigation = RampAlignment(now)
-        elif profile in ('corridor', 'corridor_search'):
+        if profile in ('corridor', 'corridor_search'):
             self.corridor_settings = self.corridor_settings or load_corridor_settings()
             self.navigation = (CorridorSearch(now, self.corridor_settings['navigation'])
                                if profile == 'corridor_search' else
@@ -198,25 +183,6 @@ class Walking:
         self.active = True
         self.message = ('Settling for 2 seconds; keep the robot still.' if sensors or profile == 'dance' else
                         'Walking on the ESP32.')
-
-    def alignment_transition_settings(self):
-        mode = self.navigation.requested_gait if self.profile == 'ramp_align' else None
-        if mode not in ('hold', 'correct') or self.base_params is None:
-            raise DeviceError('No alignment stance change is pending.', 409)
-        params = dict(self.base_params)
-        if mode == 'hold':
-            # A zero-lift, zero-yaw session stays planted at every gait phase.
-            # A delayed ready=0 can no longer freeze a newly lifted foot.
-            params.update(pitch_lift=0., yaw_amplitude=0., yaw_bias=0.)
-        return mode, params, self.controller_settings('ramp_align', params)
-
-    def resume_alignment(self, session, now, params, mode):
-        if not isinstance(session, int) or isinstance(session, bool) or not 0 < session <= 0xffffffff:
-            raise DeviceError('Invalid ESP32 motion session.', 409)
-        self.session, self.sequence = session, 0
-        self.params = params
-        self.last_confirmed_frame = now
-        self.navigation.gait_changed(mode, now)
 
     def transition_settings(self):
         phase = self.crest_sequence.requested if self.crest_sequence else None
@@ -251,8 +217,6 @@ class Walking:
         # The pitch-triggered crest phase can still use the requested speed.
         if self.crest_sequence and self.crest_sequence.phase == 'approach':
             speed = min(speed, .5)
-        if self.profile == 'ramp_align':
-            speed = min(speed, .5)
         if self.speed_governor:
             estimate = self.navigation.estimate
             period = self.params['period'] / RAMP_SPEED_SCALE
@@ -277,8 +241,10 @@ class Walking:
         nav.estimate.last_imu = now - nav.started - status['imuAgeMs'] / 1000
         nav.updated_at = now
         dt = now - self.exit_updated
-        if not 0 <= dt <= .35:
-            raise DeviceError('Ramp exit clearance lost timely control updates.', 409)
+        # A delayed update is not evidence of distance walked. The session and
+        # link watchdogs in frame() still run before this clearance phase.
+        if not 0 <= dt <= 1.:
+            dt = 0.
         self.exit_updated = now
         period = self.params['period'] / RAMP_SPEED_SCALE
         previous_speed = self.effective_speed if self.speed_governor else self.speed
@@ -330,10 +296,7 @@ class Walking:
             fresh_edges = (debug.get('accepted') and not debug.get('held') and
                            debug.get('lateral_source') == 'paired_edges' and
                            0 <= now-self.navigation.started-debug.get('timestamp', -math.inf) <= .35)
-            # A sudden edge-fit excursion holds correction for confirmation.
-            # Sustained displacement still reaches the filtered offset guard.
-            raw_lateral = debug.get('measured_lateral_m', estimate.lateral)
-            fresh_edges = fresh_edges and math.isfinite(raw_lateral) and abs(raw_lateral) < .05
+            fresh_edges = fresh_edges and math.isfinite(debug.get('measured_lateral_m', estimate.lateral))
             ready = self.heading_recovery.update(now, estimate.heading, estimate.lateral,
                 estimate.roll, estimate.pitch, ready=ready, fresh_edges=fresh_edges)
             recovering = self.heading_recovery.active
@@ -342,14 +305,14 @@ class Walking:
                 if self.speed_governor:
                     self.speed_governor.require_stability()
         if (self.exit_clearance_enabled and self.profile == 'course' and
-                self.navigation.corridor_requested and not recovering):
+                self.navigation.corridor_requested):
             # Trial 23 left one rear foot on the ramp. Trial 24 cleared it with
             # roughly 1.125 gait cycles at 50%; count cycles so other speeds scale.
             self.exit_cycles = 1.125
             self.exit_started = self.exit_updated = now
             return self.clear_exit_frame(status, now)
         if self.crest_sequence:
-            self.crest_sequence.observe(now, self.navigation.estimate.pitch, ready and not recovering)
+            self.crest_sequence.observe(now, self.navigation.estimate.pitch, ready)
             if self.crest_sequence.requested:
                 ready = False
         if (PROFILES[self.profile] or self.profile == 'dance') and now - self.started < 2:
@@ -381,9 +344,6 @@ class Walking:
             frame.update(speed=self.navigation.speed, forward=self.navigation.forward)
             if self.navigation.finished:
                 self.stop(self.navigation.reason + ' Outputs off requested.')
-        if self.profile == 'ramp_align':
-            frame.update(forward=0., heading=self.navigation.command_heading,
-                         lateral=self.navigation.command_lateral)
         if self.profile == 'corridor' and self.navigation.exit_complete:
             self.stop('Corridor exit movement finished. Outputs off requested.')
         return frame
@@ -391,5 +351,4 @@ class Walking:
     def stop(self, message='Stopped. Outputs off requested.'):
         self.active = False
         self.heading_recovery = RampHeadingRecovery()
-        self.alignment_then_course = False
         self.message = message

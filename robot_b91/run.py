@@ -244,12 +244,10 @@ def evaluate(p=None, seconds=15, walk=True, ramp=False, initial_y_m=0.0, initial
                     ):
                         bad += 1
                         break
-            if not np.isfinite(r.d.qpos).all():
-                raise RuntimeError("Non-finite physics state")
+            if any(w.number for w in r.d.warning) or not np.isfinite(r.d.qpos).all():
+                raise RuntimeError("Invalid course physics state")
             if observer:
                 observer(r, progress)
-            if find_corridor and (corridor_collision or r.tilt() > 45):
-                break
             if progress and progress.completed_at is not None:
                 if not find_corridor:
                     break

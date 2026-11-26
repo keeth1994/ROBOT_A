@@ -1,4 +1,4 @@
-"""Run one bounded, recorded ramp trial through the dashboard API.
+"""Record a ramp run through the dashboard API until completion or operator stop.
 
 The laptop webcam is recorded for the operator; it supplies no steering input.
 Create OUTPUT/STOP to end an attempt immediately. Every exit requests servo stop.
@@ -51,25 +51,21 @@ class Client:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--seconds', type=float, default=30)
+    parser.add_argument('--seconds', type=float,
+                        help='Optional operator-selected duration. Default: run until the course ends or Stop.')
     parser.add_argument('--speed', type=float, default=.5)
     parser.add_argument('--port', type=int, default=8765)
-    parser.add_argument('--profile', choices=('course', 'course_imu', 'ramp_align'), default='course')
+    parser.add_argument('--profile', choices=('course', 'course_imu'), default='course')
     parser.add_argument('--assisted-crest-start', action='store_true',
                         help='Require dashboard --start-at-crest; record assisted placement explicitly.')
-    parser.add_argument('--roll-limit', type=float, default=15)
-    parser.add_argument('--guidance-timeout', type=float, default=25,
-                        help='Stop after this many seconds held without camera guidance (3-60).')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    if not 3 <= args.guidance_timeout <= 60:
-        parser.error('Guidance timeout must be 3-60 seconds.')
-    if not 1 <= args.seconds <= 300 or not .25 <= args.speed <= 1 or not 5 <= args.roll_limit <= 15:
-        parser.error('Use 1–300 seconds and speed 0.25–1.0.')
-    if args.profile == 'ramp_align' and (args.seconds > 45 or args.speed > .5 or args.roll_limit > 8):
-        parser.error('Ramp alignment trials allow at most 45 seconds, 50% speed and 8-degree roll.')
-    if args.assisted_crest_start and (args.profile != 'course' or args.seconds > 40):
-        parser.error('Assisted crest trials require course profile and at most 40 seconds.')
+    if args.seconds is not None and (not math.isfinite(args.seconds) or args.seconds <= 0):
+        parser.error('Duration must be finite and positive.')
+    if not .25 <= args.speed <= 1:
+        parser.error('Use speed 0.25 to 1.0.')
+    if args.assisted_crest_start and args.profile != 'course':
+        parser.error('Assisted crest trials require the course profile.')
     args.output.mkdir(parents=True, exist_ok=True)
     if (args.output / 'telemetry.jsonl').exists() or (args.output / 'STOP').exists():
         parser.error('Choose a new output directory for each attempt.')
@@ -100,7 +96,6 @@ def main():
     started = None
     stop_reason = 'Trial did not start.'
     peak_roll = peak_pitch = 0.0
-    holding_since = None
     try:
         deadline = time.monotonic() + 8
         while not latest.exists() and time.monotonic() < deadline and capture.poll() is None:
@@ -121,11 +116,12 @@ def main():
         client.request('/api/heartbeat', {})
         client.request('/api/walk/' + args.profile, {})
         started = time.monotonic()
-        print(f'Started {args.profile} attempt at {args.speed:.0%}; maximum {args.seconds:g}s.', flush=True)
+        duration = f'{args.seconds:g} s' if args.seconds is not None else 'until course completion or Stop'
+        print(f'Started {args.profile} at {args.speed:.0%}, {duration}.', flush=True)
         next_sample = next_image = next_report = 0.0
         stop_reason = 'Trial time limit reached.'
         with (args.output / 'telemetry.jsonl').open('w', encoding='utf-8') as log:
-            while time.monotonic() - started < args.seconds:
+            while args.seconds is None or time.monotonic() - started < args.seconds:
                 loop_started = time.monotonic()
                 elapsed = loop_started - started
                 if (args.output / 'STOP').exists():
@@ -155,20 +151,9 @@ def main():
                     if attitude and data.get('orientationValid'):
                         roll, pitch = [abs(math.degrees(float(a))) for a in attitude[:2]]
                         peak_roll, peak_pitch = max(peak_roll, roll), max(peak_pitch, pitch)
-                        if roll > args.roll_limit or pitch > 45:
-                            stop_reason = f'Excess tilt: roll {roll:.1f}, pitch {pitch:.1f} degrees.'
-                            break
                     if not state['walking']['active']:
                         stop_reason = state['walking']['message']
                         break
-                    message = state['walking']['message']
-                    if message.startswith(('Holding steps', 'Walking paused')):
-                        holding_since = elapsed if holding_since is None else holding_since
-                        if elapsed - holding_since >= args.guidance_timeout:
-                            stop_reason = f'Navigation held for {args.guidance_timeout:g} seconds without reacquiring guidance.'
-                            break
-                    else:
-                        holding_since = None
                 if elapsed >= next_image:
                     stamp = f'{elapsed:06.1f}'
                     shutil.copyfile(latest, args.output / f'webcam_{stamp}.jpg')
@@ -203,9 +188,9 @@ def main():
             capture.wait()
         capture_log.close()
         summary = {'timestamp': datetime.now().astimezone().isoformat(),
-                   'duration_s': round(time.monotonic() - started, 2) if started else 0,
+                   'duration_s': round(time.monotonic() - started, 2) if started is not None else 0,
                    'speed': args.speed, 'reason': stop_reason,
-                   'guidance_timeout_s': args.guidance_timeout,
+                   'requested_duration_s': args.seconds,
                    'profile': args.profile,
                    'assisted_crest_start': args.assisted_crest_start,
                    'peak_roll_deg': round(peak_roll, 2), 'peak_pitch_deg': round(peak_pitch, 2),

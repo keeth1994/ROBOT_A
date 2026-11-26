@@ -423,8 +423,6 @@ class CorridorSearch:
             return False
         self.forward = 0.0
         self.estimate.heading = self.estimate.lateral = 0.0
-        if now - self.started > 300:
-            return self.finish('Corridor search timed out before entry was confirmed.')
         if not self.orientation.update(status, now, None):
             self.ir_since = self.both_seen_since = None
             return self.hold(self.orientation.reason)
@@ -452,7 +450,8 @@ class CorridorSearch:
         distances = np.asarray(self.settings['ir_scale_mv_m']) / np.maximum(
             np.asarray(volts) - self.settings['ir_offset_mv'], .001)
         if max(volts) >= 3200 or min(distances) < .04:
-            return self.finish('A side wall is too close. Reposition the robot before searching again.')
+            self.ir_since = self.both_seen_since = None
+            return self.hold('Waiting for side IR readings within their measurement range.')
         fresh_frame = camera_frame[0] != self.sequence
         if fresh_frame:
             self.sequence = camera_frame[0]
@@ -469,7 +468,11 @@ class CorridorSearch:
                 self.collect_candidates()
             if self.turn_degrees >= 360:
                 if not self.choose_entrance():
-                    return self.finish('Full turn completed without a clear wall end. Check the camera and lighting.')
+                    self.candidates.clear()
+                    self.turn_degrees = 0.
+                    self.reason = 'No clear wall end in the last turn. Scanning again.'
+                    self.estimate.heading = .3
+                    return True
                 self.change_stage('approach', now)
                 return self.hold('Full turn completed. Approaching the nearest entrance candidate.')
             self.estimate.heading = .3
@@ -530,7 +533,14 @@ class CorridorSearch:
                 self.last_wall_seen = now
                 self.change_stage('follow_wall', now)
             elif now - self.stage_started > 15 / self.speed:
-                return self.hold('No side wall found while entering. Holding position.')
+                self.change_stage('scan', now)
+                self.turn_degrees = 0.
+                self.scan_previous_heading = self.imu_heading
+                self.candidates.clear()
+                self.selected = self.approach_goal = self.approach_side = self.wall_side = None
+                self.ir_side = self.ir_since = self.last_wall_seen = self.both_seen_since = None
+                self.wall_samples.clear()
+                return self.hold('No side wall found while entering. Starting another scan.')
             self.steer_to(self.wall_heading)
             self.reason = 'Advancing through the wall end until the chosen side IR sensor confirms the wall.'
             return True
@@ -591,8 +601,6 @@ class CorridorSearch:
                 abs(self.estimate.heading) < .12 and abs(self.estimate.lateral) < .025):
             self.succeeded = True
             return self.finish('Inside the maze: both side walls confirmed and robot centered. Stopped.')
-        if now - self.stage_started > 20:
-            return self.finish('Both side walls found, but centering did not converge.')
         self.forward = 1.0
         self.reason = 'Both side walls confirmed. Centering with IR and IMU.'
         return True

@@ -7,7 +7,7 @@ import numpy as np
 from robot_dashboard.navigation import CourseNavigation
 from robot_dashboard.walking import Walking
 from test_camera_body_offset import ramp_image
-from test_ramp_alignment import status
+from test_course_control import status
 
 
 def observe(nav, now, *, heading=0., pitch=0., sequence=None):
@@ -29,50 +29,23 @@ class StartupHeadingTests(unittest.TestCase):
         self.assertFalse(nav.estimate.heading_initialized)
         self.assertIsNone(nav.estimate.last_seen)
         nav.update(status(), 2., None)
-        for now in (2.2, 2.35, 2.5, 2.65):
-            self.assertFalse(observe(nav, now))
-        self.assertTrue(observe(nav, 2.85))
-        self.assertFalse(nav.initial_pose_pending)
+        self.assertTrue(observe(nav, 2.2))
         self.assertAlmostEqual(nav.estimate.heading, 0., delta=math.radians(.5))
         self.assertFalse(nav.estimate.require_visual_heading)
 
-    def test_first_post_settle_outlier_does_not_lock_in_heading(self):
+    def test_first_post_settle_frame_can_guide_without_waiting_for_alignment(self):
         nav = self.navigation()
-        self.assertFalse(observe(nav, 2.2, heading=-19))
-        for now in np.arange(2.35, 5.11, .15):
-            self.assertFalse(observe(nav, float(now)))
-        self.assertTrue(observe(nav, 5.35))
-        self.assertAlmostEqual(nav.estimate.heading, 0., delta=math.radians(.5))
+        self.assertTrue(observe(nav, 2.2, heading=-12))
+        self.assertAlmostEqual(nav.estimate.heading, math.radians(-12), delta=.01)
+        self.assertTrue(nav.estimate.heading_initialized)
 
-    def test_changing_attitude_and_duplicate_frames_cannot_release_steps(self):
+    def test_invalid_imu_cannot_release_steps_and_a_fresh_sample_can(self):
         nav = self.navigation()
-        for i in range(12):
-            self.assertFalse(observe(nav, 2.2+i*.15, pitch=0 if i%2 else 2))
-        nav = self.navigation()
-        for i in range(12):
-            self.assertFalse(observe(nav, 2.2+i*.15, sequence=1))
-        self.assertTrue(nav.initial_pose_pending)
-
-    def test_alignment_handover_keeps_verified_heading(self):
-        nav = CourseNavigation(0., scan_ramp=True)
-        nav.estimate.heading = math.radians(3)
-        nav.estimate.heading_initialized = True
-        nav.update(status(), .2, None)
-        self.assertFalse(nav.initial_pose_pending)
-        self.assertFalse(nav.estimate.require_visual_heading)
-        self.assertAlmostEqual(nav.estimate.heading, math.radians(3))
-
-    def test_startup_accepts_fresh_images_with_slow_acknowledgements(self):
-        for gap in (.6, .85):
-            nav = self.navigation()
-            for i in range(3):
-                self.assertFalse(observe(nav, 2.2+i*gap))
-            self.assertTrue(observe(nav, 2.2+3*gap))
-            self.assertFalse(nav.initial_pose_pending)
+        self.assertFalse(nav.update(status(imuAgeMs=800), 2.2, None))
+        self.assertTrue(observe(nav, 2.4))
 
     def test_edge_search_recovers_at_observed_wifi_cadence(self):
         nav = self.navigation()
-        nav.initial_pose_pending = False
         nav.estimate.heading_initialized = True
         nav.estimate.searching = True
         self.assertFalse(observe(nav, 2.2))
@@ -81,7 +54,6 @@ class StartupHeadingTests(unittest.TestCase):
 
     def test_stale_images_and_interrupted_edges_cannot_confirm_search(self):
         nav = self.navigation()
-        nav.initial_pose_pending = False
         nav.estimate.heading_initialized = True
         nav.estimate.searching = True
         self.assertFalse(observe(nav, 2.2))
@@ -95,16 +67,14 @@ class StartupHeadingTests(unittest.TestCase):
             self.assertFalse(nav.update(status(), now, (1001, 4., image)))
         self.assertTrue(nav.estimate.searching)
 
-    def test_confirmed_startup_heading_reaches_ramp_steering(self):
+    def test_first_observed_heading_reaches_ramp_steering(self):
         walking = Walking(exit_clearance=True)
         walking.begin(status(), 8, 0., 'course')
         nav = walking.navigation
         nav.update(status(), 2., None)
-        for now in (2.2, 2.35, 2.5, 2.65, 2.85):
-            observe(nav, now, heading=14)
-        self.assertFalse(nav.initial_pose_pending)
-        walking.last_confirmed_frame = 2.9
-        frame = walking.frame(status(), 2.9)
+        observe(nav, 2.2, heading=14)
+        walking.last_confirmed_frame = 2.25
+        frame = walking.frame(status(), 2.25)
         self.assertAlmostEqual(frame['heading'], math.radians(14), delta=.01)
 
 

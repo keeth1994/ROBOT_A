@@ -12,7 +12,7 @@ from robot_b91.gait import ramp_forward_scale, rocker_targets
 from robot_dashboard.devices import DeviceError
 from robot_dashboard.runtime import Dashboard
 from robot_dashboard.walking import Walking
-from test_ramp_alignment import status
+from test_course_control import status
 
 
 class RampDriftTests(unittest.TestCase):

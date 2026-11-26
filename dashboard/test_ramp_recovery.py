@@ -1,4 +1,4 @@
-"""A moderate heading excursion may recover; faults cannot restart motion."""
+"""Course excursions can recover without ending a healthy motion session."""
 import math
 import unittest
 from unittest.mock import patch
@@ -6,7 +6,7 @@ from unittest.mock import patch
 from robot_dashboard.devices import DeviceError
 from robot_dashboard.ramp_recovery import RampHeadingRecovery
 from robot_dashboard.walking import Walking
-from test_ramp_alignment import status
+from test_course_control import status
 
 
 def update(recovery, now, heading=14, lateral=.01, roll=4, pitch=-20,
@@ -35,23 +35,26 @@ class RampRecoveryTests(unittest.TestCase):
             update(recovery, now, heading=6)
         self.assertFalse(recovery.active)
 
-    def test_missing_edges_or_imu_hold_steps_and_consume_budget(self):
+    def test_missing_guidance_holds_and_recovers_even_after_a_long_delay(self):
         for changes in (dict(ready=False), dict(fresh_edges=False),
-                        dict(fresh_edges=None), dict(roll=11)):
+                        dict(fresh_edges=None)):
             recovery = RampHeadingRecovery()
             update(recovery, 0)
             self.assertFalse(update(recovery, 1., **changes))
             self.assertTrue(recovery.active)
             self.assertTrue(update(recovery, 2.))
-            with self.assertRaisesRegex(DeviceError, 'within 15 seconds'):
-                update(recovery, 15., **changes)
+            self.assertFalse(update(recovery, 90., **changes))
+            self.assertTrue(update(recovery, 91.))
 
-    def test_large_error_tilt_edge_and_nonfinite_values_still_stop(self):
+    def test_large_finite_errors_keep_walking_but_invalid_telemetry_is_rejected(self):
         for changes in (dict(heading=20), dict(heading=-21), dict(lateral=.051),
-                        dict(lateral=-.051), dict(roll=12), dict(pitch=-36),
-                        dict(heading=float('nan'))):
-            with self.subTest(changes=changes), self.assertRaises(DeviceError):
-                update(RampHeadingRecovery(), 0, **changes)
+                        dict(lateral=-.051), dict(roll=15), dict(pitch=-46)):
+            recovery = RampHeadingRecovery()
+            with self.subTest(changes=changes):
+                self.assertTrue(update(recovery, 0, **changes))
+                self.assertTrue(update(recovery, 120, **changes))
+        with self.assertRaises(DeviceError):
+            update(RampHeadingRecovery(), 0., heading=math.nan)
 
     def test_control_gap_does_not_count_as_recovered(self):
         recovery = RampHeadingRecovery()
@@ -72,7 +75,7 @@ class RampRecoveryTests(unittest.TestCase):
         w.last_confirmed_frame = 3.
         return w
 
-    def test_recovery_commands_are_bounded_and_crest_transition_waits(self):
+    def test_recovery_commands_are_bounded_and_operator_stop_still_works(self):
         w = self.walking()
         w.crest_sequence.climbed = True
         w.navigation.estimate.pitch = 0
@@ -89,22 +92,22 @@ class RampRecoveryTests(unittest.TestCase):
         with self.assertRaisesRegex(DeviceError, 'Walking is stopped'):
             w.frame(status(), 3.1)
 
-    def test_stale_edges_hold_and_raw_offset_cannot_hide_near_edge(self):
+    def test_stale_edges_hold_but_fresh_large_raw_and_filtered_offsets_do_not_stop(self):
         w = self.walking()
         w.navigation.estimate.debug['timestamp'] = 2.
         with patch.object(w.navigation, 'update', return_value=True):
             self.assertEqual(w.frame(status(), 3.)['ready'], 0)
         w.navigation.estimate.debug.update(timestamp=3.1, measured_lateral_m=.06)
         with patch.object(w.navigation, 'update', return_value=True):
-            self.assertEqual(w.frame(status(), 3.1)['ready'], 0)
+            self.assertEqual(w.frame(status(), 3.1)['ready'], 1)
         w.navigation.estimate.lateral = .06
         with patch.object(w.navigation, 'update', return_value=True):
-            with self.assertRaisesRegex(DeviceError, 'edge-offset'):
-                w.frame(status(), 3.2)
+            self.assertEqual(w.frame(status(), 3.2)['ready'], 1)
+        self.assertTrue(w.active)
 
-    def test_recovery_preserves_link_session_and_tilt_checks(self):
+    def test_recovery_preserves_link_and_session_checks(self):
         for changes in (dict(externalActive=False), dict(motionSession=99),
-                        dict(gaitStopping=True), dict(orientation=[.25, 0, 0])):
+                        dict(gaitStopping=True)):
             w = self.walking()
             with self.assertRaises(DeviceError):
                 w.frame(status(**changes), 3.)

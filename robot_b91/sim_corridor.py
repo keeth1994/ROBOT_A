@@ -49,7 +49,7 @@ def create_robot(params, width, bend_scale=1.0):
 def evaluate(seconds=360, offset=0, yaw=0, latency=.05, mismatch=0, noise=0,
              balance_gain=1.0, rate_gain=1.0, max_steering=.4, filter_s=.15,
              yaw_amplitude=None, pitch_stance=None, pitch_lift=None, corridor_gait=False,
-             stop_on_contact=True, target_x=None, width=.4, bend_scale=1.0, wall_guard=True,
+             target_x=None, width=.4, bend_scale=1.0, wall_guard=True,
              observer=None, shared_gait=False, yaw_bias=None, wall_fit=True):
     if not math.isfinite(seconds) or seconds <= 0:
         raise ValueError('Simulation duration must be a positive number of seconds.')
@@ -91,7 +91,7 @@ def evaluate(seconds=360, offset=0, yaw=0, latency=.05, mismatch=0, noise=0,
         centerline = np.asarray(robot.course['corridor']['centerline_xy_m']) + robot.course['corridor']['origin_xy_m']
         if target_x is None:
             target_x = float(centerline[-1, 0] - .2)
-        max_offset = 0.0
+        max_offset = max_tilt = 0.0
         collision = False
         collision_pair = []
         contact_time = contact_streak = max_contact_streak = max_wall_force = 0.0
@@ -126,6 +126,9 @@ def evaluate(seconds=360, offset=0, yaw=0, latency=.05, mismatch=0, noise=0,
                 target = rocker_targets(robot.p, active_time, gait_time,
                                         command_heading + imu.heading - reference_heading, nav.estimate.lateral, robot.joint_ranges)
             robot.step_targets(target)
+            if any(w.number for w in robot.d.warning) or not np.isfinite(robot.d.qpos).all():
+                raise RuntimeError('Invalid corridor physics state.')
+            max_tilt = max(max_tilt, robot.tilt())
             touching = False
             for index, contact in enumerate(robot.d.contact):
                 if int(contact.geom1) in wall_ids or int(contact.geom2) in wall_ids:
@@ -148,12 +151,13 @@ def evaluate(seconds=360, offset=0, yaw=0, latency=.05, mismatch=0, noise=0,
             u[-1] = max(0, projection[-1])
             distance = np.min(np.linalg.norm(position - (a + u[:, None] * segment), axis=1))
             max_offset = max(max_offset, float(distance))
-            if (collision and stop_on_contact) or robot.tilt() > 35 or robot.d.qpos[0] < target_x:
+            if robot.d.qpos[0] < target_x:
                 break
         result = dict(revision=robot.revision, width_m=width, target_x=target_x, completed=bool(robot.d.qpos[0] < target_x), collision=collision, collision_pair=collision_pair,
                       contact_s=round(contact_time, 3), max_contact_streak_s=round(max_contact_streak, 3),
                       max_wall_force_n=round(max_wall_force, 2), elapsed_s=round(robot.d.time, 2), progress_m=round(start_x - robot.d.qpos[0], 3),
                       max_offset_m=round(max_offset, 3), tilt_deg=round(robot.tilt(), 1),
+                      max_tilt_deg=round(max_tilt, 1),
                       reason=nav.reason, final_xy=robot.d.qpos[:2].tolist(), gait_parameters=robot.p,
                       yaw_bias_rad=yaw_bias, guidance='IR wall fits + IMU' if wall_fit else 'IR signal balance + IMU')
         return result, samples
@@ -232,7 +236,6 @@ def main():
     ap.add_argument("--test", action="store_true", help="Run without opening the interactive viewer")
     ap.add_argument("--sensors", action="store_true", help="Show the camera, IMU and side IR readings")
     ap.add_argument("--wall-guard", action=argparse.BooleanOptionalAction, default=True)
-    ap.add_argument("--stop-on-contact", action=argparse.BooleanOptionalAction, default=True)
     ap.add_argument("--output", type=Path, help="Save settings, result and trace as JSON")
     args = vars(ap.parse_args())
     output = args.pop("output")

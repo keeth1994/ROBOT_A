@@ -1,5 +1,6 @@
 """Controller, contact geometry and scoring for the headless foam crest trials."""
 import math
+from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -81,3 +82,17 @@ class FoamCrestTests(unittest.TestCase):
             complete = run_trial(path, .10, PLACEMENTS[0], 25., 'foam')
             self.assertEqual(complete['outcome'], 'crossed', complete)
             self.assertGreaterEqual(complete['max_x_past_crest_m'], CLEARANCE_M)
+            self.assertTrue(complete['clean_crossing'])
+            self.assertEqual(complete['first_excursion_s'], {})
+
+    def test_finite_excursions_during_settling_do_not_even_shorten_a_short_trial(self):
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / 'crest.xml'
+            make_model(path, .10)
+            start = replace(PLACEMENTS[0], yaw_deg=20., offset_m=.055)
+            row = run_trial(path, .10, start, .2, 'foam')
+            self.assertEqual(row['outcome'], 'timeout')
+            self.assertGreaterEqual(row['motion_s'], .199)
+            self.assertLess(row['first_excursion_s']['heading'], 0.)
+            self.assertLess(row['first_excursion_s']['lateral'], 0.)
+            self.assertFalse(row['clean_crossing'])

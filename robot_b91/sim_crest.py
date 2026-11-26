@@ -127,12 +127,17 @@ def run_trial(path, height_m, start, seconds, gait):
     planted_downhill = set()
     past_since = None
     max_roll = max_heading = max_lateral = max_sink = 0.
+    first_excursion = {}
     reason = 'timeout'
     target = np.tile([0., params['pitch_stance']], 4)
     controller = FoamCrestController(params, climb) if gait == 'foam' else None
     max_x = x
     # Inspect the state at physics rate and update the command at the servo rate.
     for _ in range(math.ceil((SETTLE_S + seconds) / m.opt.timestep)):
+        if any(w.number for w in d.warning) or not np.isfinite(d.qpos).all() or not np.isfinite(d.qvel).all():
+            reason = 'solver failure'
+            break
+        elapsed = d.time - SETTLE_S
         rotation = d.xmat[platform].reshape(3, 3)
         heading = math.atan2(rotation[1, 0], rotation[0, 0])
         roll = math.atan2(rotation[2, 1], rotation[2, 2])
@@ -140,28 +145,24 @@ def run_trial(path, height_m, start, seconds, gait):
         max_heading = max(max_heading, abs(math.degrees(heading)))
         max_lateral = max(max_lateral, abs(d.qpos[1]))
         max_x = max(max_x, d.qpos[0])
-        if any(w.number for w in d.warning) or not np.isfinite(d.qpos).all():
-            reason = 'solver failure'
-            break
-        if max_roll > MAX_ANGLE_DEG or max_heading > MAX_ANGLE_DEG or max_lateral > MAX_LATERAL_M:
-            reason = ('roll' if max_roll > MAX_ANGLE_DEG else
-                      'heading' if max_heading > MAX_ANGLE_DEG else 'lateral')
-            break
+        if max_roll > MAX_ANGLE_DEG:
+            first_excursion.setdefault('roll', elapsed)
+        if max_heading > MAX_ANGLE_DEG:
+            first_excursion.setdefault('heading', elapsed)
+        if max_lateral > MAX_LATERAL_M:
+            first_excursion.setdefault('lateral', elapsed)
         pairs = d.contact.geom
         if len(pairs):
             foam_contact = ((pairs == foam_ids[0]) | (pairs == foam_ids[1])).any(axis=1)
             if foam_contact.any():
                 max_sink = max(max_sink, -min(d.contact.dist[foam_contact]))
         if max_sink > MAX_SINK_M:
-            reason = 'backing penetration'
-            break
+            first_excursion.setdefault('backing penetration', elapsed)
         active = d.contact.efc_address >= 0
         # With this model's elliptic friction cone the first row is normal force.
         loaded = pairs[active][d.efc_force[d.contact.efc_address[active]] > LOAD_N]
         if np.any(loaded == floor):
-            reason = 'floor contact'
-            break
-        elapsed = d.time - SETTLE_S
+            first_excursion.setdefault('floor contact', elapsed)
         if elapsed >= 0.:
             supports = set()
             for terrain, other in ((0, 1), (1, 0)):
@@ -193,6 +194,8 @@ def run_trial(path, height_m, start, seconds, gait):
     robot.close()
     return dict(height_m=height_m, slope_deg=math.degrees(math.atan(slope)),
                 **asdict(start), outcome=reason, motion_s=round(motion_s, 3),
+                first_excursion_s={name: round(t, 3) for name, t in first_excursion.items()},
+                clean_crossing=reason == 'crossed' and not first_excursion,
                 max_x_past_crest_m=round(max_x - run_m, 4), max_roll_deg=round(max_roll, 2),
                 max_heading_deg=round(max_heading, 2), max_lateral_m=round(max_lateral, 4),
                 max_sink_mm=round(1000 * max_sink, 2))
@@ -255,13 +258,15 @@ def main(argv=None):
     if args.samples < 1 or args.workers < 1 or not math.isfinite(args.seconds) or args.seconds <= 0:
         parser.error('Seconds, worker count and sample count must be positive.')
     cases = list(scenarios(suites, args.heights_cm, args.samples, args.seed))
-    if any(not BASE_M < h < BASE_M + start.run_m for _, h, start in cases):
-        parser.error('Choose finite heights above the base and below a 45-degree slope.')
+    if any(not math.isfinite(h) or h <= BASE_M for _, h, _ in cases):
+        parser.error('Choose finite heights above the base.')
     rows = sweep(cases, args.seconds, args.workers, gaits)
     for suite in suites:
         for label in gaits:
             group = [row for row in rows if row['gait'] == label and row['suite'] == suite]
-            print(f"{suite} {label}: {sum(row['outcome'] == 'crossed' for row in group)}/{len(group)} crossed")
+            crossed = sum(row['outcome'] == 'crossed' for row in group)
+            clean = sum(row['clean_crossing'] for row in group)
+            print(f"{suite} {label}: {crossed}/{len(group)} crossed ({clean} within the reference limits)")
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         report = dict(mujoco=mujoco.__version__, random_seed=args.seed, foam_thickness_m=FOAM_M, base_height_m=BASE_M,
