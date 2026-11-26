@@ -52,6 +52,7 @@ class Robot:
         self.course = (
             json.loads((ROOT / "reference/b91_course.json").read_text()) if ramp else None
         )
+        self.ramp_offset_right = json.loads((ROOT / 'reference/b91_navigation.json').read_text())['ramp_offset_right_m']
         self.ai = [self.m.actuator(n).id for n in self.names]
         ratings = np.array([servo_properties(cfg, n) for n in self.names])
         self.limit = ratings[:, 0]
@@ -133,7 +134,7 @@ class Robot:
                 # Optional ideal lateral position feedback for simulation, not an implemented sensor estimator.
                 lateral = self.d.qpos[1]
                 if self.course:
-                    lateral = local_points(self.d.qpos[:3], self.course)[1]
+                    lateral = local_points(self.d.qpos[:3], self.course)[1] + self.ramp_offset_right
                     heading -= math.radians(self.course["yaw_deg"])
                     heading = math.atan2(math.sin(heading), math.cos(heading))
             pace = RAMP_SPEED_SCALE if self.course else 1.0

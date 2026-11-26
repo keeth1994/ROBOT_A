@@ -104,7 +104,7 @@ class SimNavigation:
         if self.search:
             return (self.search.estimate.heading + self.imu.heading - self.search.imu_heading,
                     self.search.estimate.lateral)
-        return self.estimate.heading, self.estimate.lateral
+        return self.estimate.heading, self.estimate.lateral_error
 
     def close(self):
         self.renderer.close()

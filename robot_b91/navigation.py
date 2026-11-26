@@ -10,7 +10,7 @@ import numpy as np
 class Navigation:
     def __init__(self, width_m=0.30, fovy_deg=42.9470936, camera_x_m=0.0626,
                  camera_pitch_deg=15.0, dark_min=3, dark_max=25, max_chroma=.28, max_blind_s=8.0,
-                 adaptive_surface=False, guidance='ramp', tape_width_m=0.025):
+                 adaptive_surface=False, guidance='ramp', tape_width_m=0.025, ramp_offset_right_m=0.0):
         if guidance not in ('ramp', 'blue_tape'):
             raise ValueError('Guidance must be ramp or blue_tape.')
         if not math.isfinite(tape_width_m) or tape_width_m <= 0:
@@ -18,6 +18,7 @@ class Navigation:
         self.guidance = guidance
         self.tape_width_m = tape_width_m
         self.width_m = width_m
+        self.ramp_offset_right_m = ramp_offset_right_m
         self.fovy = math.radians(fovy_deg)
         self.camera_x = camera_x_m
         self.camera_pitch = math.radians(camera_pitch_deg)
@@ -184,6 +185,11 @@ class Navigation:
         self.accepted += 1
         self.debug.update(accepted=True, reason="Camera measurement accepted")
         return True
+
+    @property
+    def lateral_error(self):
+        # Y points left, so a target to the right adds to the steering error.
+        return self.lateral + (self.ramp_offset_right_m if self.guidance == 'ramp' else 0.0)
 
     def ready(self, timestamp):
         """Brief occlusions coast on gyro and held offset; long losses hold gait.

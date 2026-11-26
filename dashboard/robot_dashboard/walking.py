@@ -146,11 +146,14 @@ class Walking:
             self.message = 'Dancing on the ESP32.' if self.profile == 'dance' else 'Walking on the ESP32.'
         self.sequence += 1
         estimate = self.navigation.estimate if self.navigation else None
+        lateral = estimate.lateral if estimate else 0
+        if self.profile in RAMP_PROFILES:
+            lateral = estimate.lateral_error
         frame = {'session': self.session, 'sequence': self.sequence,
                  'speed': self.speed, 'ready': int(ready),
                  'heading': estimate.heading if estimate else 0,
                  'heading_reference': self.navigation.imu_heading if self.navigation else 0,
-                 'lateral': estimate.lateral if estimate else 0}
+                 'lateral': lateral}
         if self.profile == 'corridor_search':
             frame.update(speed=self.navigation.speed, forward=self.navigation.forward)
             if self.navigation.finished:
