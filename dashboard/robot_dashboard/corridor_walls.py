@@ -60,6 +60,12 @@ class IRWallNavigation(CourseNavigation):
         self.last_both_seen = None
         self.exit_started = None
         self.exit_complete = False
+        self.finish_on_missing_walls = False
+        self.missing_walls_since = None
+        self.exit_clearance_heading = None
+        self.exit_clearance_distance = 0.0
+        self.exit_clearance_last = None
+        self.exit_clearance_speed = 0.0
         self.exit_elapsed = 0.0
         self.exit_last_update = None
 
@@ -97,17 +103,46 @@ class IRWallNavigation(CourseNavigation):
         self.reason = 'Continuing straight briefly after the wall signals ended.'
         return True
 
+    def clear_exit(self, now):
+        if self.exit_clearance_last is not None:
+            dt = max(0, min(.3, now - self.exit_clearance_last))
+            self.exit_clearance_distance += self.exit_clearance_speed * dt
+        self.exit_clearance_last = now
+        self.exit_clearance_speed = self.walk_speed
+        if self.exit_clearance_distance >= .20 - 1e-9:
+            self.exit_complete = True
+            self.reason = '20 cm forward clearance complete. Corridor stage finished.'
+            return False
+        error = self.imu_heading - self.exit_clearance_heading
+        self.estimate.heading = math.atan2(math.sin(error), math.cos(error))
+        self.estimate.lateral = 0.0
+        self.reason = f'Moving straight before dancing: {self.exit_clearance_distance * 100:.1f} / 20 cm estimated.'
+        return True
+
     def update(self, status, now, camera_frame=None):
         if self.exit_complete:
             return False
         if not super().update(status, now, None):
+            self.exit_clearance_last = None
+            self.missing_walls_since = None
             self.reset_walls()
             return False
+        if self.exit_clearance_heading is not None:
+            return self.clear_exit(now)
+        volts = None
         try:
             volts = ir_readings(status)
             self.voltages = volts
             distances = self.ir_scale_mv_m / np.maximum(np.asarray(volts) - self.ir_offset_mv, .001)
             weak = distances > .30
+            if any(weak):
+                if self.missing_walls_since is None:
+                    self.missing_walls_since = now
+                if self.finish_on_missing_walls and now - self.missing_walls_since >= 10:
+                    self.exit_clearance_heading = self.imu_heading
+                    return self.clear_exit(now)
+            else:
+                self.missing_walls_since = None
             if any(weak) and self.continue_past_walls(weak, now):
                 return True
             if self.exit_complete:
@@ -116,6 +151,8 @@ class IRWallNavigation(CourseNavigation):
             if any(weak):
                 raise ValueError('Both walls must be within the IR sensors\' working range.')
         except ValueError as error:
+            if volts is None:
+                self.missing_walls_since = None
             self.reset_walls()
             self.reason = 'Holding steps: ' + str(error)
             return False

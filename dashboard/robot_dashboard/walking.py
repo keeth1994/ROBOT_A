@@ -221,7 +221,7 @@ class Walking:
             if self.navigation.finished:
                 self.stop(self.navigation.reason + ' Outputs off requested.')
         if self.profile == 'corridor' and self.navigation.exit_complete:
-            self.stop('Corridor exit movement finished. Outputs off requested.')
+            self.stop(self.navigation.reason + ' Outputs off requested.')
         if getattr(self.navigation, 'ramp_finished', False):
             self.stop(self.navigation.reason + ' Outputs off requested.')
         return frame

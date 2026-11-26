@@ -8,7 +8,7 @@ from PIL import Image
 
 from dashboard.test_corridor_entrance import endpoint
 from dashboard.test_crest_sequence import status
-from dashboard.robot_dashboard.corridor_search import CorridorSearch, ENTRANCE_ADVANCE_M
+from dashboard.robot_dashboard.corridor_search import CorridorSearch, ENTRANCE_ADVANCE_M, RAMP_CLEARANCE_M
 from dashboard.robot_dashboard.corridor_walls import IRWallNavigation, load_corridor_settings
 
 
@@ -86,6 +86,94 @@ class CorridorIRTurnTests(unittest.TestCase):
         self.frame(nav, 2.1, readings=(100, 100))
         self.assertEqual(nav.stage, 'approach')
         self.assertIsNone(nav.wall_point)
+
+    def test_entrance_steps_run_at_twice_the_selected_speed(self):
+        for stage in ('clear_end', 'align_wall', 'enter', 'follow_wall'):
+            nav = self.navigation()
+            nav.set_speed(.5)
+            nav.acquire_wall(0, .16, 2)
+            nav.stage = stage
+            self.frame(nav, 2.1, readings=(750, 100))
+            self.assertEqual(nav.speed, 1, stage)
+
+    def test_course_entry_finishes_when_both_walls_are_confirmed_without_centering(self):
+        nav = self.navigation()
+        nav.center_on_entry = False
+        nav.stage = 'enter'
+        nav.wall_side = 0
+        nav.wall_heading = 0
+        self.frame(nav, 2, readings=(750, 750))
+        self.assertFalse(nav.finished)
+        self.frame(nav, 2.7, readings=(750, 750))
+        self.assertTrue(nav.succeeded)
+        self.assertTrue(nav.finished)
+        self.assertNotEqual(nav.stage, 'center')
+
+    def test_ramp_clearance_moves_forward_before_starting_scan(self):
+        nav = self.navigation()
+        nav.change_stage('clear_ramp', 2)
+        self.frame(nav, 2, readings=(100, 100), heading=.6)
+        self.assertEqual(nav.stage, 'clear_ramp')
+        self.assertEqual(nav.estimate.heading, 0)
+        self.assertEqual(nav.forward, 1)
+        nav.position = (RAMP_CLEARANCE_M + .001) * np.array([math.cos(.6), math.sin(.6)])
+        self.frame(nav, 2.1, readings=(100, 100), heading=.6)
+        self.assertEqual(nav.stage, 'scan')
+        self.assertEqual(nav.turn_degrees, 0)
+
+    def test_course_missing_walls_start_clearance_after_ten_seconds_at_half_speed(self):
+        for readings in ((100, 750), (750, 100), (100, 100)):
+            nav = IRWallNavigation(0, **load_corridor_settings()['navigation'])
+            nav.set_speed(.5)
+            nav.finish_on_missing_walls = True
+            for now in (2, 5, 11.9):
+                self.frame(nav, now, readings=readings)
+                self.assertFalse(nav.exit_complete)
+            self.frame(nav, 12, readings=readings)
+            self.assertFalse(nav.exit_complete)
+            self.assertIsNotNone(nav.exit_clearance_heading)
+            self.assertEqual(nav.exit_clearance_distance, 0)
+
+    def test_both_walls_reset_course_missing_wall_timer(self):
+        nav = IRWallNavigation(0, **load_corridor_settings()['navigation'])
+        nav.finish_on_missing_walls = True
+        self.frame(nav, 2, readings=(100, 750))
+        self.frame(nav, 7, readings=(750, 750))
+        self.assertIsNone(nav.missing_walls_since)
+        for now in (8, 17.9):
+            self.frame(nav, now, readings=(100, 750))
+            self.assertFalse(nav.exit_complete)
+        self.frame(nav, 18, readings=(100, 750))
+        self.assertFalse(nav.exit_complete)
+        self.assertIsNotNone(nav.exit_clearance_heading)
+
+    def test_course_walks_twenty_cm_straight_before_finishing_at_both_speeds(self):
+        for speed in (1, .5):
+            nav = IRWallNavigation(0, **load_corridor_settings()['navigation'])
+            nav.set_speed(speed)
+            nav.finish_on_missing_walls = True
+            self.frame(nav, 2, readings=(100, 750), heading=.6)
+            self.assertTrue(self.frame(nav, 12, readings=(100, 750), heading=.6))
+            steps = round(.20 / (nav.walk_speed * .1))
+            for i in range(1, steps):
+                self.assertTrue(self.frame(nav, 12 + i * .1, readings=(750, 750), heading=.7))
+                self.assertFalse(nav.exit_complete)
+                self.assertAlmostEqual(nav.estimate.heading, .1)
+                self.assertEqual(nav.estimate.lateral, 0)
+            self.assertFalse(self.frame(nav, 12 + steps * .1, readings=(750, 750), heading=.7))
+            self.assertTrue(nav.exit_complete)
+            self.assertAlmostEqual(nav.exit_clearance_distance, .20)
+
+    def test_lost_imu_does_not_count_toward_exit_clearance(self):
+        nav = IRWallNavigation(0, **load_corridor_settings()['navigation'])
+        nav.finish_on_missing_walls = True
+        self.frame(nav, 2, readings=(100, 750))
+        self.frame(nav, 12, readings=(100, 750))
+        packet = status() | dict(orientationValid=False)
+        nav.update(packet, 12.1)
+        nav.update(packet, 17)
+        self.frame(nav, 17.1)
+        self.assertEqual(nav.exit_clearance_distance, 0)
 
     def test_close_wall_does_not_finish_corridor_search(self):
         nav = self.navigation()

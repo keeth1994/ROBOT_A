@@ -10,6 +10,7 @@ from .corridor import ir_readings
 from .navigation import CourseNavigation
 
 ENTRANCE_ADVANCE_M = .02
+RAMP_CLEARANCE_M = .10
 
 
 def wall_view(rgb, preferred_side=None, camera_pitch=None, fovy_deg=None):
@@ -246,6 +247,8 @@ class CorridorSearch:
         self.estimate = self.orientation.estimate
         self.camera_geometry = dict(camera_geometry or load_corridor_settings()['camera'])
         self.stage = 'scan'
+        self.center_on_entry = True
+        self.clearance_heading = None
         self.approach_walk_time = 0.0
         self.speed = self.base_speed = self.last_speed = 1.0
         self.forward = 0.0
@@ -526,6 +529,8 @@ class CorridorSearch:
         if self.stage == 'approach' and self.moving and self.forward > 0 and self.ir_since is None:
             # Walk faster across open floor; slow as soon as the chosen IR sees the wall.
             self.speed *= 1.5
+        elif self.stage in ('clear_end', 'align_wall', 'enter', 'follow_wall'):
+            self.speed *= 2
         self.last_speed = self.speed
         return self.moving
 
@@ -570,6 +575,17 @@ class CorridorSearch:
                                   fovy_deg=self.camera_geometry['fovy_deg'])
         if now - self.started < 2:
             return self.hold('Settling for 2 seconds; keep the robot still.')
+        if self.stage == 'clear_ramp':
+            if self.clearance_heading is None:
+                self.clearance_heading = self.imu_heading
+                self.advance_start = self.position.copy()
+            direction = np.array([math.cos(self.clearance_heading), math.sin(self.clearance_heading)])
+            if (self.position - self.advance_start) @ direction >= RAMP_CLEARANCE_M:
+                self.change_stage('scan', now)
+                return self.hold('Ramp clearance complete. Starting the corridor scan.')
+            self.steer_to(self.clearance_heading)
+            self.reason = 'Walking 10 cm forward to clear the ramp before scanning.'
+            return True
         if self.stage == 'scan':
             if self.search_heading is None:
                 self.search_heading = self.imu_heading
@@ -592,6 +608,9 @@ class CorridorSearch:
         both = self.stage in ('enter', 'follow_wall') and self.wall_side is not None and max(distances) <= .30
         self.both_seen_since = (self.both_seen_since if self.both_seen_since is not None else now) if both else None
         if self.both_seen_since is not None and now - self.both_seen_since >= .6:
+            if not self.center_on_entry:
+                self.succeeded = True
+                return self.finish('Both side walls confirmed. Starting corridor navigation.')
             self.change_stage('center', now)
             return self.hold('Both IR sensors confirm side walls. Aligning inside the maze.')
 

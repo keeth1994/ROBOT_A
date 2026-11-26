@@ -132,6 +132,14 @@ class RunCourseTests(unittest.TestCase):
         self.assertEqual([p for p, _ in calls], ['/status', '/stop'])
         self.assertFalse(app.walking.active)
 
+    def test_course_clears_ramp_skips_entry_centering_and_enables_missing_wall_finish(self):
+        app = self.start()
+        self.finish_stage(app, ramp_finished=True)
+        self.assertEqual(app.walking.navigation.stage, 'clear_ramp')
+        self.assertFalse(app.walking.navigation.center_on_entry)
+        self.finish_stage(app, finished=True, succeeded=True)
+        self.assertTrue(app.walking.navigation.finish_on_missing_walls)
+
     def test_unsuccessful_search_does_not_start_corridor(self):
         app = self.start()
         self.finish_stage(app, ramp_finished=True)

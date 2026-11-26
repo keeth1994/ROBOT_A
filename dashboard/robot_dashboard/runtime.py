@@ -280,6 +280,7 @@ class Dashboard:
         return True
 
     def _start_course_stage(self, url, profile):
+        previous_profile = self.walking.profile
         devices.request(url, '/stop', {}, timeout=.15)
         self.walking.stop(f'Starting {profile.replace("_", " ")}.')
         status = devices.request(url, '/status', timeout=.15)
@@ -294,6 +295,12 @@ class Dashboard:
         self._aim_camera(url, status, self.walking.camera_start_angle(profile))
         result = devices.request(url, '/motion/start', settings, timeout=.15)
         self.walking.begin(status, result['session'], time.monotonic(), profile=profile)
+        if profile == 'corridor_search':
+            self.walking.navigation.center_on_entry = not self.course_running
+            if previous_profile == 'course':
+                self.walking.navigation.change_stage('clear_ramp', time.monotonic())
+        elif profile == 'corridor':
+            self.walking.navigation.finish_on_missing_walls = self.course_running
 
     def walk_command(self, action):
         with self.servo_lock:
