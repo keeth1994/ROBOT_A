@@ -38,7 +38,10 @@ class NoCrestTests(unittest.TestCase):
                 walking.navigation.observe_slope(start + i * .1, math.radians(pitch))
         self.assertEqual(walking.navigation.estimate.climbs_seen, 2)
         self.assertEqual(walking.camera_target(110), -4)
-        self.assertAlmostEqual(walking.navigation.estimate.lateral_error, .03)
+        enabled = Walking()
+        enabled.begin(status(), 1, 100, 'course')
+        self.assertAlmostEqual(walking.navigation.estimate.lateral_error,
+                               enabled.navigation.estimate.lateral_error)
 
     def test_disabled_crest_does_not_require_crest_firmware_capabilities(self):
         app = Dashboard(crest_enabled=False)

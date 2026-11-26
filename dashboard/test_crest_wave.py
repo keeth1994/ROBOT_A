@@ -42,7 +42,8 @@ class CrestWaveTests(unittest.TestCase):
                 after = rocker_targets(self.params | dict(pattern=pattern), 4, time)
                 if pattern == 'crest':
                     np.testing.assert_allclose(after[[3, 7]], before[[3, 7]])
-                    np.testing.assert_allclose(after[[1, 5]], 2 * before[[1, 5]])
+                    ratio = self.params['front_pitch_lift'] / self.params['pitch_lift']
+                    np.testing.assert_allclose(after[[1, 5]], ratio * before[[1, 5]])
                     np.testing.assert_allclose(after[::2], before[::2])
                 else:
                     np.testing.assert_array_equal(after, before)

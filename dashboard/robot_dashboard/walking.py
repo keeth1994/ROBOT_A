@@ -144,7 +144,7 @@ class Walking:
 
     def transition_settings(self):
         phase = self.crest_sequence.requested if self.crest_sequence else None
-        if phase not in ('crest', 'descent') or self.base_params is None:
+        if phase not in ('crest', 'descent', 'plateau') or self.base_params is None:
             raise DeviceError('No ramp gait change is pending.', 409)
         params = self.base_params | (CREST_WAVE_GAIT if phase == 'crest' else {})
         return params, self.controller_settings(self.profile, params)

@@ -30,8 +30,8 @@ class CrestSequenceTests(unittest.TestCase):
         baseline = walking.start_settings('course')
         nav = walking.navigation
         nav.estimate.heading = -.12
-        nav.estimate.lateral = -.03
-        for phase in ('crest', 'descent'):
+        nav.estimate.lateral = -nav.estimate.ramp_offset_right_m
+        for phase in ('crest', 'descent', 'plateau'):
             nav.estimate.heading = -.12
             walking.crest_sequence.requested = phase
             params, settings = walking.transition_settings()
@@ -39,7 +39,7 @@ class CrestSequenceTests(unittest.TestCase):
                 self.assertEqual(settings['pattern'], 'crest')
                 self.assertEqual(settings['rear_stride_scale'], .3)
                 self.assertEqual(settings['yaw_bias'], -.25)
-                self.assertEqual(settings['front_pitch_lift'], .5)
+                self.assertAlmostEqual(settings['front_pitch_lift'], math.radians(50))
             else:
                 self.assertEqual(settings, baseline)
             walking.resume_gait(2, 10, params)
@@ -165,5 +165,51 @@ class CrestSequenceTests(unittest.TestCase):
         seq.observe(46, .3, False)
         self.assertEqual(seq.phase, 'crest')
         self.assertIsNone(seq.requested)
+
+    def enter_crest(self):
+        seq = CrestSequence()
+        self.feed(seq, 0, -22, 20)
+        self.feed(seq, 2, -5, 10)
+        self.assertEqual(seq.requested, 'crest')
+        seq.switched(3)
+        return seq
+
+    def test_sustained_level_pitch_returns_to_normal_gait(self):
+        seq = self.enter_crest()
+        self.feed(seq, 3, 0, 81)
+        self.assertIsNone(seq.requested)
+        self.feed(seq, 11.1, 0, 14)
+        self.assertEqual(seq.requested, 'plateau')
+        seq.switched(12.5)
+        self.feed(seq, 13, -22, 20)
+        self.assertEqual(seq.phase, 'plateau')
+        self.assertIsNone(seq.requested)
+
+    def test_short_level_pitch_does_not_end_crest_gait(self):
+        seq = self.enter_crest()
+        self.feed(seq, 3, 0, 70)
+        self.feed(seq, 10, 7, 10)
+        self.assertIsNone(seq.requested)
+        self.assertIsNone(seq.exit_candidate)
+
+    def test_pauses_and_sample_gaps_reset_plateau_confirmation(self):
+        for missing in ('paused', 'gap'):
+            with self.subTest(missing=missing):
+                seq = self.enter_crest()
+                self.feed(seq, 3, 0, 81)
+                if missing == 'paused':
+                    seq.observe(11.1, 0, False)
+                self.feed(seq, 13, 0, 40)
+                self.assertIsNone(seq.requested)
+                self.feed(seq, 17, 0, 20)
+                self.assertEqual(seq.requested, 'plateau')
+
+    def test_switching_from_plateau_to_descent_restarts_confirmation(self):
+        seq = self.enter_crest()
+        self.feed(seq, 3, 0, 81)
+        self.feed(seq, 11.1, 20, 4)
+        self.assertIsNone(seq.requested)
+        self.feed(seq, 11.5, 20, 6)
+        self.assertEqual(seq.requested, 'descent')
 
 

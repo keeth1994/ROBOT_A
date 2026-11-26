@@ -6,7 +6,7 @@ MAX_SAMPLE_GAP_S = .9
 
 # Lift one foot at a time, with shorter rear strokes and an inward stance.
 CREST_WAVE_GAIT = dict(duty=.8, yaw_amplitude=.55, rear_stride_scale=.30, pitch_lift=.25,
-                       front_pitch_lift=.50, pitch_stance=0., yaw_bias=-.25, pattern='crest')
+                       front_pitch_lift=math.radians(50), pitch_stance=0., yaw_bias=-.25, pattern='crest')
 
 
 class CrestSequence:
@@ -16,11 +16,12 @@ class CrestSequence:
         self.since = self.previous = None
         self.moving_seconds = 0.
         self.requested = None
+        self.exit_candidate = None
 
     def observe(self, now, pitch, ready):
         dt = 0 if self.previous is None else now - self.previous
         self.previous = now
-        if self.requested or self.phase == 'descent':
+        if self.requested or self.phase in ('descent', 'plateau'):
             return
         if not ready or not 0 < dt <= MAX_SAMPLE_GAP_S:
             self.since = None
@@ -31,10 +32,19 @@ class CrestSequence:
             condition = degrees <= -15 if not self.climbed else degrees >= -10
             duration = 1.0 if not self.climbed else .4
         else:
-            # Require sustained downhill pitch and at least four seconds of
-            # movement before returning to the normal gait.
-            condition = degrees >= 14 and self.moving_seconds >= 4
-            duration = .6
+            candidate = None
+            if self.moving_seconds >= 4:
+                if degrees >= 14:
+                    candidate = 'descent'
+                elif self.climbed and abs(degrees) <= 4:
+                    candidate = 'plateau'
+            if candidate != self.exit_candidate:
+                self.since = None
+            self.exit_candidate = candidate
+            condition = candidate is not None
+            # Level pitch must persist beyond a complete slow gait cycle.
+            # This measures commanded walking time, not actual forward progress.
+            duration = 5.0 if candidate == 'plateau' else .6
         if not condition:
             self.since = None
             return
@@ -45,10 +55,10 @@ class CrestSequence:
         if self.phase == 'approach' and not self.climbed:
             self.climbed = True
         else:
-            self.requested = 'crest' if self.phase == 'approach' else 'descent'
+            self.requested = 'crest' if self.phase == 'approach' else self.exit_candidate
 
     def switched(self, now):
-        if self.requested not in ('crest', 'descent'):
+        if self.requested not in ('crest', 'descent', 'plateau'):
             raise ValueError('No slope-triggered gait change is pending.')
         self.phase = self.requested
         self.requested = None
