@@ -34,9 +34,18 @@ class CourseNavigation:
         self.downhill_seen = False
         self.checking_exit = self.exit_aimed = self.corridor_requested = False
         self.exit_missing_since = None
+        self.top_checked = False
+        self.ramp_finished = False
 
     def observe_slope(self, timestamp, pitch):
-        if not self.scan_ramp or self.checking_exit or self.corridor_requested:
+        if not self.scan_ramp:
+            return
+        if self.estimate.observe_slope(timestamp - self.started, pitch):
+            self.checking_exit = self.exit_aimed = False
+            self.exit_missing_since = None
+            self.downhill_since = self.flat_since = None
+            self.downhill_seen = False
+        if self.checking_exit or self.corridor_requested or self.ramp_finished:
             return
         settings = self.camera_calibration
         if self.last_slope_sample is not None and timestamp - self.last_slope_sample > .35:
@@ -51,7 +60,8 @@ class CourseNavigation:
             self.downhill_since = None
         if pitch <= -math.radians(settings['downhill_deg']):
             self.downhill_seen = False
-        if self.downhill_seen and abs(pitch) <= math.radians(settings['flat_deg']):
+        check_top = self.estimate.climbs_seen == 2 and not self.top_checked
+        if (self.downhill_seen or check_top) and abs(pitch) <= math.radians(settings['flat_deg']):
             if self.flat_since is None:
                 self.flat_since = timestamp
             if timestamp - self.flat_since >= settings['flat_confirm_s']:
@@ -68,6 +78,8 @@ class CourseNavigation:
     def report(self):
         return self.estimate.report() | {'detection_reason': self.reason,
                                         'checking_ramp_exit': self.checking_exit,
+                                        'top_platform_checked': self.top_checked,
+                                        'ramp_finished': self.ramp_finished,
                                         'corridor_requested': self.corridor_requested}
 
     def hold(self, reason, now, camera_frame):
@@ -95,6 +107,8 @@ class CourseNavigation:
             if not valid:
                 self.downhill_since = self.flat_since = self.last_slope_sample = None
                 self.exit_missing_since = None
+                if self.scan_ramp:
+                    self.estimate.observe_slope(elapsed, None)
                 return self.hold('Holding steps: waiting for fresh ESP32 orientation.', now, camera_frame)
             roll, pitch, heading = map(float, attitude)
             # Preserve visual heading corrections while following the local gyro estimate.
@@ -145,23 +159,39 @@ class CourseNavigation:
                     now - received < .35):
                 self.camera_sequence = sequence
                 if self.checking_exit:
+                    after_second_climb = self.estimate.climbs_seen == 2
+                    flat = not after_second_climb or abs(self.estimate.pitch) <= math.radians(
+                        self.camera_calibration['flat_deg'])
                     previous = self.estimate.debug
                     if previous is None or received - self.started - previous['timestamp'] > .35:
                         self.exit_missing_since = None
                     accepted = self.estimate.frame(received - self.started, rgb, use_imu=True)
-                    if self.estimate.confirm_ramp(elapsed, accepted):
+                    present = self.estimate.debug['surface_detected'] if after_second_climb else accepted
+                    if self.estimate.confirm_ramp(elapsed, flat and present):
                         self.checking_exit = self.exit_aimed = self.downhill_seen = False
                         self.downhill_since = self.flat_since = self.exit_missing_since = None
-                        self.estimate.searching = False
-                        self.estimate.move_started = None
-                    elif accepted:
+                        if after_second_climb:
+                            self.top_checked = True
+                            self.estimate.start_search(elapsed, math.radians(
+                                servo_to_cradle_deg(self.camera_angle, self.camera_calibration)), 'backward')
+                            self.estimate.last_seen = None
+                        else:
+                            self.estimate.searching = False
+                            self.estimate.move_started = None
+                    elif not flat or present:
                         self.exit_missing_since = None
                     elif (not self.estimate.debug['surface_detected'] and
                           self.estimate.debug['reason'] != 'Invalid RGB image'):
                         if self.exit_missing_since is None:
                             self.exit_missing_since = received
                         if received - self.exit_missing_since >= self.camera_calibration['exit_check_s']:
-                            self.corridor_requested = True
+                            if after_second_climb:
+                                self.ramp_finished = True
+                                self.checking_exit = self.exit_aimed = False
+                                self.estimate.searching = False
+                                self.estimate.move_started = None
+                            else:
+                                self.corridor_requested = True
                     else:
                         self.exit_missing_since = None
                 elif self.scan_ramp:
@@ -170,10 +200,12 @@ class CourseNavigation:
                                              0, self.estimate.camera_x, now=elapsed)
                 else:
                     self.estimate.frame(received - self.started, rgb, use_imu=self.use_imu)
+        if self.ramp_finished:
+            return self.hold('Ramp finished: flat ground and no ramp ahead.', now, None)
         if self.checking_exit:
             reason = ('Ramp ended after downhill and level readings; starting corridor search.'
                       if self.corridor_requested else
-                      'Holding steps: checking the forward view after downhill and level readings.')
+                      'Checking the ramp ahead on the flat section.')
             return self.hold(reason, now, None)
         if (self.estimate.debug and self.estimate.debug.get('held') and
                 not (self.scan_ramp and self.estimate.searching)):

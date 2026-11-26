@@ -28,6 +28,42 @@ class RampScanNavigation(Navigation):
         self.move_from = math.radians(settings['forward_deg'])
         self.search_wait_since = None
         self.reacquired_since = self.last_confirmation = None
+        self.climbs_seen = 0
+        self.slope_stage = 'first_climb'
+        self.slope_since = self.last_slope_sample = None
+
+    def observe_slope(self, timestamp, pitch):
+        """Recognize climb, descent, then second climb from IMU pitch."""
+        if not self.use_imu or timestamp < 2 or self.climbs_seen == 2:
+            return False
+        if pitch is None or not math.isfinite(pitch):
+            self.slope_since = self.last_slope_sample = None
+            return False
+        if self.last_slope_sample is not None and not 0 < timestamp - self.last_slope_sample <= .9:
+            self.slope_since = None
+        self.last_slope_sample = timestamp
+        threshold = math.radians(self.settings['downhill_deg'])
+        matches = pitch >= threshold if self.slope_stage == 'descent' else pitch <= -threshold
+        if not matches:
+            self.slope_since = None
+            return False
+        if self.slope_since is None:
+            self.slope_since = timestamp
+        if timestamp - self.slope_since < self.settings['downhill_confirm_s']:
+            return False
+        self.slope_since = None
+        if self.slope_stage == 'first_climb':
+            self.climbs_seen = 1
+            self.slope_stage = 'descent'
+        elif self.slope_stage == 'descent':
+            self.slope_stage = 'second_climb'
+        else:
+            self.climbs_seen = 2
+            self.slope_stage = 'complete'
+            if self.view != 'backward':
+                self.start_search(timestamp, self.camera_pitch - self.mount_pitch, 'backward')
+            return True
+        return False
 
     def view_target(self):
         return math.radians(self.settings[self.view + '_deg'])
@@ -63,6 +99,10 @@ class RampScanNavigation(Navigation):
     def imu(self, timestamp, acceleration, angular_velocity):
         previous = self.last_imu
         super().imu(timestamp, acceleration, angular_velocity)
+        if self.last_imu == timestamp:
+            self.observe_slope(timestamp, self.pitch)
+        else:
+            self.observe_slope(timestamp, None)
         if previous is not None and self.last_imu == timestamp and self.walking:
             dt = timestamp - previous
             if 0 < dt <= .1 and self.last_seen is not None:
@@ -125,6 +165,7 @@ class RampScanNavigation(Navigation):
             state = 'turning' if self.search_wait_since is None else 'searching'
         report.update(camera_pitch_deg=math.degrees(self.camera_pitch),
                       camera_view=self.view, camera_search_state=state,
+                      uphill_slopes_seen=self.climbs_seen, slope_stage=self.slope_stage,
                       cache_age_s=age,
                       cache_confidence=0 if age is None else max(0, 1 - age / self.blind_timeout),
                       using_cached_ramp=bool(not self.searching and self.debug and not self.debug['accepted'] and

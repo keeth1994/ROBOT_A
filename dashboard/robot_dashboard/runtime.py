@@ -147,7 +147,7 @@ class CameraPipeline:
 
 
 class Dashboard:
-    def __init__(self, config_path=None):
+    def __init__(self, config_path=None, *, crest_enabled=True):
         self.lock = threading.RLock()
         self.servo_lock = threading.Lock()
         self.camera_settings_lock = threading.Lock()
@@ -162,7 +162,7 @@ class Dashboard:
         self.cache = {name: {'online': False, 'data': None, 'error': 'Connecting...', 'at': 0}
                       for name in ('servo', 'camera')}
         self.camera = CameraPipeline(self.stream_url)
-        self.walking = Walking()
+        self.walking = Walking(crest_enabled=crest_enabled)
         self.debug_lock = threading.Lock()
         self.debug_preview = CourseNavigation(time.monotonic(), use_imu=False)
         self.threads = []
@@ -282,7 +282,7 @@ class Dashboard:
             try:
                 status = devices.request(url, '/status', timeout=.15)
                 self.walking.prepare(status)
-                if action == 'course' and not all(status.get(name) is True for name in
+                if action == 'course' and self.walking.crest_enabled and not all(status.get(name) is True for name in
                         ('crestWaveGait', 'signedYawBias', 'rearStrideScale', 'frontPitchLift')):
                     raise devices.DeviceError('Upload the updated controller firmware for automatic crest walking.', 409)
                 if action == 'corridor' and status.get('corridorWallGait') is not True:

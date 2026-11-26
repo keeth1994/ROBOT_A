@@ -20,7 +20,7 @@ RAMP_PROFILES = ('course', 'course_camera')
 
 
 class Walking:
-    def __init__(self):
+    def __init__(self, *, crest_enabled=True):
         with (ROOT / 'reference/b91_gait.toml').open('rb') as stream:
             self.params = tomllib.load(stream)
         self.active = False
@@ -31,6 +31,7 @@ class Walking:
         self.corridor_settings = None
         self.speed = 1.0
         self.crest_sequence = None
+        self.crest_enabled = crest_enabled
         self.base_params = None
         self.resume_until = None
         self.camera_settings = load_camera_scan_settings()
@@ -46,6 +47,7 @@ class Walking:
                     speed=self.speed, period_s=(1.0 if self.profile == 'dance' else period) / self.speed,
                     camera_controlled=self.active and self.camera_start_angle(self.profile) is not None,
                     ramp_gait_phase=self.crest_sequence.phase if self.crest_sequence else None,
+                    crest_enabled=self.crest_enabled,
                     navigation=self.navigation.report() if self.navigation else None)
 
     def camera_start_angle(self, profile):
@@ -120,7 +122,7 @@ class Walking:
         if profile not in PROFILES:
             raise ValueError('Unknown walking profile.')
         self.profile = profile
-        self.crest_sequence = CrestSequence() if profile == 'course' else None
+        self.crest_sequence = CrestSequence() if profile == 'course' and self.crest_enabled else None
         self.base_params = dict(self.params)
         self.resume_until = None
         sensors = PROFILES[profile]
@@ -215,6 +217,8 @@ class Walking:
                 self.stop(self.navigation.reason + ' Outputs off requested.')
         if self.profile == 'corridor' and self.navigation.exit_complete:
             self.stop('Corridor exit movement finished. Outputs off requested.')
+        if getattr(self.navigation, 'ramp_finished', False):
+            self.stop(self.navigation.reason + ' Outputs off requested.')
         return frame
 
     def stop(self, message='Stopped. Outputs off requested.'):

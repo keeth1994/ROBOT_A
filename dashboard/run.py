@@ -9,11 +9,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=8765)
     parser.add_argument('--config', type=Path, default=Path(__file__).with_name('config.local.json'))
+    parser.add_argument('--no-crest', action='store_true',
+                        help='Keep the normal gait at crests; retain ramp tracking and camera changes.')
     args = parser.parse_args()
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from robot_dashboard.runtime import Dashboard
     from robot_dashboard.server import DashboardServer
-    app = Dashboard(args.config)
+    app = Dashboard(args.config, crest_enabled=not args.no_crest)
     server = DashboardServer(('127.0.0.1', args.port), app)
     app.start()
     print(f'Robot dashboard: http://127.0.0.1:{server.server_port}', flush=True)
