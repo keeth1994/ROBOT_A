@@ -32,16 +32,33 @@ int main() {
   assert(gait.stopped(3380));
   for (int leg = 0; leg < 4; ++leg) assert(gait.angles[2*leg+1] == 0);
 
+  // Alignment verification must remain planted regardless of Wi-Fi pause
+  // timing. Zero-lift/zero-yaw uses the existing installed protocol.
+  p = walking::Parameters();
+  p.crest = true; p.search = true; p.corridor = true;
+  p.duty = .8; p.pitchStance = 0; p.pitchLift = 0; p.yawAmplitude = 0; p.yawBias = 0;
+  gait.begin(0, p, true, 2000);
+  gait.forward = 0; gait.speed = .5;
+  for (uint32_t now = 20; now < 18000; now += 20) {
+    gait.ready = (now / 600) % 2; // Delayed hold/release commands at many phases.
+    gait.update(now, true, .03);
+    for (int i = 0; i < 8; ++i) assert(gait.angles[i] == 0);
+  }
+
   std::cout << std::setprecision(17);
   std::string pattern;
   double elapsed, time, heading, lateral;
   while (std::cin >> pattern >> p.period >> p.duty >> p.yawAmplitude >> p.pitchLift
          >> p.pitchStance >> p.yawBias >> p.pitchMin >> p.headingGain
          >> p.lateralGain >> p.strafeGain >> elapsed >> time >> heading >> lateral >> p.turnLimit >> p.rearStrideScale) {
-    p.crest = pattern == "crest"; p.crawl = pattern == "crawl";
+    const bool ramp = pattern == "ramp" || pattern == "ramp_crest";
+    p.search = p.corridor = pattern == "align" || ramp;
+    double forward = pattern == "align" ? 0 : 1;
+    if (ramp && !(std::cin >> forward)) return 1;
+    p.crest = pattern == "crest" || pattern == "align" || pattern == "ramp_crest"; p.crawl = pattern == "crawl";
     p.steeringTrim = 0; // Python caller accounts for trim separately.
     double target[8];
-    walking::targets(p, elapsed, time, heading, lateral, target);
+    walking::targets(p, elapsed, time, heading, lateral, target, forward);
     for (double angle : target) std::cout << angle << ' ';
     std::cout << '\n';
   }

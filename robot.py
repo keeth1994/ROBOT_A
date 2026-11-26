@@ -7,6 +7,7 @@ from robot_b91.paths import ROOT
 
 COMMANDS = {
     'walk': ('robot_b91.run', 'Walking; --ramp or --corridor for a course, --test for report'),
+    'crest': ('robot_b91.sim_crest', 'Headless trials of the crest gait on a foam-covered ramp'),
     'corridor': ('robot_b91.sim_corridor', 'Interactive B10 corridor; --test for a run without a viewer'),
     'build': ('robot_b91.build', 'Rebuild MuJoCo assets from the saved CAD export'),
 }
@@ -41,6 +42,10 @@ def main():
         return
     if command not in COMMANDS:
         raise SystemExit(f'Unknown command: {command}. Run python robot.py --help.')
+    if command == 'crest':
+        # Worker processes must be able to import the trial function by module name.
+        from robot_b91.sim_crest import main as run_crest
+        raise SystemExit(run_crest(rest))
     if command == 'build' and rest:
         if rest in (['--help'], ['-h']):
             print('Usage: python robot.py build\nRebuild B10 from its saved CAD export.')

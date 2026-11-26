@@ -23,6 +23,7 @@ python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
 | Dashboard | `python dashboard/run.py` |
 | Servo calibration | `python servo_calibration/gui.py` |
 | Course simulation | `python robot.py walk --ramp` or `.\start.ps1` |
+| Foam crest simulation | `python robot.py crest --help` |
 | Simulation options | `python robot.py walk --help` |
 | Checks | `python robot.py check all` |
 
@@ -31,11 +32,131 @@ python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
 - Simulation gait: `reference/b91_gait.toml`
 - Generated reports and recordings: `results/` (ignored by Git)
 
+### Foam crest trials
+
+Compare the dashboard's current crest wave and the simulation candidate on identical starts:
+
+```powershell
+python robot.py crest --suite all --gait both --seed 20261127 --workers 4 --output results/ramp_trials/foam_crest_20261126.json
+```
+
+The default suite uses 10, 14, 18 and 22.5 cm crests. Supply `--heights-cm 12 16 20`
+to test other finished heights. The full suite adds alternate slopes, approach
+distances and offsets, then 24 seeded randomized starts. Each run starts from rest
+near one sharp crest on a 29 cm wide deck. Printed feet contact a compliant 10 mm layer
+over rigid backing. Sliding friction (0.9 to 1.3) and compliance are assumptions,
+not measurements. The candidate blends the climbing gait into the crest wave from
+body pitch, using ideal attitude with a pitch error in the perturbed cases.
+
+A pass requires the body to stay 22 cm past the crest for 0.2 s, all four feet
+to have loaded the downhill panel, at least two to be supporting the robot at
+finish, and no chassis support at finish. Roll or heading beyond 12 degrees,
+drift beyond 4 cm, floor contact, excess penetration, and timeout fail a run.
+The command exits nonzero for any failure of the selected gait (the candidate
+when running both). It does not connect to the robot or change its installed gait.
+
+On 2026-11-26 with MuJoCo 3.13.0 and seed `20261127`:
+
+| Crossings completed | Dashboard wave | Foam candidate |
+|---|---:|---:|
+| Standard heights and starts | 3/12 | 11/12 |
+| Alternative slopes and starts | 4/15 | 15/15 |
+| Randomized starts reserved for the final run | 8/24 | 22/24 |
+
+All 15 baseline successes were retained. Their median crossing time fell from 23.47 s
+to 10.47 s. The failures were the left start at 22.5 cm and random case 8 at
+19.75 cm (lateral drift), and random case 15 at 20.38 cm (heading). Limits are
+evaluated before report values are rounded. Above the course design height,
+`python robot.py crest --heights-cm 25 30` crossed 1/3 starts at 25 cm and 0/3
+at 30 cm. These are isolated crest trials, not a full-course or hardware qualification.
+
 One-off recovery probes and simulation experiment scripts are local, Git-ignored
 tools. Historical experiment commands below require those local files and are
 not available in a fresh checkout. The dashboard regression tests, trial recorder
 (`dashboard/ramp_trial.py`) and stationary camera checker
 (`dashboard/capture_ramp_views.py`) remain tracked.
+
+### Manual ramp testing — 2026-11-20 handoff
+
+The dashboard was left running at http://127.0.0.1:8765 with outputs off and
+the operator's requested speed retained. Place the robot on flat floor at the ramp entrance, clear
+your hands, and press **Follow ramp (camera + IMU)**. Keep the dashboard tab
+visible so its operator heartbeat stays active. **Stop all servos** stops it.
+
+Automatic entrance alignment, drift correction and crest assistance are enabled.
+The first climb is capped at 50%; subsequent phases allow up to the requested
+speed, with automatic slowing. After a disturbance or gait change, speed now stays
+at 50% until a complete stable gait cycle is observed. This latest speed-recovery
+change passes the tests but still needs physical validation. GUI runs stop at the
+ramp exit or a safety stop; the recorder's duration limits do not apply to the GUI.
+
+Navigation follows the paired ramp edges using the onboard camera and IMU.
+Edge confirmation now tolerates control updates up to 0.9 seconds apart while
+still requiring individually fresh images (under 0.35 seconds old, or 0.25 for
+entrance alignment). This fixes a recovery deadlock: recorded updates averaged
+about 0.6 seconds apart, but the former confirmation limit was 0.35 seconds.
+Alignment allows 15 seconds to reacquire edges or entrance floor visibility,
+holding steps during that interval; it allows 45 seconds without improvement
+and 120 seconds overall. On the ramp, brief gaps retain the existing one-second
+IMU guidance allowance, then hold steps and search for edges. Tilt, heading,
+controller connection and operator Stop guards remain active. These changes
+pass offline tests and a recorded-decision replay; physical reliability still
+needs validation by the operator. No firmware upload is needed.
+
+Entrance alignment now corrects toward 8 mm from the center and 2 degrees of
+the ramp direction, using the latest four independent edge measurements instead
+of a long median of already-filtered offsets. After correction, it switches to
+the installed firmware's zero-lift, zero-yaw stance, settles for two seconds,
+and verifies fresh, stable measurements with all feet down. If that check finds
+remaining error, it restores the correction gait and repeats. This fixes the
+observed loop where Wi-Fi delay let a foot lift between the feet-down status
+check and the pause command, gradually changing the heading during verification.
+The stance changes use confirmed stop/start requests; a failed change ends the
+run. No USB upload is required. This behavior still needs a physical test.
+
+Ramp centering now computes body offset from the paired-edge fit's own heading,
+when sufficient edge depth is visible. Previously it substituted the slowly
+corrected gyro heading into that geometry, which could reverse the reported
+side error. Gyro fusion still supplies steering and narrow-edge fallback.
+Logs now include the independent edge heading/offset and offset source. With
+drift control enabled, strafe gain is 12 (the sideways command remains capped
+at 0.3), and forward stride reduces smoothly from full at 1 cm offset to half
+at 3 cm. The 0.2 turn limit is unchanged; no fixed rightward bias is added.
+Crest, speed recovery and descent confirmation tolerate fresh control samples
+up to 0.9 seconds apart, fixing another 0.35-second cadence restriction that
+prevented crest assistance from arming in the latest runs. These changes are
+tested offline; physical drift and crossing performance remain unverified.
+
+With ramp drift control enabled, crossing 12 degrees of heading error now starts
+a bounded recovery instead of immediately ending the run. It caps speed at 50%
+and forward stride at 35%, retaining the existing turn and sideways limits.
+Correction requires fresh paired edges and roll below 10 degrees; otherwise
+steps hold while guidance settles. A single raw edge-offset excursion beyond
+5 cm also holds correction for rechecking. Recovery ends after heading stays
+within 7 degrees and offset within 2.5 cm for 0.8 seconds. It stops after 15
+seconds without recovery, at 20 degrees heading, 5 cm filtered offset, or the
+existing 12-degree roll/35-degree pitch envelope. Operator Stop and connection
+watchdogs remain immediate. Crest transitions wait during recovery. This is
+tested offline but not yet validated as a successful physical recovery.
+
+To run the current crest wave with the recorded alignment and drift options:
+
+```powershell
+.\.venv\Scripts\python.exe dashboard/run.py --ramp-only --adaptive-ramp-speed --align-ramp --ramp-drift-control
+```
+
+The current session additionally records controls and onboard images under
+`results/ramp_trials/manual_heading_recovery/`. Repeated GUI runs can be
+distinguished by their motion-session IDs and timestamps. For a fresh recording
+after restarting, append `--control-log results/ramp_trials/NEW/control.jsonl`,
+using a new folder name. The requested speed resets to 100% on a dashboard
+restart, so set its slider back to 65% before starting.
+
+Trial 54 data and analysis are in `results/ramp_trials/attempt_54_drift_control/`:
+`analysis.json`, `control_metrics.csv`, `control.jsonl`, `control_frames/`,
+`telemetry.jsonl` and webcam snapshots. That full attempt stopped at the first
+crest after 100.3 seconds; it did not complete the ramp. All 106 dashboard tests
+pass. The robot's full-ramp repeatability is still unresolved.
 
 ## Calibration and firmware
 
@@ -65,6 +186,112 @@ slowing: recorded time was approximately 206 seconds at 50% and 20 seconds at
 Peak recorded control roll was 8.68 degrees. This is one verified full automatic
 run; repeatability and different exam-course geometry remain unverified.
 Results and source hashes are in `results/ramp_trials/attempt_45_full_approach_heading/`.
+
+Repeat trial 46 on 2026-11-20 stopped on the first descent after 107.32 seconds
+at the 12-degree heading guard. It used the same control source and settings
+as trial 45 and remained on the ramp. Recorded navigation heading reached
+-12.16 degrees and peak control roll was 8.07 degrees. The cause of the drift
+is not established; reliable full traversal remains an open task.
+
+Trial 49 added automatic entrance alignment and handed over to climbing after
+3.65 seconds. It reached the descent phase at 92.29 seconds, then stopped at
+106.42 seconds after 12 seconds without camera reacquisition. It remained on
+the ramp with outputs off. This validates the alignment-to-climb transition,
+but is not another completed ramp run.
+
+Trial 50 corrected about 5 cm of entrance offset and 7 degrees of heading error,
+then entered the climb after 21.61 seconds. It switched to the crest gait at
+95.46 seconds and descent at 105.48 seconds. The user confirmed that the chassis
+was completely past the first ridge. After ordinary camera reacquisition,
+the IMU recorded a rapid turn during a diagonal foot lift; the 12-degree heading
+guard stopped the run at 124.24 seconds. The new two-view heading recovery did
+not trigger on this run. Outputs were confirmed off. Full-ramp repeatability
+is still unresolved, particularly during the first descent.
+
+Preliminary descent simulations compared the baseline with raised support,
+single-foot lifting, lower lifts, longer support time and earlier heading
+correction. None improved the sampled baseline result. These local experiments
+use assumed 25-degree geometry, unmeasured friction and ideal feedback; some
+cases slide substantially during initial settling. They do not justify replacing
+the physical gait. Results are under `results/ramp_trials/descent_support_sim/`,
+`descent_support_refined/` and `descent_steering_sim/`.
+
+Assisted descent trial 51 stopped after 2.63 seconds, before any walking steps.
+All four feet stayed in the commanded starting stance. The heading estimate
+changed from about 1.3 degrees in the stationary precheck to 12.5 degrees during
+settling; independent checks afterward gave 13.5 and 12.0 degrees at the two
+forward camera angles. This suggests turning or slipping during initial stance
+placement. The MCU deliberately holds yaw at zero during its first two seconds,
+so that reading cannot exclude physical turning in this interval. Outputs were
+confirmed off. This trial did not measure downhill walking performance; the next
+diagnostic starts with all four feet beyond the crest on the descending surface.
+Assisted section tests do not establish a full automatic traversal.
+
+Trial 52, placed with all four feet beyond the crest, exposed a separate startup
+error: a -19.3-degree heading fit made during IMU settling remained latched even
+though a stationary check afterward measured about zero. Unseeded camera/IMU
+ramp starts now wait until the MCU's two-second settling period has passed,
+then require at least four independent visual fits spanning 0.6 seconds at a
+forward camera angle. Heading spread must stay within 2 degrees, offset spread
+within 15 mm, and IMU attitude spread within 0.75 degrees. The median pose seeds
+normal tracking; an alignment handover keeps its already verified pose. The
+existing heading stop and camera search remain active.
+
+All 72 dashboard tests pass. Recorded-image replay confirmed startup after
+5.6 seconds, and a live check with legs disabled confirmed it after 2.93 seconds.
+Assisted trial 53 then walked down the first descent, through the valley and
+onto the next climb at 50%, stopping at its 35-second limit with outputs off.
+Peak recorded roll was 7.02 degrees. Camera search reacquired the downward rear
+view during the descent. The user still observed excessive left drift; estimated
+sideways error peaked near 50 mm. This validates startup and forward progress,
+but does not establish satisfactory lateral control or a full ramp traversal.
+
+The next correction candidate adds `--ramp-drift-control` to the dashboard
+command. Sideways gain rises from 6 to 8, retaining its existing 0.3 saturation
+and the 0.2 turn limit. Forward stride smoothly reduces from 100% at 15 mm offset
+to 65% at 40 mm, giving sideways correction more time without changing cadence.
+Both directions use the same response. This uses the installed controller's
+variable-forward protocol; a capability check rejects unsupported firmware
+before motion. Camera-only, manual, corridor and alignment profiles keep their
+existing settings.
+
+In an uncalibrated simulation screen, the selected response reduced lateral
+error in the three cases that completed, while the same three of six cases
+completed overall. Its first full physical test is described below. The change
+passed 78 dashboard tests, including 200 additional comparisons with MCU gait math and
+the required forward command during gait restarts and exit clearance.
+Monitored comparisons use a five-minute overall ceiling, allowing completion
+instead of the earlier 35-second cutoff.
+The recorder's guidance-hold timeout is now 25 seconds, configurable with
+`--guidance-timeout`; heading, tilt and connection-loss stops remain active.
+
+The user requested a full entrance start for trial 54. Alignment completed in
+about 12 seconds, then the robot climbed at 50% and entered the crest gait at
+91.7 seconds. It stopped at 100.3 seconds on the 12-degree heading guard and
+remained on the ramp. Fresh stationary fits from both forward views confirmed
+about -12.2 degrees heading, with only 2.4 mm lateral offset. Outputs were off.
+This was a real turn rather than a completed ramp run or a false heading stop.
+
+Detailed recording captured 521 acknowledged control updates and 519 onboard
+frames. The approach's median absolute estimated offset was 11.6 mm, with a
+45.3 mm peak; this single run does not establish improved repeatability.
+At the crest, diagonal front-right/rear-left lifting coincided with sharp yaw
+motion. The governor restored 65% after one quiet second between lifts; the
+next lift preceded the final heading stop. It also slipped at 50%, so speed
+alone is not a proven explanation.
+
+The governor now requires a whole stable gait cycle before restoring speed
+(four seconds at 50% for this gait). Gait changes restart that stability check,
+and gaps in observations cannot count toward it. Replay of trial 54 removes
+all four recorded 65% crest commands, but does not predict the resulting motion.
+All 80 dashboard tests pass; a physical repeat is pending.
+
+For detailed recording, add `--control-log results/ramp_trials/NEW/control.jsonl`
+to the dashboard command. Each acknowledged command records the fresh MCU
+status, navigation decision, timing and corresponding camera frame. A bounded
+background queue keeps image encoding and disk writes outside the control loop.
+Final samples now flush even after control stops; trial 54's last buffered
+records were lost on shutdown, so its stop event comes from `telemetry.jsonl`.
 
 This uses the earlier diagonal crest gait with gentle steering. Assisted trial
 40 cleared the first ridge, confirmed by the user, and changed to the descent
@@ -111,7 +338,7 @@ Onboard pitch triggers the first-crest transition;
 established camera/IMU guidance is retained. The crest uses the requested speed
 (65% planned for the next trial); adaptive speed is automatically enabled for the
 wave and reduces speed to 50% when roll, heading error or lateral drift increases.
-It restores requested speed after one second of stable alignment. The original
+It restores requested speed after a full stable gait cycle. The original
 gait resumes on descent. `--crest-assist` retains the
 previous diagonal crest gait for comparison. Neither option starts motion by itself.
 
@@ -214,7 +441,25 @@ views failed. Offline replay reacquired guidance after 11.2 seconds with the
 added view, including preservation of an existing heading estimate; the old
 sequence did not reacquire in 50 simulated seconds. Calibration anchors,
 steering limits and the requirement for sustained detection remain unchanged.
-Physical automatic use of the new view still needs validation.
+Trial 45 subsequently reacquired this view automatically on both descents.
+
+On the trial-49 descent, the retained heading of about -6 degrees rejected all
+ten stationary forward-view samples. Fresh fits at both forward camera angles
+agreed near +10 to +11 degrees with little lateral offset. The source of that
+heading disagreement is not established. A paused recovery now requires at
+least four consistent fresh observations spanning 0.6 seconds at each forward
+angle. Both views must agree within 2.5 degrees and 15 mm, with no more than
+2 degrees of body attitude change. Candidate heading must remain within the
+12-degree stop limit, offset within 50 mm, and heading correction within
+20 degrees. Rear views cannot trigger this recovery. The controller keeps steps
+held until ordinary sustained camera reacquisition succeeds after the update.
+
+Recorded-image replay reacquired in five seconds with recovery enabled; the
+previous search did not reacquire within 16 seconds. A live camera-only check
+reacquired in 7.1 seconds with leg outputs disabled throughout. Recovery during
+a moving full ramp run remains unvalidated. The recorder's 12-second search
+timeout used in those tests was 12 seconds; it is now 25 seconds following the
+request to allow more recovery time. Existing heading/tilt stops are unchanged.
 
 For a deliberate assisted placement at the first crest, add `--start-at-crest`
 to the dashboard command and `--assisted-crest-start --seconds 35` to
@@ -224,6 +469,45 @@ diagonal crest gait; the latter can be combined with `--adaptive-ramp-speed`.
 This begins directly in the selected crest gait, retains the heading/tilt guards,
 and restores the normal gait on descent. These tests are recorded as assisted
 and do not establish a full ramp traversal.
+
+### Ramp entrance alignment
+
+**Align with ramp** uses the onboard camera and IMU to center and straighten
+the robot on flat floor before the ramp. It commands sideways movement and
+heading correction with zero forward stride, at up to 50% speed. The entrance
+must be visible in the calibrated forward camera view, with floor visible
+between the robot and ramp. The laptop webcam remains operator feedback only.
+
+The capture range is 10 cm lateral offset and 20 degrees of heading error.
+Alignment requires an estimate within 12 mm and 3 degrees, followed by a
+stationary check with all feet planted. It stops at 8 degrees of roll/pitch,
+after three seconds without fresh camera guidance, after 18 seconds without
+measurable improvement, or after 45 seconds overall. Actual displacement can
+include fore/aft drift even though forward stride is zero.
+
+The standalone button stops after alignment. Add `--align-ramp` to the dashboard
+command to align automatically when **Follow ramp (camera + IMU)** is started, then
+confirm the controller is stopped before beginning the normal ramp program.
+The option cannot be combined with `--start-at-crest`. Installed firmware already
+supports this motion through `corridorSearchGait`, `crestWaveGait` and
+`boundedSteering`; no USB upload is needed. The existing climbing and crest gait
+settings are unchanged. Alignment requires a fresh visual heading on each
+accepted image, with IMU roll/pitch compensation. This avoids treating an old
+heading estimate as evidence that the body is centered.
+
+Physical trial 47 declared success during initial settling, but an independent
+stationary check disagreed; it is not counted as successful alignment. After
+the visual-heading correction, trial 48 made corrective steps and completed in
+22.78 seconds at 50%, with peak roll 0.95 degrees. A separate five-frame check
+gave median offset 10 mm right and heading -0.7 degrees, within the target;
+one image fit was an outlier. Outputs were confirmed off. This is one successful
+standalone test; larger offsets/headings and the opposite correction direction
+still need physical validation. Trial 49 subsequently validated the automatic
+transition into climbing, but stopped on the first descent after camera loss.
+The climb inherits the verified median heading and offset, rather than the
+latest individual frame. All 80 dashboard tests pass, including compiled
+controller gait comparisons, rejection of a final-frame outlier at handover,
+and the paused recovery's consistency and movement guards.
 
 ### Experimental sideways steps
 

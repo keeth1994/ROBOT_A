@@ -1,14 +1,17 @@
 """Camera navigation using orientation estimated on the ESP32."""
 import json
 import math
+from collections import deque
 from copy import copy
+from statistics import median
 
 import numpy as np
 
-from robot_b91.navigation import Navigation
+from robot_b91.navigation import Navigation, EDGE_SAMPLE_MAX_GAP_S, EDGE_SAMPLE_WINDOW_S
 from robot_b91.paths import ROOT
 from robot_b91.camera_calibration import load_camera_scan_settings, servo_to_cradle_deg, cradle_to_servo_deg
 from robot_b91.camera_scan import RampScanNavigation
+from .heading_recovery import PausedHeadingRecovery
 
 
 class CourseNavigation:
@@ -38,12 +41,19 @@ class CourseNavigation:
         self.downhill_seen = False
         self.checking_exit = self.exit_aimed = self.corridor_requested = False
         self.exit_missing_since = None
+        self.heading_recovery = PausedHeadingRecovery([
+            self.camera_calibration['forward_servo_deg'],
+            self.camera_calibration.get('forward_search_servo_deg', self.camera_calibration['forward_servo_deg'])])
+        # A verified alignment handover already supplies heading. Otherwise,
+        # bootstrap only after MCU settling, from consistent independent fits.
+        self.initial_pose_pending = None if self.scan_ramp and use_imu else False
+        self.initial_pose_samples = deque()
 
     def observe_slope(self, timestamp, pitch):
         if not self.scan_ramp or self.checking_exit or self.corridor_requested:
             return
         settings = self.camera_calibration
-        if self.last_slope_sample is not None and timestamp - self.last_slope_sample > .35:
+        if self.last_slope_sample is not None and timestamp - self.last_slope_sample > EDGE_SAMPLE_MAX_GAP_S:
             self.downhill_since = self.flat_since = None
         self.last_slope_sample = timestamp
         if pitch >= math.radians(settings['downhill_deg']):
@@ -71,11 +81,15 @@ class CourseNavigation:
 
     def report(self):
         return self.estimate.report() | {'detection_reason': self.reason,
+                                        'initial_pose_pending': self.initial_pose_pending,
+                                        'heading_recoveries': self.heading_recovery.count,
                                         'checking_ramp_exit': self.checking_exit,
                                         'corridor_requested': self.corridor_requested}
 
     def hold(self, reason, now, camera_frame):
         self.reason = reason
+        if self.initial_pose_pending:
+            self.initial_pose_samples.clear()
         if self.use_camera and camera_frame is not None:
             sequence, received, rgb = camera_frame
             if self.started <= received <= now and now - received < 1.5:
@@ -89,6 +103,9 @@ class CourseNavigation:
     def update(self, status, now, camera_frame):
         self.updated_at = now
         elapsed = now - self.started
+        if self.initial_pose_pending is None:
+            self.initial_pose_pending = not self.estimate.heading_initialized
+            self.estimate.require_visual_heading = self.initial_pose_pending
         if self.use_imu:
             try:
                 age = float(status.get('imuAgeMs', math.inf)) / 1000
@@ -107,6 +124,8 @@ class CourseNavigation:
             self.imu_heading = heading
             self.estimate.roll, self.estimate.pitch = roll, pitch
             self.estimate.last_imu = max(0, elapsed - age)
+            if self.initial_pose_pending and elapsed < 2:
+                return self.hold('Holding steps: waiting for startup IMU settling.', now, camera_frame)
             if elapsed >= 2:
                 self.observe_slope(now - age, pitch)
         if not self.use_camera:
@@ -157,9 +176,11 @@ class CourseNavigation:
             if (sequence != self.camera_sequence and self.started <= received <= now and
                     now - received < .35):
                 self.camera_sequence = sequence
+                if self.initial_pose_pending and received < self.started + 2:
+                    return self.hold('Holding steps: waiting for a camera frame after settling.', now, None)
                 if self.checking_exit:
                     previous = self.estimate.debug
-                    if previous is None or received - self.started - previous['timestamp'] > .35:
+                    if previous is None or received - self.started - previous['timestamp'] > EDGE_SAMPLE_MAX_GAP_S:
                         self.exit_missing_since = None
                     accepted = self.estimate.frame(received - self.started, rgb, use_imu=True)
                     if self.estimate.confirm_ramp(elapsed, accepted):
@@ -178,11 +199,26 @@ class CourseNavigation:
                     else:
                         self.exit_missing_since = None
                 elif self.scan_ramp:
+                    was_searching = self.estimate.searching
                     self.estimate.scan_frame(received - self.started, rgb,
                                              math.radians(servo_to_cradle_deg(self.camera_angle, self.camera_calibration)),
                                              0, self.estimate.camera_x, now=elapsed)
+                    if not self.estimate.searching:
+                        self.heading_recovery.reset()
+                    elif was_searching and self.use_imu and not self.initial_pose_pending:
+                        self._recover_paused_heading(received, rgb, status, now)
                 else:
                     self.estimate.frame(received - self.started, rgb, use_imu=self.use_imu)
+                if self.initial_pose_pending:
+                    self._confirm_initial_pose(received, status)
+        if self.initial_pose_pending:
+            if (self.initial_pose_samples and
+                    now - self.initial_pose_samples[-1][0] > EDGE_SAMPLE_MAX_GAP_S):
+                self.initial_pose_samples.clear()
+            self.reason = 'Holding steps: confirming a stable startup heading from the camera and IMU.'
+            if self.estimate.debug is not None:
+                self.estimate.debug = dict(self.estimate.debug, held=True, reason=self.reason)
+            return False
         if self.checking_exit:
             reason = ('Ramp ended after downhill and level readings; starting corridor search.'
                       if self.corridor_requested else
@@ -195,7 +231,10 @@ class CourseNavigation:
                  self.estimate.last_seen is not None and
                  elapsed - self.estimate.last_seen <= self.estimate.blind_timeout)
         if self.scan_ramp and self.estimate.searching:
-            self.reason = f'Walking paused; searching the {self.estimate.view} view for ramp guidance.'
+            if self.estimate.reacquired_since is not None:
+                self.reason = f'Holding steps: confirming ramp edges in the {self.estimate.view} view.'
+            else:
+                self.reason = f'Walking paused; searching the {self.estimate.view} view for ramp guidance.'
         elif ready:
             if self.estimate.debug and not self.estimate.debug['accepted']:
                 self.reason = f'Continuing briefly using the last valid {self.target} direction.'
@@ -206,3 +245,64 @@ class CourseNavigation:
             detail = self.estimate.debug['reason'] if self.estimate.debug else f'Waiting for visible {self.target}'
             self.reason = 'Holding steps: ' + detail + '.'
         return ready
+
+    def _confirm_initial_pose(self, received, status):
+        estimate = self.estimate
+        debug = estimate.debug or {}
+        samples = self.initial_pose_samples
+        forward_angles = self.heading_recovery.angles
+        if (not debug.get('accepted') or estimate.searching or
+                self.camera_angle not in forward_angles):
+            samples.clear()
+            return
+        if samples and (self.camera_angle != samples[-1][1] or
+                        not 0 < received - samples[-1][0] <= EDGE_SAMPLE_MAX_GAP_S):
+            samples.clear()
+        samples.append((received, self.camera_angle, debug['measured_heading_rad'],
+                        debug['measured_lateral_m'], tuple(status['orientation'])))
+        while samples and received - samples[0][0] > EDGE_SAMPLE_WINDOW_S:
+            samples.popleft()
+        if len(samples) < 4 or received - samples[0][0] < .6:
+            return
+        headings, offsets = [s[2] for s in samples], [s[3] for s in samples]
+        attitude_stable = all(max(s[4][axis] for s in samples) - min(s[4][axis] for s in samples)
+                              <= math.radians(.75) for axis in range(3))
+        if (not attitude_stable or max(headings) - min(headings) > math.radians(2) or
+                max(offsets) - min(offsets) > .015):
+            return
+        # Pass the measured heading through to steering and optional drift recovery.
+        estimate.heading, estimate.lateral = median(headings), median(offsets)
+        estimate.require_visual_heading = False
+        self.initial_pose_pending = False
+        samples.clear()
+
+    def _recover_paused_heading(self, received, rgb, status, now):
+        """Probe fresh visual poses without changing the tracked pose prematurely."""
+        estimate = self.estimate
+        if (self.camera_angle not in self.heading_recovery.angles or
+                self.camera_angle != self.camera_target(now)):
+            self.heading_recovery.missing()
+            return
+        probe = copy(estimate)
+        probe.require_visual_heading = True
+        if not probe.frame(received-self.started, rgb, use_imu=True):
+            self.heading_recovery.missing()
+            return
+        action = self.heading_recovery.observe(
+            received-self.started, self.camera_angle,
+            probe.debug['measured_heading_rad'], probe.debug['measured_lateral_m'],
+            status['orientation'], estimate.heading)
+        if action is None:
+            return
+        if 'target_angle' in action:
+            estimate.start_search(now-self.started,
+                math.radians(servo_to_cradle_deg(self.camera_angle, self.camera_calibration)),
+                'forward', shallow=action['target_angle'] != self.camera_calibration['forward_servo_deg'])
+            estimate.last_seen = None
+            return
+        estimate.heading, estimate.lateral = action['heading'], action['lateral']
+        estimate.heading_initialized = True
+        estimate.last_seen = None
+        estimate.reacquired_since = estimate.last_confirmation = None
+        # Keep searching until the ordinary detector confirms sustained guidance
+        # with this pose. No steps are enabled by the recovery itself.

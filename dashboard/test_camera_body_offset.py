@@ -81,6 +81,33 @@ class CameraBodyOffsetTests(unittest.TestCase):
         self.assertTrue(nav.frame(5.2,ramp_image(0,0,math.radians(10),0,lens)), nav.debug['reason'])
         self.assertAlmostEqual(nav.heading, math.radians(10), delta=.005)
 
+    def test_heading_bias_cannot_reverse_edge_based_centering(self):
+        lens = np.array([-.017, 0, .247])
+        for view in (30, 158):
+            for body_y in (-.04, .04):
+                for bias_deg in (-8, 8):
+                    with self.subTest(view=view, offset=body_y, bias=bias_deg):
+                        roll, pitch, yaw = np.radians([4, -15, 2])
+                        nav = Navigation(width_m=.29, camera_pitch_deg=view,
+                                         camera_x_m=lens[0], camera_z_m=lens[2])
+                        nav.view_sign = 1 if view == 30 else -1
+                        nav.heading_initialized = True
+                        nav.heading = yaw + math.radians(bias_deg)
+                        nav.roll, nav.pitch = roll, pitch
+                        rgb = ramp_image(roll, pitch, yaw, body_y, lens, view, -.2)
+                        self.assertTrue(nav.frame(5, rgb), nav.debug['reason'])
+                        self.assertEqual(nav.debug['lateral_source'], 'paired_edges')
+                        self.assertAlmostEqual(nav.debug['measured_lateral_m'], body_y, delta=.004)
+                        self.assertAlmostEqual(nav.heading, yaw+math.radians(bias_deg))
+
+    def test_narrow_edge_view_reports_heading_dependent_fallback(self):
+        image = np.full((240, 320, 3), 200, dtype=np.uint8)
+        image[80:110, 100:220] = 15
+        nav = Navigation(camera_pitch_deg=0)
+        self.assertTrue(nav.frame(3, image))
+        self.assertEqual(nav.debug['lateral_source'], 'tracked_heading')
+        self.assertIsNone(nav.debug['visual_heading_rad'])
+
 
 if __name__ == '__main__':
     unittest.main()

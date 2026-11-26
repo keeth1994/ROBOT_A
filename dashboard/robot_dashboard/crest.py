@@ -1,6 +1,8 @@
 """First-crest wave gait, triggered only by onboard observations."""
 import math
 
+from robot_b91.navigation import EDGE_SAMPLE_MAX_GAP_S
+
 
 # Trial 34's front .45/rear 35% stayed grounded. Try a wider .55 front stroke
 # with rear 30%: front excursion increases 22%, rear stays near .16 rad.
@@ -11,19 +13,27 @@ CREST_WAVE_GAIT = dict(duty=.8, yaw_amplitude=.55, rear_stride_scale=.30, pitch_
 
 
 class RampSpeedGovernor:
-    """Slow early near the edge; require sustained centering before speeding up."""
+    """Slow early; observe an entire stable gait cycle before speeding up."""
     def __init__(self):
         self.slow = False
         self.centered_since = None
+        self.previous = None
 
-    def update(self, now, requested, roll, heading, lateral, *, ready):
+    def require_stability(self):
+        self.slow = True
+        self.centered_since = self.previous = None
+
+    def update(self, now, requested, roll, heading, lateral, *, ready, stable_cycle_s=1.):
+        if self.previous is not None and not 0 <= now - self.previous <= EDGE_SAMPLE_MAX_GAP_S:
+            self.centered_since = None
+        self.previous = now
         if abs(roll) >= math.radians(5) or abs(heading) >= math.radians(8) or abs(lateral) >= .02:
             self.slow = True
             self.centered_since = None
         elif (ready and abs(roll) < math.radians(3) and abs(heading) < math.radians(4) and
               abs(lateral) < .012):
             self.centered_since = now if self.centered_since is None else self.centered_since
-            if now - self.centered_since >= 1:
+            if now - self.centered_since >= max(1., stable_cycle_s):
                 self.slow = False
         else:
             self.centered_since = None
@@ -43,7 +53,7 @@ class CrestSequence:
         self.previous = now
         if self.requested or self.phase == 'descent':
             return
-        if not ready or not 0 < dt <= .35:
+        if not ready or not 0 < dt <= EDGE_SAMPLE_MAX_GAP_S:
             self.since = None
             return
         self.moving_seconds += dt
