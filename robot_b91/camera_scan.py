@@ -4,7 +4,7 @@ import math
 
 from robot_b91.navigation import Navigation
 
-BACKWARD_RETRY_DISTANCE_M = .05
+BACKWARD_RETRY_DISTANCE_M = .10
 
 
 def flip_target(elapsed, start, end, settings):
@@ -200,7 +200,7 @@ class RampScanNavigation(Navigation):
         elif self.backward_retry == 'advance':
             guidance = 'Following both forward edges' if self.retry_using_vision else 'Using the saved gyro direction'
             self.debug['reason'] = (f'{guidance} before retrying the backward view: '
-                                    f'{self.retry_distance * 100:.1f} / 5 cm estimated')
+                                    f'{self.retry_distance * 100:.1f} / {BACKWARD_RETRY_DISTANCE_M * 100:g} cm estimated')
         elif self.backward_pending and accepted:
             self.debug['reason'] += '; waiting for both forward edges before turning camera backward'
         elif not accepted and self.last_seen is not None:

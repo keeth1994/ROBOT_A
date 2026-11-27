@@ -109,7 +109,7 @@ class SecondClimbCameraTests(unittest.TestCase):
             nav = self.retry_navigation()
             nav.motion_speed = speed
             nav.walking = True
-            for i in range(1, 50):
+            for i in range(1, 100):
                 now = 9.2 + i * .1
                 forward_frame(nav, now)
                 if nav.backward_retry == 'backward':
@@ -117,7 +117,7 @@ class SecondClimbCameraTests(unittest.TestCase):
                 self.assertTrue(nav.ready(now))
             self.assertEqual(nav.view, 'backward')
             self.assertEqual(nav.backward_retry, 'backward')
-            self.assertAlmostEqual(nav.retry_distance, .05, delta=.0031)
+            self.assertAlmostEqual(nav.retry_distance, .10, delta=.0031)
             durations.append(now - 9.2)
             for elapsed in (2.1, 2.3, 2.5):
                 backward_frame(nav, now + elapsed)
