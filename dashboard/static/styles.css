@@ -30,6 +30,9 @@ button.danger { color: #fff; background: #a52d2d; border-color: #cf6464; }
 .stats { font: 12px ui-monospace, monospace; }
 #consoleLog { height: 220px; overflow: auto; margin: 0 0 6px; padding: 10px; background: #101214; color: #b7e6bd; border: 1px solid var(--line); font: 12px/1.6 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 #debugFeed { display: block; width: 100%; height: auto; }
+.joint-plot-view { overflow-x: auto; }
+#jointPlot { display: block; width: 100%; min-width: 600px; height: auto; background: white; color-scheme: light; }
+#jointPlotPanel summary { font-size: 17px; font-weight: 600; }
 #walkSpeed { width: 100%; }
 summary { cursor: pointer; }
 .form-row, .actions { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }

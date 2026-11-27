@@ -52,17 +52,20 @@ class Handler(BaseHTTPRequestHandler):
                 query = parse_qs(urlsplit(self.path).query)
                 try:
                     after = max(0, int(query.get('after_message', ['0'])[0]))
+                    after_joint = max(0, int(query.get('after_joint', ['0'])[0]))
                 except ValueError:
-                    return self.json({'error': 'Use a valid message number.'}, 400)
+                    return self.json({'error': 'Use valid history numbers.'}, 400)
                 state = self.server.app.state(after_message=after,
-                                              message_session=query.get('message_session', [None])[0])
+                                              message_session=query.get('message_session', [None])[0],
+                                              after_joint=after_joint)
                 return self.json({**state, 'token': self.server.token})
             if path == '/api/video.mjpeg':
                 return self.stream()
             if path == '/api/navigation-debug.jpg':
                 return self.send_bytes(self.server.app.navigation_debug_frame(), 'image/jpeg')
             files = {'/': ('index.html', 'text/html; charset=utf-8'),
-                     '/app.js': ('app.js', 'text/javascript'), '/styles.css': ('styles.css', 'text/css')}
+                     '/app.js': ('app.js', 'text/javascript'), '/styles.css': ('styles.css', 'text/css'),
+                     '/gait-plot.js': ('gait-plot.js', 'text/javascript')}
             if path not in files:
                 return self.json({'error': 'Not found.'}, 404)
             filename, content_type = files[path]

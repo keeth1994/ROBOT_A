@@ -31,6 +31,13 @@
     <pre id="consoleLog" tabindex="0" aria-label="Dashboard message history"></pre>
     <small>Latest 5,000 messages. Scroll up to read earlier messages.</small>
   </section>
+  <section>
+    <details id="jointPlotPanel">
+      <summary>Live joint targets</summary>
+      <p class="subtle">Commanded joint angles · latest 10 seconds.</p>
+      <div class="joint-plot-view"><canvas id="jointPlot" width="1100" height="650" role="img" aria-label="Live yaw and pitch joint targets for FL, RL, FR and RR legs"></canvas></div>
+    </details>
+  </section>
   <div class="workspace">
     <section>
       <div class="panel-head"><h2>Camera</h2><button id="videoToggle">Start video</button></div>
@@ -101,6 +108,7 @@
   </div>
   <p class="subtle">Lost heartbeat disables Wi-Fi motion after 3 seconds.</p>
 </main>
+<script src="/gait-plot.js"></script>
 <script src="/app.js"></script>
 </body>
 </html>

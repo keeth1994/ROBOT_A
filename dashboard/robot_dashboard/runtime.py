@@ -3,6 +3,7 @@ from collections import deque
 from copy import copy
 from io import BytesIO
 import json
+import math
 from pathlib import Path
 import threading
 import time
@@ -165,6 +166,9 @@ class Dashboard:
         self.camera = CameraPipeline(self.stream_url)
         self.message_lock = threading.Lock()
         self.messages = deque(maxlen=5000)
+        self.joint_samples = deque(maxlen=400)
+        self.joint_sequence = 0
+        self.joint_started = None
         self.message_sequence = 0
         self.message_session = str(time.time_ns())
         self.last_messages = {}
@@ -211,6 +215,7 @@ class Dashboard:
                     if not alive:
                         raise devices.DeviceError('Operator heartbeat lost; walking stopped.')
                     status = devices.request(url, '/status', timeout=.15)
+                    self.record_joint_sample(status)
                     frame = self.walking.frame(status, time.monotonic(), self.camera.navigation_frame())
                     navigation = self.walking.navigation
                     if navigation and navigation.use_camera:
@@ -420,7 +425,30 @@ class Dashboard:
             self.message_sequence += 1
             self.messages.append(dict(id=self.message_sequence, time=time.time(), source=source, message=message))
 
-    def state(self, after_message=0, message_session=None):
+    def record_joint_sample(self, status, now=None):
+        if not status.get('externalActive'):
+            return
+        joints = status.get('joints')
+        if not isinstance(joints, list):
+            return
+        angles = {joint.get('name'): joint.get('angle') for joint in joints if isinstance(joint, dict)}
+        names = [f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch')]
+        if any(isinstance(angles.get(name), bool) or not isinstance(angles.get(name), (int, float)) or
+               not math.isfinite(angles[name]) for name in names):
+            return
+        # Reverse the controller's mounting conversion to recover gait joint targets.
+        yaw = [angles[f'{leg}_yaw'] * (-1 if leg in ('RL', 'RR') else 1)
+               for leg in ('FL', 'RL', 'FR', 'RR')]
+        pitch = [angles[f'{leg}_pitch'] - 45 for leg in ('FL', 'RL', 'FR', 'RR')]
+        now = time.monotonic() if now is None else now
+        with self.lock:
+            if self.joint_started is None:
+                self.joint_started = now
+            self.joint_sequence += 1
+            self.joint_samples.append(dict(id=self.joint_sequence, time_s=now - self.joint_started,
+                                           yaw=yaw, pitch=pitch))
+
+    def state(self, after_message=0, message_session=None, after_joint=0):
         with self.lock:
             now = time.monotonic()
             status = {'config': dict(self.config)}
@@ -435,8 +463,11 @@ class Dashboard:
         with self.message_lock:
             if message_session != self.message_session:
                 after_message = 0
+                after_joint = 0
             status['message_session'] = self.message_session
             status['messages'] = [dict(entry) for entry in self.messages if entry['id'] > after_message]
+        with self.lock:
+            status['joint_samples'] = [dict(sample) for sample in self.joint_samples if sample['id'] > after_joint]
         return status
 
     def navigation_debug_frame(self):

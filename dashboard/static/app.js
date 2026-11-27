@@ -5,6 +5,8 @@ let addressesLoaded = false, showingVideo = false;
 let debugUrl = null;
 let speedBusy = false;
 let messageSession = '', lastMessage = 0;
+let lastJoint = 0;
+const gaitPlot = new GaitPlot(el('jointPlot'));
 let consoleLines = [];
 const consoleMessages = new Map();
 const rows = new Map();
@@ -126,6 +128,13 @@ function render(state) {
   if (messageSession !== state.message_session) {
     messageSession = state.message_session;
     lastMessage = 0;
+    lastJoint = 0;
+    gaitPlot.reset();
+  }
+  const samples = (state.joint_samples || []).filter(sample => sample.id > lastJoint);
+  if (samples.length) {
+    lastJoint = samples[samples.length - 1].id;
+    gaitPlot.append(samples);
   }
   let messagesAdded = false;
   for (const entry of state.messages || []) {
@@ -212,7 +221,7 @@ function render(state) {
 }
 async function poll() {
   try {
-    const query = new URLSearchParams({after_message:lastMessage, message_session:messageSession});
+    const query = new URLSearchParams({after_message:lastMessage, message_session:messageSession, after_joint:lastJoint});
     const response = await fetch('/api/state?' + query, {cache:'no-store', signal:AbortSignal.timeout(2000)});
     if (!response.ok) throw Error('Local server unavailable');
     render(await response.json());
@@ -260,6 +269,8 @@ el('clearConsole').onclick = () => {
   consoleMessages.clear();
   el('consoleLog').textContent = '';
 };
+el('jointPlotPanel').ontoggle = () => gaitPlot.draw();
+window.addEventListener('resize', () => gaitPlot.draw());
 el('cameraPitchEnable').onclick = () => servoCommand('camera-pitch', {angle:0});
 el('cameraPitchRelease').onclick = () => servoCommand('camera-pitch', {release:1});
 el('cameraPitch').oninput = () => { el('cameraPitchValue').textContent = el('cameraPitch').value + '°'; };
