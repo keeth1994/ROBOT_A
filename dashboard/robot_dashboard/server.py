@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import secrets
 import time
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from .devices import DeviceError
 from .walking import WALK_ACTIONS
@@ -49,7 +49,14 @@ class Handler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         try:
             if path == '/api/state':
-                return self.json({**self.server.app.state(), 'token': self.server.token})
+                query = parse_qs(urlsplit(self.path).query)
+                try:
+                    after = max(0, int(query.get('after_message', ['0'])[0]))
+                except ValueError:
+                    return self.json({'error': 'Use a valid message number.'}, 400)
+                state = self.server.app.state(after_message=after,
+                                              message_session=query.get('message_session', [None])[0])
+                return self.json({**state, 'token': self.server.token})
             if path == '/api/video.mjpeg':
                 return self.stream()
             if path == '/api/navigation-debug.jpg':

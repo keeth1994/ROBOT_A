@@ -1,4 +1,5 @@
 import http.client
+from collections import deque
 from copy import copy
 from io import BytesIO
 import json
@@ -162,7 +163,13 @@ class Dashboard:
         self.cache = {name: {'online': False, 'data': None, 'error': 'Connecting...', 'at': 0}
                       for name in ('servo', 'camera')}
         self.camera = CameraPipeline(self.stream_url)
-        self.walking = Walking(crest_enabled=crest_enabled, crest_position=crest_position)
+        self.message_lock = threading.Lock()
+        self.messages = deque(maxlen=5000)
+        self.message_sequence = 0
+        self.message_session = str(time.time_ns())
+        self.last_messages = {}
+        self.walking = Walking(crest_enabled=crest_enabled, crest_position=crest_position,
+                               on_message=lambda text: self.log_message('Motion', text))
         self.course_running = False
         self.debug_lock = threading.Lock()
         self.debug_preview = CourseNavigation(time.monotonic(), use_imu=False)
@@ -205,6 +212,9 @@ class Dashboard:
                         raise devices.DeviceError('Operator heartbeat lost; walking stopped.')
                     status = devices.request(url, '/status', timeout=.15)
                     frame = self.walking.frame(status, time.monotonic(), self.camera.navigation_frame())
+                    navigation = self.walking.navigation
+                    if navigation and navigation.use_camera:
+                        self.log_message('Vision', (navigation.estimate.debug or {}).get('reason'))
                     if not self.walking.active:
                         if not self._continue_course(url):
                             devices.request(url, '/stop', {}, timeout=.15)
@@ -394,9 +404,23 @@ class Dashboard:
             with self.lock:
                 if generation == self.generation and epoch == self.status_epoch[name]:
                     self.cache[name] = update
+                    data = update['data'] or {}
+                    text = update['error'] or data.get('message') or data.get('error')
+                    self.log_message('Controller' if name == 'servo' else 'Camera', text)
             self.stop_event.wait(.5 if name == 'servo' else 1)
 
-    def state(self):
+    def log_message(self, source, message):
+        if not message:
+            return
+        message = str(message)
+        with self.message_lock:
+            if self.last_messages.get(source) == message:
+                return
+            self.last_messages[source] = message
+            self.message_sequence += 1
+            self.messages.append(dict(id=self.message_sequence, time=time.time(), source=source, message=message))
+
+    def state(self, after_message=0, message_session=None):
         with self.lock:
             now = time.monotonic()
             status = {'config': dict(self.config)}
@@ -404,8 +428,15 @@ class Dashboard:
                 status[name] = {**entry, 'online': entry['online'] and now - entry['at'] < 2.5}
             status['operator_alive'] = now - self.browser_heartbeat < 1.5
         status['pipeline'] = self.camera.state()
+        pipeline = status['pipeline']
+        self.log_message('Video', 'Video stream live.' if pipeline['fresh'] else pipeline['error'])
         status['walking'] = self.walking.state()
         status['walking']['course_running'] = self.course_running
+        with self.message_lock:
+            if message_session != self.message_session:
+                after_message = 0
+            status['message_session'] = self.message_session
+            status['messages'] = [dict(entry) for entry in self.messages if entry['id'] > after_message]
         return status
 
     def navigation_debug_frame(self):

@@ -4,10 +4,30 @@ let token = '', current = null, commandBusy = false, cameraBusy = false, cameraD
 let addressesLoaded = false, showingVideo = false;
 let debugUrl = null;
 let speedBusy = false;
+let messageSession = '', lastMessage = 0;
+let consoleLines = [];
+const consoleMessages = new Map();
 const rows = new Map();
 const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
   walkCourseTape:'course_tape', walkCourseImu:'course_imu', walkCorridor:'corridor',
   searchCorridor:'corridor_search', dance:'dance', runCourse:'run_course'};
+
+function renderConsole() {
+  const output = el('consoleLog');
+  const atBottom = output.scrollHeight - output.scrollTop - output.clientHeight < 24;
+  output.textContent = consoleLines.join('\n');
+  if (atBottom) output.scrollTop = output.scrollHeight;
+}
+
+function consoleMessage(source, text, time = Date.now(), refresh = true) {
+  if (!text || consoleMessages.get(source) === text) return;
+  consoleMessages.set(source, text);
+  const date = new Date(time);
+  const timestamp = date.toLocaleTimeString([], {hour12:false}) + '.' + String(date.getMilliseconds()).padStart(3, '0');
+  consoleLines.push('[' + timestamp + '] ' + source + ': ' + text);
+  if (consoleLines.length > 5000) consoleLines.shift();
+  if (refresh) renderConsole();
+}
 
 function showSpeed(speed) {
   el('walkSpeed').value = Math.round(speed * 100);
@@ -27,6 +47,7 @@ function badge(id, text, good = false, bad = false) {
 }
 function message(text, error = false) {
   el('result').textContent = text; el('result').style.borderColor = error ? 'var(--danger)' : 'var(--line)';
+  consoleMessage(error ? 'Error' : 'Dashboard', text);
 }
 async function servoCommand(name, values = {}) {
   if (commandBusy && name !== 'stop') return;
@@ -102,6 +123,18 @@ function renderIr(status) {
 }
 function render(state) {
   current = state; token = state.token || token;
+  if (messageSession !== state.message_session) {
+    messageSession = state.message_session;
+    lastMessage = 0;
+  }
+  let messagesAdded = false;
+  for (const entry of state.messages || []) {
+    if (entry.id <= lastMessage) continue;
+    consoleMessage(entry.source, entry.message, entry.time * 1000, false);
+    lastMessage = entry.id;
+    messagesAdded = true;
+  }
+  if (messagesAdded) renderConsole();
   el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'course_tape', 'corridor_search'].includes(state.walking.profile)
     ? 'Live walking perception: the actual frame and decision used by the controller.'
     : 'Camera preview only; no walking starts.';
@@ -179,10 +212,13 @@ function render(state) {
 }
 async function poll() {
   try {
-    const response = await fetch('/api/state', {cache:'no-store', signal:AbortSignal.timeout(2000)});
+    const query = new URLSearchParams({after_message:lastMessage, message_session:messageSession});
+    const response = await fetch('/api/state?' + query, {cache:'no-store', signal:AbortSignal.timeout(2000)});
     if (!response.ok) throw Error('Local server unavailable');
     render(await response.json());
+    consoleMessage('Connection', 'Dashboard connected.');
   } catch (error) {
+    consoleMessage('Connection', error.message);
     current = null; renderControls(); clearFeed(); badge('operator', 'PC server unavailable', false, true);
     renderIr(null);
     el('accel').textContent = el('gyro').textContent = '— / — / —';
@@ -194,6 +230,7 @@ async function heartbeat() {
     if (token && document.visibilityState === 'visible') await post('/api/heartbeat', {}, 1200);
   } catch (error) {
     badge('operator', 'Heartbeat not confirmed', false, true);
+    consoleMessage('Heartbeat', error.message);
   } finally { setTimeout(heartbeat, 250); }
 }
 async function debugPoll() {
@@ -207,6 +244,7 @@ async function debugPoll() {
     debugUrl = nextUrl;
   } catch (error) {
     el('debugSource').textContent = error.message;
+    consoleMessage('Camera debug', error.message);
     el('debugFeed').hidden = true;
   } finally { setTimeout(debugPoll, 500); }
 }
@@ -217,6 +255,11 @@ el('cameraDebug').ontoggle = async () => {
   }
 };
 el('stop').onclick = () => servoCommand('stop');
+el('clearConsole').onclick = () => {
+  consoleLines = [];
+  consoleMessages.clear();
+  el('consoleLog').textContent = '';
+};
 el('cameraPitchEnable').onclick = () => servoCommand('camera-pitch', {angle:0});
 el('cameraPitchRelease').onclick = () => servoCommand('camera-pitch', {release:1});
 el('cameraPitch').oninput = () => { el('cameraPitchValue').textContent = el('cameraPitch').value + '°'; };

@@ -28,6 +28,7 @@ button.danger { color: #fff; background: #a52d2d; border-color: #cf6464; }
 [hidden] { display: none !important; }
 #placeholder { padding: 16px; color: #adb4bd; text-align: center; }
 .stats { font: 12px ui-monospace, monospace; }
+#consoleLog { height: 220px; overflow: auto; margin: 0 0 6px; padding: 10px; background: #101214; color: #b7e6bd; border: 1px solid var(--line); font: 12px/1.6 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 #debugFeed { display: block; width: 100%; height: auto; }
 #walkSpeed { width: 100%; }
 summary { cursor: pointer; }

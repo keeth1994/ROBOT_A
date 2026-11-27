@@ -20,7 +20,8 @@ RAMP_PROFILES = ('course', 'course_camera')
 
 
 class Walking:
-    def __init__(self, *, crest_enabled=True, crest_position='first'):
+    def __init__(self, *, crest_enabled=True, crest_position='first', on_message=None):
+        self.on_message = on_message
         if crest_position not in ('first', 'last'):
             raise ValueError('Crest position must be first or last.')
         self.crest_position = crest_position
@@ -39,6 +40,17 @@ class Walking:
         self.resume_until = None
         self.camera_settings = load_camera_scan_settings()
         self.message = 'Stopped. Walking is not started automatically.'
+
+    @property
+    def message(self):
+        return self._message
+
+    @message.setter
+    def message(self, text):
+        changed = text != getattr(self, '_message', None)
+        self._message = text
+        if changed and self.on_message:
+            self.on_message(text)
 
     def state(self):
         period = self.params['period']

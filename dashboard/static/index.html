@@ -26,6 +26,11 @@
     <p><button id="connect">Save addresses</button> <small>Use the IP from Serial Monitor if .local names fail.</small></p>
   </section>
   <p id="result" role="status" class="result">Ready. No movement starts automatically.</p>
+  <section>
+    <div class="panel-head"><h2>Console</h2><button id="clearConsole">Clear</button></div>
+    <pre id="consoleLog" tabindex="0" aria-label="Dashboard message history"></pre>
+    <small>Latest 5,000 messages. Scroll up to read earlier messages.</small>
+  </section>
   <div class="workspace">
     <section>
       <div class="panel-head"><h2>Camera</h2><button id="videoToggle">Start video</button></div>
