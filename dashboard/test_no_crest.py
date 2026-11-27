@@ -7,6 +7,7 @@ from unittest.mock import patch
 from dashboard.robot_dashboard.runtime import Dashboard
 from dashboard.robot_dashboard.walking import Walking
 from dashboard.test_crest_sequence import status
+from dashboard.test_second_climb_camera import forward_frame
 
 
 class NoCrestTests(unittest.TestCase):
@@ -37,6 +38,7 @@ class NoCrestTests(unittest.TestCase):
             for i in range(8):
                 walking.navigation.observe_slope(start + i * .1, math.radians(pitch))
         self.assertEqual(walking.navigation.estimate.climbs_seen, 2)
+        forward_frame(walking.navigation.estimate, 5)
         self.assertEqual(walking.camera_target(110), -4)
         enabled = Walking()
         enabled.begin(status(), 1, 100, 'course')

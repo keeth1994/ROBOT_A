@@ -159,6 +159,8 @@ class CourseNavigation:
                  elapsed - self.estimate.last_seen <= self.estimate.blind_timeout)
         if self.scan_ramp and self.estimate.searching:
             self.reason = f'Walking paused; searching the {self.estimate.view} view for ramp guidance.'
+        elif self.scan_ramp and self.estimate.backward_retry == 'advance' and ready:
+            self.reason = self.estimate.debug['reason'] + '.'
         elif ready:
             if self.estimate.debug and not self.estimate.debug['accepted']:
                 self.reason = f'Continuing briefly using the last valid {self.target} direction.'

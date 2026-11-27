@@ -181,6 +181,8 @@ class Walking:
             raise DeviceError('ESP32 is stopping after losing navigation; restart explicitly.', 409)
         if self.profile in ('corridor', 'corridor_search'):
             self.navigation.set_speed(self.speed)
+        elif self.navigation and getattr(self.navigation, 'scan_ramp', False):
+            self.navigation.estimate.motion_speed = self.speed
         if self.resume_until is not None:
             if now < self.resume_until:
                 self.sequence += 1
@@ -198,6 +200,8 @@ class Walking:
             self.crest_sequence.observe(now, self.navigation.estimate.pitch, ready and now - self.started >= 2)
             if self.crest_sequence.requested:
                 ready = False
+        if self.navigation and getattr(self.navigation, 'scan_ramp', False):
+            self.navigation.estimate.walking = ready
         if (PROFILES[self.profile] or self.profile == 'dance') and now - self.started < 2:
             self.message = 'Settling for 2 seconds; keep the robot still.'
         elif self.profile == 'dance' and status.get('danceTurnDegrees') is not None:

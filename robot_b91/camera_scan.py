@@ -4,6 +4,8 @@ import math
 
 from robot_b91.navigation import Navigation
 
+BACKWARD_RETRY_DISTANCE_M = .05
+
 
 def flip_target(elapsed, start, end, settings):
     """Pass quickly through straight down and approach each viewing angle smoothly."""
@@ -31,6 +33,13 @@ class RampScanNavigation(Navigation):
         self.climbs_seen = 0
         self.slope_stage = 'first_climb'
         self.slope_since = self.last_slope_sample = None
+        self.backward_pending = False
+        self.backward_retry = None
+        self.retry_distance = 0.0
+        self.retry_updated = None
+        self.retry_gyro_heading = self.retry_last_heading = 0.0
+        self.retry_using_vision = False
+        self.motion_speed = 1.0
 
     def observe_slope(self, timestamp, pitch):
         """Recognize climb, descent, then second climb from IMU pitch."""
@@ -61,7 +70,7 @@ class RampScanNavigation(Navigation):
             self.climbs_seen = 2
             self.slope_stage = 'complete'
             if self.view != 'backward':
-                self.start_search(timestamp, self.camera_pitch - self.mount_pitch, 'backward')
+                self.backward_pending = True
             return True
         return False
 
@@ -79,6 +88,8 @@ class RampScanNavigation(Navigation):
 
     def start_search(self, timestamp, angle, view):
         self.view = view
+        if view == 'backward':
+            self.backward_pending = False
         self.searching = True
         self.walking = False
         self.move_started = timestamp
@@ -113,6 +124,15 @@ class RampScanNavigation(Navigation):
         # Dashboard video can arrive before the current IMU sample. Search timing
         # uses control time while ramp observation age keeps the image timestamp.
         now = timestamp if now is None else now
+        was_retrying = self.backward_retry is not None
+        if was_retrying:
+            turn = self.heading - self.retry_last_heading
+            self.retry_gyro_heading += math.atan2(math.sin(turn), math.cos(turn))
+        if self.backward_retry == 'advance':
+            dt = max(0, min(.3, now - self.retry_updated))
+            if self.walking:
+                self.retry_distance += self.settings['estimated_speed_m_s'] * self.motion_speed * dt
+            self.retry_updated = now
         self.camera_pitch = self.mount_pitch + angle
         self.camera_x = camera_x
         self.view_sign = 1 if math.cos(self.camera_pitch) >= 0 else -1
@@ -120,18 +140,44 @@ class RampScanNavigation(Navigation):
         fresh_imu = (not self.use_imu or
                      self.last_imu is not None and 0 <= now - self.last_imu <= .05)
         if fresh_imu and now >= 2:
-            if self.searching:
+            if self.backward_retry == 'advance':
+                if self.retry_distance >= BACKWARD_RETRY_DISTANCE_M:
+                    self.backward_retry = 'backward'
+                    self.start_search(now, angle, 'backward')
+            elif (self.backward_pending and self.view == 'forward' and accepted and
+                    self.debug.get('edge_source') == 'paired' and
+                    abs(angle - self.view_target()) <= math.radians(self.settings['view_tolerance_deg']) and
+                    abs(angular_speed) < math.radians(5)):
+                # Refresh position from both forward edges before the second-climb flip.
+                self.backward_retry = 'backward'
+                # Gyro changes now measure turning away from the pre-flip direction.
+                self.heading = 0.0
+                self.retry_gyro_heading = 0.0
+                self.start_search(now, angle, 'backward')
+            elif self.searching:
                 target = self.view_target()
                 arrived = (abs(angle - target) <= math.radians(self.settings['view_tolerance_deg']) and
                            abs(angular_speed) < math.radians(5))
                 if arrived:
                     if self.search_wait_since is None:
                         self.search_wait_since = now
-                    if self.confirm_ramp(now, accepted):
+                    if self.backward_retry == 'backward' and not (
+                            accepted and self.debug.get('edge_source') == 'paired'):
+                        self.backward_retry = 'forward'
+                        self.start_search(now, angle, 'forward')
+                    elif self.backward_retry == 'forward':
+                        self.backward_retry = 'advance'
+                        self.retry_distance = 0.0
+                        self.retry_updated = now
                         self.searching = False
                         self.move_started = None
                         self.search_wait_since = None
-                    if (self.searching and self.reacquired_since is None and
+                    elif self.confirm_ramp(now, accepted):
+                        self.searching = False
+                        self.move_started = None
+                        self.search_wait_since = None
+                        self.backward_retry = None
+                    if (self.backward_retry is None and self.searching and self.reacquired_since is None and
                             now - self.search_wait_since >= self.settings['search_view_s']):
                         self.flip(now, angle)
                 else:
@@ -141,8 +187,22 @@ class RampScanNavigation(Navigation):
                 last_good = self.last_seen if self.last_seen is not None else 2.0
                 if now - last_good >= self.settings['loss_timeout_s']:
                     self.flip(now, angle)
+        self.retry_using_vision = (self.backward_retry == 'advance' and fresh_imu and
+                                   accepted and self.debug.get('edge_source') == 'paired' and
+                                   self.view_sign > 0)
+        if was_retrying and self.backward_retry is not None and not self.retry_using_vision:
+            # Keep the original gyro direction as fallback when the forward pair is unavailable.
+            self.heading = self.retry_gyro_heading
+        if self.backward_retry is not None:
+            self.retry_last_heading = self.heading
         if self.searching:
             self.debug.update(held=True, reason=f'Walking paused; searching the {self.view} view for ramp guidance')
+        elif self.backward_retry == 'advance':
+            guidance = 'Following both forward edges' if self.retry_using_vision else 'Using the saved gyro direction'
+            self.debug['reason'] = (f'{guidance} before retrying the backward view: '
+                                    f'{self.retry_distance * 100:.1f} / 5 cm estimated')
+        elif self.backward_pending and accepted:
+            self.debug['reason'] += '; waiting for both forward edges before turning camera backward'
         elif not accepted and self.last_seen is not None:
             if now - self.last_seen <= self.settings['loss_timeout_s']:
                 self.debug['reason'] += '; using recent ramp observation'
@@ -151,10 +211,21 @@ class RampScanNavigation(Navigation):
         return accepted
 
     def ready(self, timestamp):
+        if self.backward_retry == 'advance':
+            fresh_imu = (not self.use_imu or self.last_imu is not None and
+                         0 <= timestamp - self.last_imu <= .05)
+            return (timestamp >= 2 and fresh_imu and
+                    timestamp - self.retry_updated <= self.settings['loss_timeout_s'])
         fresh = (super().ready(timestamp) if self.use_imu else
                  self.last_seen is not None and timestamp - self.last_seen <= self.blind_timeout)
         return (timestamp >= 2 and fresh and not self.searching and
                 timestamp - self.last_seen <= self.settings['loss_timeout_s'])
+
+    @property
+    def lateral_error(self):
+        if self.backward_retry == 'advance' and not self.retry_using_vision:
+            return 0.0
+        return super().lateral_error
 
     def report(self):
         report = super().report()
@@ -163,6 +234,8 @@ class RampScanNavigation(Navigation):
         state = 'tracking' if self.last_seen is not None else 'waiting_for_ramp'
         if self.searching:
             state = 'turning' if self.search_wait_since is None else 'searching'
+        elif self.backward_retry == 'advance':
+            state = 'advancing_before_retry'
         report.update(camera_pitch_deg=math.degrees(self.camera_pitch),
                       camera_view=self.view, camera_search_state=state,
                       uphill_slopes_seen=self.climbs_seen, slope_stage=self.slope_stage,
