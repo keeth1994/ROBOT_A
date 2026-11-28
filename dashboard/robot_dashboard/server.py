@@ -1,13 +1,13 @@
-"""Loopback-only dashboard HTTP server. All motion writes are explicit requests."""
 import hmac
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 import secrets
 import time
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from .devices import DeviceError
+from .walking import WALK_ACTIONS
 
 STATIC = Path(__file__).resolve().parents[1] / 'static'
 
@@ -49,11 +49,23 @@ class Handler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         try:
             if path == '/api/state':
-                return self.json({**self.server.app.state(), 'token': self.server.token})
+                query = parse_qs(urlsplit(self.path).query)
+                try:
+                    after = max(0, int(query.get('after_message', ['0'])[0]))
+                    after_joint = max(0, int(query.get('after_joint', ['0'])[0]))
+                except ValueError:
+                    return self.json({'error': 'Use valid history numbers.'}, 400)
+                state = self.server.app.state(after_message=after,
+                                              message_session=query.get('message_session', [None])[0],
+                                              after_joint=after_joint)
+                return self.json({**state, 'token': self.server.token})
             if path == '/api/video.mjpeg':
                 return self.stream()
+            if path == '/api/navigation-debug.jpg':
+                return self.send_bytes(self.server.app.navigation_debug_frame(), 'image/jpeg')
             files = {'/': ('index.html', 'text/html; charset=utf-8'),
-                     '/app.js': ('app.js', 'text/javascript'), '/styles.css': ('styles.css', 'text/css')}
+                     '/app.js': ('app.js', 'text/javascript'), '/styles.css': ('styles.css', 'text/css'),
+                     '/gait-plot.js': ('gait-plot.js', 'text/javascript')}
             if path not in files:
                 return self.json({'error': 'Not found.'}, 404)
             filename, content_type = files[path]
@@ -78,9 +90,14 @@ class Handler(BaseHTTPRequestHandler):
             path = urlsplit(self.path).path
             app = self.server.app
             if path == '/api/heartbeat':
-                result = app.servo_command('/heartbeat', {})
-            elif path in ('/api/servo/start', '/api/servo/servo', '/api/servo/release', '/api/servo/stop'):
+                result = app.operator_heartbeat()
+            elif path in ('/api/servo/start', '/api/servo/servo', '/api/servo/release', '/api/servo/stop',
+                          '/api/servo/camera-pitch'):
                 result = app.servo_command('/' + path.rsplit('/', 1)[1], values)
+            elif path == '/api/walk/speed':
+                result = app.set_walking_speed(values.get('speed'))
+            elif path in (f'/api/walk/{action}' for action in WALK_ACTIONS):
+                result = app.walk_command(path.rsplit('/', 1)[1])
             elif path == '/api/config':
                 result = app.configure(values)
             elif path == '/api/video':

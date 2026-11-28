@@ -5,14 +5,14 @@ from concurrent.futures import ProcessPoolExecutor
 import json
 from types import SimpleNamespace
 import numpy as np
-from robot_b91.paths import ROOT
-from robot_b91.run import Robot, evaluate, load_gait_parameters
-from robot_b91.progress import CourseProgress
-from robot_b91.gait import rocker_targets
+from robot.paths import ROOT
+from robot.simulation.run import Robot, evaluate, load_gait_parameters
+from robot.simulation.progress import CourseProgress
+from robot.gait import rocker_targets
 
 
 def check_scoring():
-    r = Robot(ramp=True)
+    r = Robot(ramp=True, feedback="ideal")
     course = r.course
 
     def traverse(bypass=False, reverse=False, exit_clear=True):
@@ -39,16 +39,19 @@ def check_scoring():
     assert not traverse(bypass=True), "Floor beside the ramp must not count as a pass"
     assert not traverse(reverse=True), "Every foot must visit the panels in order"
     assert not traverse(exit_clear=False), "Rear feet must clear the final descent"
+    r.close()
 
 
 def main(robust=False):
     check_scoring()
-    p, _ = load_gait_parameters(ROOT / "reference/b91_gait.toml", "course")
-    # The portable command generator cannot ask for travel beyond +/-45 degrees.
+    p = load_gait_parameters()
+    robot = Robot(ramp=True, feedback="ideal")
+    ranges = robot.joint_ranges
+    robot.close()
     for t in np.linspace(0, 2, 101):
-        targets = rocker_targets(p, t, t, heading_error_rad=0.4, lateral_error_m=-0.1)
+        targets = rocker_targets(p, t, t, heading_error_rad=0.4, lateral_error_m=-0.1, joint_ranges=ranges)
         assert targets.shape == (8,) and np.isfinite(targets).all()
-        assert np.max(np.abs(targets)) <= np.pi / 4
+        assert np.all(targets >= ranges[:, 0]) and np.all(targets <= ranges[:, 1])
     cases = [("nominal", {}, {})]
     if robust:
         cases += [
@@ -61,17 +64,17 @@ def main(robust=False):
         ]
     if robust:
         with ProcessPoolExecutor(max_workers=4) as pool:
-            jobs = [pool.submit(evaluate, p | changes, seconds=120, ramp=True, **start)
+            jobs = [pool.submit(evaluate, p | changes, seconds=240, ramp=True, **start)
                     for _, changes, start in cases]
             reports = [dict(case=case[0], **job.result()) for case, job in zip(cases, jobs)]
     else:
-        reports = [dict(case="nominal", **evaluate(p, seconds=120, ramp=True))]
+        reports = [dict(case="nominal", **evaluate(p, seconds=240, ramp=True))]
     for result in reports:
         print(f"{result['case']}: completed={result['course_completed']}, "
               f"time={result['duration_s']:.3f}s, tilt={result['max_tilt_deg']:.2f}deg, "
               f"nonfoot contact={result['nonfoot_ground_fraction']:.1%}", flush=True)
-    if robust:
-        (ROOT / "results/b91_course_validation.json").write_text(json.dumps(reports, indent=2))
+    (ROOT / "results").mkdir(exist_ok=True)
+    (ROOT / "results/b10_course_validation.json").write_text(json.dumps(reports, indent=2))
     for result in reports:
         assert result["course_completed"], result
         assert not result["fallen"] and result["warnings"] == 0

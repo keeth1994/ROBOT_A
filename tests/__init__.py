@@ -1,1 +1,1 @@
-"""Executable checks for B9-1 physics and repository structure."""
+"""Executable checks for B10 physics and repository structure."""

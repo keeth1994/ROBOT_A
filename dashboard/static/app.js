@@ -1,13 +1,56 @@
 'use strict';
 const el = id => document.getElementById(id);
+const recordingView = new URLSearchParams(location.search).get('recording') === '1';
+if (recordingView) {
+  document.body.classList.add('recording-view');
+  el('jointPlotPanel').open = el('cameraDebug').open = true;
+}
 let token = '', current = null, commandBusy = false, cameraBusy = false, cameraDirty = false;
 let addressesLoaded = false, showingVideo = false;
+let debugUrl = null;
+let speedBusy = false;
+let messageSession = '', lastMessage = 0;
+let lastJoint = 0;
+const gaitPlot = new GaitPlot(el('jointPlot'));
+let consoleLines = [];
+const consoleMessages = new Map();
 const rows = new Map();
+const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
+  walkCourseImu:'course_imu', walkCorridor:'corridor',
+  searchCorridor:'corridor_search', dance:'dance', runCourse:'run_course'};
 
-async function post(path, body = {}) {
+function renderConsole() {
+  const output = el('consoleLog');
+  const atBottom = output.scrollHeight - output.scrollTop - output.clientHeight < 24;
+  output.textContent = consoleLines.join('\n');
+  if (atBottom) output.scrollTop = output.scrollHeight;
+}
+
+function consoleMessage(source, text, time = Date.now(), refresh = true) {
+  text = visibleMessage(text);
+  if (!text || consoleMessages.get(source) === text) return;
+  consoleMessages.set(source, text);
+  const date = new Date(time);
+  const timestamp = date.toLocaleTimeString([], {hour12:false}) + '.' + String(date.getMilliseconds()).padStart(3, '0');
+  consoleLines.push('[' + timestamp + '] ' + source + ': ' + text);
+  if (consoleLines.length > 5000) consoleLines.shift();
+  if (refresh) renderConsole();
+}
+
+function visibleMessage(text) {
+  return text === 'Walking locally on ESP32.' ? '' : text;
+}
+
+function showSpeed(speed) {
+  el('walkSpeed').value = Math.round(speed * 100);
+  el('walkSpeedValue').textContent = el('walkSpeed').value + '%';
+}
+
+async function post(path, body = {}, timeout = 10000) {
+  if (recordingView) throw Error('Use the normal dashboard to control the robot.');
   if (!token) throw Error('Dashboard is still connecting. Try again.');
   const response = await fetch(path, {method:'POST', headers:{'Content-Type':'application/json','X-Dashboard-Token':token},
-    body:JSON.stringify(body), signal:AbortSignal.timeout(10000)});
+    body:JSON.stringify(body), signal:AbortSignal.timeout(timeout)});
   const result = await response.json();
   if (!response.ok) throw Error(result.error || 'Command failed');
   return result;
@@ -17,6 +60,7 @@ function badge(id, text, good = false, bad = false) {
 }
 function message(text, error = false) {
   el('result').textContent = text; el('result').style.borderColor = error ? 'var(--danger)' : 'var(--line)';
+  consoleMessage(error ? 'Error' : 'Dashboard', text);
 }
 async function servoCommand(name, values = {}) {
   if (commandBusy && name !== 'stop') return;
@@ -25,42 +69,114 @@ async function servoCommand(name, values = {}) {
   catch (error) { message(error.message + (name === 'stop' ? ' Stop is NOT confirmed; use the servo power switch if needed.' : ''), true); }
   finally { commandBusy = false; renderControls(); }
 }
+async function walkForward(profile = 'walk') {
+  if (commandBusy) return;
+  commandBusy = true; renderControls();
+  try { const result = await post('/api/walk/' + profile); message(result.message); }
+  catch (error) { message(error.message, true); }
+  finally { commandBusy = false; renderControls(); }
+}
 function renderControls() {
   const device = current?.servo, s = device?.data;
-  const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.servoReady || s?.faulted || s?.running || !current?.operator_alive || commandBusy;
+  const walking = !!current?.walking?.active || !!s?.externalActive;
+  const blocked = document.visibilityState !== 'visible' || !device?.online || !s?.calibratedAngles || !s?.servoReady || s?.faulted || s?.running || walking || !current?.operator_alive || commandBusy;
+  const pitch = s?.cameraPitch;
+  const pitchBlocked = document.visibilityState !== 'visible' || !device?.online || !s?.servoReady ||
+    s?.faulted || !current?.operator_alive || commandBusy || !pitch || current?.walking?.camera_controlled;
+  el('cameraPitchEnable').disabled = pitchBlocked || pitch?.angle !== null;
+  el('cameraPitchRelease').disabled = pitchBlocked || pitch?.angle === null;
+  el('cameraPitch').disabled = pitchBlocked || pitch?.angle === null;
+  Object.keys(walkButtons).forEach(id => {
+    el(id).disabled = blocked || !!s?.manualActive || s?.motionProtocol !== 2;
+  });
   el('all').disabled = el('groups').disabled = blocked || !!s?.manualActive;
   rows.forEach(row => {
     row.enable.disabled = blocked || row.active;
-    row.release.disabled = commandBusy || !device?.online || !row.active;
+    row.release.disabled = walking || commandBusy || !device?.online || !row.active;
     row.slider.disabled = blocked || !row.active;
   });
 }
 function renderServos(s) {
-  const channels = s.channels.split(',').map(Number).filter(n => Number.isInteger(n) && n >= 0 && n <= 15);
-  channels.forEach((channel, index) => {
+  if (!s.calibratedAngles || !Array.isArray(s.joints)) return;
+  s.joints.forEach(joint => {
+    const channel = joint.channel;
     let row = rows.get(channel);
     if (!row) {
       const box = document.createElement('div'); box.className = 'servo';
-      box.innerHTML = '<div class="servo-top"><label></label><span class="pulse"></span></div><input type="range" step="1"><div class="servo-buttons"><button class="enable">Enable at center</button><button class="release">Release</button></div>';
+      box.innerHTML = '<div class="servo-top"><label></label><span class="pulse"></span></div><input type="range" step="1"><div class="servo-buttons"><button class="enable"></button><button class="release">Release</button></div>';
       row = {box, slider:box.querySelector('input'), enable:box.querySelector('.enable'), release:box.querySelector('.release'), active:false};
       row.slider.id = 'channel-' + channel; box.querySelector('label').htmlFor = row.slider.id;
-      box.querySelector('label').textContent = 'Channel ' + channel;
-      row.slider.onchange = () => servoCommand('servo', {channel, pulse:Number(row.slider.value)});
-      row.enable.onclick = () => servoCommand('servo', {channel, pulse:current.servo.data.center});
+      box.querySelector('label').textContent = joint.name + ' · channel ' + String(channel).padStart(2, '0');
+      row.slider.onchange = () => servoCommand('servo', {channel, angle:Number(row.slider.value)});
+      row.enable.onclick = () => servoCommand('servo', {channel, angle:row.restAngle});
       row.release.onclick = () => servoCommand('release', {channel});
       rows.set(channel, row); el('servos').append(box);
     }
-    row.active = s.manual[index] !== null;
-    row.slider.min = s.manualMin; row.slider.max = s.manualMax;
-    if (document.activeElement !== row.slider) row.slider.value = row.active ? s.manual[index] : s.center;
-    row.box.querySelector('.pulse').textContent = row.active ? s.manual[index] + ' µs commanded' : 'Pulses off';
+    row.active = joint.angle !== null;
+    row.restAngle = joint.restAngle;
+    row.enable.textContent = joint.name.endsWith('_pitch') ? 'Enable foot down (+45°)' : 'Enable neutral (0°)';
+    row.slider.min = joint.minAngle; row.slider.max = joint.maxAngle;
+    if (document.activeElement !== row.slider) row.slider.value = row.active ? joint.angle : joint.restAngle;
+    const sweeping = s.running && s.active.split(',').map(Number).includes(channel);
+    row.box.querySelector('.pulse').textContent = row.active ? joint.angle + '° · ' + joint.pulse + ' µs commanded' : sweeping ? 'Calibrated sweep running' : 'Pulses off';
   });
 }
 function clearFeed() {
   el('feed').removeAttribute('src'); el('feed').hidden = true; el('placeholder').hidden = false; showingVideo = false;
 }
+function renderIr(status) {
+  const readings = status?.irMillivolts;
+  const live = Array.isArray(readings) && readings.length === 2 &&
+    readings.every(n => Number.isFinite(n) && n >= 0) &&
+    Number.isFinite(status.irAgeMs) && status.irAgeMs >= 0 && status.irAgeMs < 1000;
+  badge('irState', live ? 'Updating' : 'No data', live);
+  ['ir35', 'ir34'].forEach((id, i) => {
+    el(id).textContent = live ? (readings[i] / 1000).toFixed(3) + ' V' : '—';
+  });
+}
 function render(state) {
   current = state; token = state.token || token;
+  if (messageSession !== state.message_session) {
+    messageSession = state.message_session;
+    lastMessage = 0;
+    lastJoint = 0;
+    gaitPlot.reset();
+  }
+  const samples = (state.joint_samples || []).filter(sample => sample.id > lastJoint);
+  if (samples.length) {
+    lastJoint = samples[samples.length - 1].id;
+    gaitPlot.append(samples);
+  }
+  let messagesAdded = false;
+  for (const entry of state.messages || []) {
+    if (entry.id <= lastMessage) continue;
+    consoleMessage(entry.source, entry.message, entry.time * 1000, false);
+    lastMessage = entry.id;
+    messagesAdded = true;
+  }
+  if (messagesAdded) renderConsole();
+  el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'corridor_search'].includes(state.walking.profile)
+    ? ''
+    : 'Camera preview only; no walking starts.';
+  el('walkMessage').textContent = state.walking?.message || 'ESP32 walking unavailable.';
+  if (!speedBusy && document.activeElement !== el('walkSpeed')) {
+    showSpeed(state.walking?.speed ?? 1);
+  }
+  const nav = state.walking?.navigation;
+  el('navigationStats').textContent = nav && nav.guidance !== 'corridor_search'
+    ? 'Heading: ' + (nav.heading_rad * 180 / Math.PI).toFixed(1) + '° · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm · Camera accepted: ' + nav.accepted_frames + '/' + nav.camera_frames + (['course', 'course_camera'].includes(state.walking.profile) ? ' · Ramp: ' + (nav.ramp_detected ? 'detected' : 'not detected') : '')
+    : '';
+  if (nav?.guidance === 'corridor') {
+    const voltage = value => value === null ? 'unavailable' : value + ' mV';
+    el('navigationStats').textContent = 'Left IR: ' + voltage(nav.left_mv) +
+      ' · Right IR: ' + voltage(nav.right_mv) +
+      ' · Steering: ' + (nav.steering_rad > .001 ? 'right' : nav.steering_rad < -.001 ? 'left' : 'straight');
+  }
+  if (nav?.guidance === 'corridor_search') {
+    el('navigationStats').textContent = 'Corridor search: ' + nav.stage +
+      ' · Scan: ' + nav.turn_degrees.toFixed(0) + '° / 360°' +
+      (nav.target === null ? '' : ' · Opening target: ' + Math.round(nav.target * 100) + '% across image');
+  }
   if (!addressesLoaded) {
     el('servoAddress').value = state.config.servo; el('cameraAddress').value = state.config.camera; addressesLoaded = true;
   }
@@ -68,9 +184,24 @@ function render(state) {
   badge('servoOnline', state.servo.online ? 'Connected' : 'Offline', state.servo.online);
   badge('cameraOnline', state.camera.online ? 'Connected' : 'Offline', state.camera.online);
   const s = state.servo.data;
+  const pitch = s?.cameraPitch;
+  if (pitch) {
+    el('cameraPitch').min = pitch.minAngle;
+    el('cameraPitch').max = pitch.maxAngle;
+  }
+  if (pitch && document.activeElement !== el('cameraPitch') && !commandBusy) {
+    el('cameraPitch').value = pitch.angle ?? 0;
+    el('cameraPitchValue').textContent = (pitch.angle ?? 0) + '°';
+  }
+  el('cameraPitchStatus').textContent = !state.servo.online ? 'Controller offline.' : !pitch
+    ? 'Upload the camera-pitch controller firmware to enable these controls.'
+    : pitch.angle === null ? 'Camera servo released. Enable at 0° before adjusting.'
+    : current?.walking?.camera_controlled ? 'Automatic camera control: ' + pitch.angle + '°.'
+    : 'Commanded position: ' + pitch.angle + '°. Camera-guided walking pauses briefly after tilt changes.';
+  renderIr(state.servo.online ? s : null);
   if (state.servo.online && s) {
-    renderServos(s); el('controllerMessage').textContent = s.message;
-    badge('servoState', s.faulted ? 'Fault' : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
+    renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? visibleMessage(s.message) : 'Upload the calibrated controller firmware to enable these controls.';
+    badge('servoState', s.faulted ? 'Fault' : s.externalActive ? (state.walking?.profile === 'dance' ? 'Dancing' : 'ESP32 walking') : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
     const live = s.imuReady && s.imuValid;
     badge('imuState', live ? 'Live' : 'Unavailable', live);
     el('accel').textContent = live ? s.accel.map(n => n.toFixed(3)).join(' / ') : '— / — / —';
@@ -86,7 +217,7 @@ function render(state) {
   if (ready && !cameraDirty && !cameraBusy) {
     el('resolution').value = camera.resolution; el('fps').value = String(camera.targetFps); el('quality').value = String(camera.quality);
   }
-  el('cameraStats').textContent = ready ? camera.width + ' × ' + camera.height + ', target ' + camera.targetFps + ' fps. Camera send rate: ' + camera.sentFps + ' fps. Settings reset on camera restart.' : state.camera.error || camera?.error || 'Waiting for camera.';
+  el('cameraStats').textContent = ready ? camera.width + ' × ' + camera.height + ', target ' + camera.targetFps + ' fps. Camera send rate: ' + camera.sentFps + ' fps.' : state.camera.error || camera?.error || 'Waiting for camera.';
   const p = state.pipeline;
   el('videoToggle').textContent = p.enabled ? 'Stop video' : 'Start video'; el('videoToggle').disabled = cameraBusy;
   el('receiveFps').textContent = p.fresh ? p.receive_fps.toFixed(1) + ' fps' : '—';
@@ -101,17 +232,74 @@ function render(state) {
 }
 async function poll() {
   try {
-    if (token && document.visibilityState === 'visible') await post('/api/heartbeat').catch(() => {});
-    const response = await fetch('/api/state', {cache:'no-store', signal:AbortSignal.timeout(2000)});
+    const query = new URLSearchParams({after_message:lastMessage, message_session:messageSession, after_joint:lastJoint});
+    const response = await fetch('/api/state?' + query, {cache:'no-store', signal:AbortSignal.timeout(2000)});
     if (!response.ok) throw Error('Local server unavailable');
     render(await response.json());
+    consoleMessage('Connection', 'Dashboard connected.');
   } catch (error) {
+    consoleMessage('Connection', error.message);
     current = null; renderControls(); clearFeed(); badge('operator', 'PC server unavailable', false, true);
+    renderIr(null);
     el('accel').textContent = el('gyro').textContent = '— / — / —';
     el('frameAge').textContent = el('receiveFps').textContent = '—';
   } finally { setTimeout(poll, 500); }
 }
+async function heartbeat() {
+  if (recordingView) return;
+  try {
+    if (token && document.visibilityState === 'visible') await post('/api/heartbeat', {}, 1200);
+  } catch (error) {
+    badge('operator', 'Heartbeat not confirmed', false, true);
+    consoleMessage('Heartbeat', error.message);
+  } finally { setTimeout(heartbeat, 250); }
+}
+async function debugPoll() {
+  try {
+    if (!el('cameraDebug').open || document.visibilityState !== 'visible') return;
+    const response = await fetch('/api/navigation-debug.jpg', {cache:'no-store', signal:AbortSignal.timeout(2000)});
+    if (!response.ok) throw Error('Camera debug unavailable');
+    const nextUrl = URL.createObjectURL(await response.blob());
+    el('debugFeed').src = nextUrl; el('debugFeed').hidden = false;
+    if (debugUrl) URL.revokeObjectURL(debugUrl);
+    debugUrl = nextUrl;
+  } catch (error) {
+    el('debugSource').textContent = error.message;
+    consoleMessage('Camera debug', error.message);
+    el('debugFeed').hidden = true;
+  } finally { setTimeout(debugPoll, 500); }
+}
+el('cameraDebug').ontoggle = async () => {
+  if (!recordingView && el('cameraDebug').open && token && !current?.pipeline.enabled) {
+    try { await post('/api/video', {enabled:true}); }
+    catch (error) { message(error.message, true); }
+  }
+};
 el('stop').onclick = () => servoCommand('stop');
+el('clearConsole').onclick = () => {
+  consoleLines = [];
+  consoleMessages.clear();
+  el('consoleLog').textContent = '';
+};
+el('jointPlotPanel').ontoggle = () => gaitPlot.draw();
+window.addEventListener('resize', () => gaitPlot.draw());
+el('cameraPitchEnable').onclick = () => servoCommand('camera-pitch', {angle:0});
+el('cameraPitchRelease').onclick = () => servoCommand('camera-pitch', {release:1});
+el('cameraPitch').oninput = () => { el('cameraPitchValue').textContent = el('cameraPitch').value + '°'; };
+el('cameraPitch').onchange = () => servoCommand('camera-pitch', {angle:Number(el('cameraPitch').value)});
+Object.entries(walkButtons).forEach(([id, profile]) => { el(id).onclick = () => walkForward(profile); });
+el('walkSpeed').oninput = () => { el('walkSpeedValue').textContent = el('walkSpeed').value + '%'; };
+el('walkSpeed').onchange = async () => {
+  speedBusy = true; el('walkSpeed').disabled = true;
+  try {
+    const result = await post('/api/walk/speed', {speed:Number(el('walkSpeed').value) / 100});
+    showSpeed(result.speed);
+    message('Motion speed set to ' + el('walkSpeed').value + '% (' + result.period_s.toFixed(2) + ' s per cycle).');
+  } catch (error) {
+    showSpeed(current?.walking?.speed ?? 1);
+    message(error.message, true);
+  } finally { speedBusy = false; el('walkSpeed').disabled = false; }
+};
 el('all').onclick = () => servoCommand('start', {mode:'all'});
 el('groups').onclick = () => servoCommand('start', {mode:'groups'});
 el('connect').onclick = async () => {
@@ -135,10 +323,10 @@ el('applyCamera').onclick = async () => {
   finally { cameraBusy = false; }
 };
 function cancelMotion() {
-  if (token) post('/api/servo/stop').catch(() => {});
+  if (!recordingView && token) post('/api/servo/stop').catch(() => {});
 }
 document.addEventListener('visibilitychange', () => { renderControls(); if (document.visibilityState !== 'visible') cancelMotion(); });
 window.addEventListener('pagehide', () => {
-  if (token) fetch('/api/servo/stop', {method:'POST', headers:{'Content-Type':'application/json','X-Dashboard-Token':token}, body:'{}', keepalive:true}).catch(() => {});
+  if (!recordingView && token) fetch('/api/servo/stop', {method:'POST', headers:{'Content-Type':'application/json','X-Dashboard-Token':token}, body:'{}', keepalive:true}).catch(() => {});
 });
-renderControls(); poll();
+renderControls(); poll(); heartbeat(); debugPoll();

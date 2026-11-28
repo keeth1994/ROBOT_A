@@ -1,59 +1,55 @@
-# Robot B10_1 CAD / B9-1 simulation
+# KeAnSi Quadruped Robot
 
-The current Fusion assembly is B10_1, with direct-drive yaw joints and the user-edited top plate. Its compact camera unit uses a sideways Parallax 900-00005, one pushrod and a 40:20 gear pair for 190 degrees of camera travel. Each tower uses two mounting holes. Physical fit testing is in progress.
+![KeAnSi quadruped robot rotating](assets/robot-spin.gif)
 
-The separate B9-1 MuJoCo model uses four Parallax pitch servos, two HS-475HB front yaw servos and two MG995 rear yaw servos, modeled at 5 V. B10_1 geometry and direct-drive kinematics have not been transferred to simulation.
+A quadruped robot made as a project for the [MMA4004 course](https://www.ntnu.edu/studies/courses/MMA4004) at NTNU. The task was to navigate an obstacle course with adjustable ramps and a corridor with multiple turns.
+
+The project uses ESP32 controllers, a PC dashboard for control and testing, servo calibration tools, and MuJoCo for simulation.
+
+## Setup
+
+- Python 3.12+ with Tkinter
+- Run commands from the repository root
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt -r servo_calibration/requirements.txt
+```
 
 ## Run
 
-From this folder in PowerShell:
-
-```powershell
-.\.venv\Scripts\python.exe robot.py walk
-.\.venv\Scripts\python.exe robot.py walk --gait-profile slope
-.\.venv\Scripts\python.exe robot.py walk --gait-profile transition
-.\.venv\Scripts\python.exe robot.py walk --ramp --seconds 100
-.\.venv\Scripts\python.exe robot.py walk --ramp --test
-.\.venv\Scripts\python.exe robot.py walk --ramp --video results/b91_course.mp4
-.\.venv\Scripts\python.exe robot.py walk --test --seconds 15
-.\.venv\Scripts\python.exe robot.py check all
-```
-
-`start.ps1` starts the course. `--ramp` automatically selects the `course` gait and pauses the simulation after a verified completion. Explicit `--gait-profile` selections still override this. Run `robot.py --help` for available commands. No RL training pipeline or trained policy is included.
-
-A small gait control window opens, allowing you to switch between gait profiles.
-
-## Current files
-
-- [Fusion assembly](cad/B10_1/Robot_B10_1.f3d)
-- [STEP assembly](cad/B10_1/Robot_B10_1.step)
-- [Camera print parts](cad/B10_1/STL)
-- [Editable print plates](cad/B10_1/Editable_plates)
-- [Simulation assumptions and results](docs/DESIGN_B91_SIM.md)
-- [Ramp controller, validation and physical transfer requirements](docs/RAMP_CONTROLLER.md)
-- [ESP32 firmware prototype and commissioning](firmware/README.md)
-- [Recorded course traversal (2x playback)](results/b91_course.mp4)
-- [Machine-readable current design](cad/current_design.json)
-
-| Folder | Contents |
+| Task | Command |
 |---|---|
-| `robot_b91/` | Model builder, walking controller, geometry and terrain helpers |
-| `cad/` | Current assembly, source yaw and Fusion exporter |
-| `reference/` | Current CAD export, mass, kinematics, gait and terrain settings |
-| `models/` | MuJoCo models and visual meshes |
-| `tests/` | Model and entry-point checks |
-| `results/` | Current standing, walking and course reports plus preview |
+| Dashboard | `python dashboard/run.py` |
+| Servo calibration | `python servo_calibration/gui.py` |
+| Course simulation | `python robot.py walk --ramp --find-corridor` or `.\start.ps1` |
+| Simulation options | `python robot.py walk --help` |
+| Model checks | `python robot.py check b10` |
 
-## Setup and rebuild
+- Dashboard: http://127.0.0.1:8765
+- Gait settings: `reference/b91_gait.toml` (dashboard and simulation)
+- Generated reports and recordings: `results/` (ignored by Git)
 
-Use Python 3.12 and install `requirements.txt` into `.venv`. The lock file records pinned dependencies.
+## Calibration and firmware
 
-For the existing B9-1 simulation only, export its saved B9-1 assembly using `cad/ExportB91` inside Fusion, then run `robot.py build`. This regenerates the simulation from the CAD export. Edit `reference/b91_course_settings.json` to change terrain, then rebuild.
+1. Upload `servo_calibration/esp32_calibration/esp32_calibration.ino`.
+2. Calibrate using the GUI. Measurements save to `servo_calibration/measurements.json`.
+3. Export the header: `python servo_calibration/export_controller.py --output firmware/controller_esp32/measured_servos.h`.
+4. Upload `firmware/controller_esp32/controller_esp32.ino` with its accompanying headers.
 
-B9-1 simulation provisional mass: 1.163 kg (not a B10 mass estimate). Flat test: 0.502 m in 15 seconds without falling.
-The course gait completes all five ramp sections in 63.406 simulated seconds,
-with every foot visiting every section, no side-floor bypass and no fall.
-CAD, terrain, mass, friction and servo ratings are unchanged. This is a simulation
-result: steering uses ideal heading and lateral position. An ESP32 firmware
-prototype reuses the gait with IMU heading and operator lateral steering, but
-physical calibration, robot testing and autonomous localization remain unfinished.
+- Arduino libraries: Adafruit PWM Servo Driver and SparkFun BMI270
+- Camera firmware: `firmware/timer_camera/`
+- Wi-Fi: sketch `wifi_config.h` files configure connection to the PC's 2.4 GHz hotspot
+- Yaw angles: -45 to +45 degrees
+- Pitch angles: -90 to +45 degrees; +45 means foot down
+- Stop: disables PWM; servo power remains on
+
+## CAD and rebuild
+
+- Current assembly and parts: `cad/B10_1/`
+- Rebuild simulation: `python robot.py build`
+- After STEP changes:
+  1. `python -m pip install -r requirements-cad.txt`
+  2. `python cad/export_b10_sim.py`
+  3. `python robot.py build`

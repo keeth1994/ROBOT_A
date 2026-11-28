@@ -3,9 +3,18 @@
 .vscode/
 __pycache__/
 *.pyc
+MJMODEL.TXT
 logs/
 .pytest_cache/
 .ruff_cache/
 .pio/
 
 dashboard/config.local.json
+images/
+
+# Generated reports, recordings and CAD previews.
+results/
+cad/B9_8/*.json
+cad/B9_8/*.png
+cad/B9_8/*.txt
+cad/B9_8/*_candidate.*

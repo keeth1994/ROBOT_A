@@ -1,4 +1,4 @@
-"""Small HTTP clients. No autonomous heartbeat or motion loop exists here."""
+"""HTTP connections to the ESP32s."""
 import http.client
 import json
 import re
@@ -9,6 +9,10 @@ class DeviceError(Exception):
     def __init__(self, message, status=502):
         super().__init__(message)
         self.status = status
+
+
+class DeviceConnectionError(DeviceError):
+    """A connection error that can be retried."""
 
 
 def origin(value):
@@ -37,7 +41,7 @@ def stream_origin(camera, port=81):
 
 def connection(base, timeout=0.8):
     parsed = urlsplit(base)
-    # http.client deliberately avoids proxy environment variables for LAN devices.
+    # Connect directly to the ESP32, without a proxy.
     return http.client.HTTPConnection(parsed.hostname, parsed.port or 80, timeout=timeout)
 
 
@@ -58,7 +62,7 @@ def request(base, path, values=None, timeout=0.8):
             except (ValueError, AttributeError):
                 pass
             raise DeviceError(text[:300] or f'Device HTTP {response.status}', response.status)
-        if path == '/status' or path == '/settings':
+        if path in ('/status', '/settings', '/motion/start'):
             data = json.loads(text)
             if not isinstance(data, dict):
                 raise DeviceError('Device returned an invalid status.')
@@ -66,14 +70,16 @@ def request(base, path, values=None, timeout=0.8):
         return {'message': text}
     except DeviceError:
         raise
-    except (OSError, http.client.HTTPException, ValueError) as error:
+    except (OSError, http.client.HTTPException) as error:
+        raise DeviceConnectionError(str(error)) from error
+    except ValueError as error:
         raise DeviceError(str(error)) from error
     finally:
         conn.close()
 
 
 def mjpeg_frames(response, max_frame=2_000_000):
-    """Parse bounded Content-Length multipart frames without queuing images."""
+    """Read camera frames without buffering old images."""
     buffer = bytearray()
     while True:
         part = response.read1(16384)

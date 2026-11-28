@@ -1,11 +1,11 @@
 """Check current entry points and configuration paths."""
 
 import json, subprocess, sys
-from robot_b91.paths import ROOT
+from robot.paths import ROOT
 
 
 def main():
-    import robot
+    import robot.cli as robot
 
     for command in robot.COMMANDS:
         run = subprocess.run(
@@ -21,16 +21,16 @@ def main():
     if tasks.exists():
         for task in json.loads(tasks.read_text())["tasks"]:
             assert task["args"][1] in robot.COMMANDS or task["args"][1] == "check"
-    cfg = json.loads((ROOT / "cad/current_design.json").read_text())
-    for key in [
-        "assembly",
-        "step",
-        "fit_report",
-        "simulation_model",
-        "simulation_course",
-        "simulation_manifest",
-    ]:
-        assert (ROOT / cfg[key]).is_file(), key
+    for path in (
+        "cad/B10_1/Robot_B10_1.f3d",
+        "cad/B10_1/Robot_B10_1.step",
+        "models/robot_b10.xml",
+        "models/robot_b10_course.xml",
+        "reference/robot_b10_manifest.json",
+        "reference/b91_gait.toml",
+        "servo_calibration/measurements.json",
+    ):
+        assert (ROOT / path).is_file(), path
     print("PASS: current command help, outside-repo launch, tasks and asset paths.")
 
 

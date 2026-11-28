@@ -1,0 +1,21 @@
+{
+  "calibration_note": "Physical camera height is 29 cm and wall height is 17 cm. Camera angle, field of view, IR response and walking speed are starting estimates from B10 CAD. Camera pitch includes the -80 degree corridor camera command.",
+  "gait": {
+    "yaw_amplitude": 0.4,
+    "yaw_bias": 0.3
+  },
+  "camera": {
+    "height_m": 0.29,
+    "wall_height_m": 0.17,
+    "forward_m": -0.013,
+    "pitch_deg": -1.475409836,
+    "fovy_deg": 42.9470936
+  },
+  "navigation": {
+    "sensor_positions": [[0.004, 0.0716], [0.004, -0.0716]],
+    "walk_speed": 0.04,
+    "window_s": 1.5,
+    "ir_scale_mv_m": [120, 120],
+    "ir_offset_mv": [0, 0]
+  }
+}
