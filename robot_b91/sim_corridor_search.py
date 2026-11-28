@@ -86,7 +86,7 @@ def evaluate(case='side', seconds=300, output=None, observer=None):
         robot.close()
 
 
-def run_interactive(case, seconds, output, sensors=False):
+def run_interactive(case, seconds, output, sensors=False, speed=1.0):
     from mujoco import viewer
 
     with ExitStack() as stack:
@@ -114,8 +114,8 @@ def run_interactive(case, seconds, output, sensors=False):
                 if overlay:
                     overlay.update(time.perf_counter())
                 window.sync()
-                time.sleep(max(0, robot.d.time - (time.perf_counter() - started)))
-                next_frame = robot.d.time + 1 / 30
+                time.sleep(max(0, robot.d.time / speed - (time.perf_counter() - started)))
+                next_frame = robot.d.time + speed / 30
             return True
 
         result = evaluate(case, seconds, output, observer=update)
@@ -133,14 +133,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--case', choices=CASES, default='side')
     parser.add_argument('--seconds', type=float, default=300)
+    parser.add_argument('--speed', type=float, default=1.0,
+                        help='Viewer speed multiplier (default: 1; use 2 for twice real time)')
     parser.add_argument('--output', type=Path, default=ROOT / 'results/corridor_search')
     parser.add_argument('--viewer', action='store_true', help='Watch the search in the interactive simulation')
     parser.add_argument('--sensors', action='store_true', help='Show the onboard camera, IMU and IR readings')
     args = parser.parse_args()
+    if not math.isfinite(args.speed) or args.speed <= 0:
+        parser.error('--speed must be a positive number')
     if args.sensors and not args.viewer:
         parser.error('--sensors requires --viewer')
     args.output.mkdir(parents=True, exist_ok=True)
-    result = (run_interactive(args.case, args.seconds, args.output, args.sensors) if args.viewer else
+    result = (run_interactive(args.case, args.seconds, args.output, args.sensors, args.speed) if args.viewer else
               evaluate(args.case, args.seconds, args.output))
     if not args.viewer and (not result['succeeded'] or not result['inside_and_centered'] or result['collision']):
         raise SystemExit(1)

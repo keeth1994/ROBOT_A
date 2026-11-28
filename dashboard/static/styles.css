@@ -49,6 +49,7 @@ td { font: 13px ui-monospace, monospace; }
 .servo-buttons { display: flex; gap: 8px; }
 .servo button { font-size: 12px; padding: 4px 8px; }
 .result { border: 1px solid var(--line); background: #22252a; padding: 8px 12px; }
+#result:empty, #debugSource:empty, #controllerMessage:empty { display: none; }
 @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; } }
 @media (max-width: 550px) {
   header { flex-wrap: wrap; gap: 8px; padding: 10px; }
@@ -57,3 +58,20 @@ td { font: 13px ui-monospace, monospace; }
   .connections { grid-template-columns: minmax(0, 1fr) auto; }
   .connections label { grid-column: 1 / -1; }
 }
+
+/* Keep every requested panel in the recording, regardless of operator scrolling. */
+.recording-view main { max-width: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-content: start; }
+.recording-view .workspace, .recording-view .workspace > div { display: contents; }
+.recording-view section { margin: 0; min-width: 0; }
+.recording-view #connectionsPanel, .recording-view #consolePanel, .recording-view #coursePanel,
+.recording-view main > .subtle, .recording-view button, .recording-view input,
+.recording-view .form-row, .recording-view .servo-buttons { display: none; }
+.recording-view #cameraPanel { grid-column: 1; grid-row: 1 / span 5; }
+.recording-view #jointPanel { grid-column: 2; grid-row: 1; }
+.recording-view #imuPanel { grid-column: 2; grid-row: 2; }
+.recording-view #irPanel { grid-column: 2; grid-row: 3; }
+.recording-view #result { grid-column: 2; grid-row: 4; margin: 0; }
+.recording-view #servoPanel { grid-column: 3; grid-row: 1 / span 5; }
+.recording-view #jointPlot { min-width: 0; }
+.recording-view .servo { padding: 8px 0; }
+.recording-view summary { pointer-events: none; }

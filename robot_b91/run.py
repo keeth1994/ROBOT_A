@@ -308,6 +308,8 @@ def main():
     ap.add_argument('--find-corridor', action='store_true',
                     help='Continue after the ramp, find the corridor with camera/IMU/IR, and stop centered')
     ap.add_argument("--seconds", type=float, help="duration (default: 300 with search, 240 on ramp, 20 on flat)")
+    ap.add_argument('--speed', type=float, default=1.0,
+                    help='Viewer speed multiplier (default: 1; use 2 for twice real time)')
     ap.add_argument("--render")
     ap.add_argument(
         "--sensors", action="store_true",
@@ -316,6 +318,8 @@ def main():
     ap.add_argument("--video", help="save a headless MP4 evaluation at 2x playback speed")
     ap.add_argument("--params")
     args = ap.parse_args()
+    if not math.isfinite(args.speed) or args.speed <= 0:
+        ap.error('--speed must be a positive number')
     if args.video and args.render:
         ap.error("Choose either --video or --render")
     if args.sensors and (args.test or args.video or args.render):
@@ -388,11 +392,14 @@ def main():
                 from robot_b91.sensors import SensorOverlay
 
                 sensors = SensorOverlay(r, v)
+            started = time.perf_counter()
+            next_frame = 0.0
             while v.is_running():
                 t = time.perf_counter()
                 search = r.navigation.search if r.navigation else None
                 finished = (search.finished if search else bool(progress and progress.completed_at is not None))
-                if r.d.time < args.seconds and not finished:
+                advancing = r.d.time < args.seconds and not finished
+                if advancing:
                     r.step(not args.hold)
                     if progress and progress.completed_at is None:
                         progress.update(r.d, r.tilt())
@@ -404,12 +411,16 @@ def main():
                                 print(f"Course completed in {progress.completed_at:.2f} simulated seconds; simulation paused.")
                     if search and search.finished:
                         print(search.reason)
-                if not args.ramp:
-                    v.cam.lookat[:2] = r.d.qpos[:2]
-                if sensors:
-                    sensors.update(t)
-                v.sync()
-                time.sleep(max(0, r.m.opt.timestep - (time.perf_counter() - t)))
+                if r.d.time >= next_frame or not advancing:
+                    if not args.ramp:
+                        v.cam.lookat[:2] = r.d.qpos[:2]
+                    if sensors:
+                        sensors.update(t)
+                    v.sync()
+                    # Keep the physics timestep fixed; only change viewer pacing.
+                    delay = r.d.time / args.speed - (time.perf_counter() - started)
+                    time.sleep(max(0, delay) if advancing else 1 / 30)
+                    next_frame = r.d.time + args.speed / 30
         finally:
             if sensors:
                 sensors.close()

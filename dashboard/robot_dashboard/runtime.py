@@ -311,7 +311,6 @@ class Dashboard:
         result = devices.request(url, '/motion/start', settings, timeout=.15)
         self.walking.begin(status, result['session'], time.monotonic(), profile=profile)
         if profile == 'corridor_search':
-            self.walking.navigation.center_on_entry = not self.course_running
             if previous_profile == 'course':
                 self.walking.navigation.change_stage('clear_ramp', time.monotonic())
         elif profile == 'corridor':

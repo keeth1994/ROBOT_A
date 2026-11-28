@@ -1,5 +1,10 @@
 'use strict';
 const el = id => document.getElementById(id);
+const recordingView = new URLSearchParams(location.search).get('recording') === '1';
+if (recordingView) {
+  document.body.classList.add('recording-view');
+  el('jointPlotPanel').open = el('cameraDebug').open = true;
+}
 let token = '', current = null, commandBusy = false, cameraBusy = false, cameraDirty = false;
 let addressesLoaded = false, showingVideo = false;
 let debugUrl = null;
@@ -22,6 +27,7 @@ function renderConsole() {
 }
 
 function consoleMessage(source, text, time = Date.now(), refresh = true) {
+  text = visibleMessage(text);
   if (!text || consoleMessages.get(source) === text) return;
   consoleMessages.set(source, text);
   const date = new Date(time);
@@ -31,12 +37,17 @@ function consoleMessage(source, text, time = Date.now(), refresh = true) {
   if (refresh) renderConsole();
 }
 
+function visibleMessage(text) {
+  return text === 'Walking locally on ESP32.' ? '' : text;
+}
+
 function showSpeed(speed) {
   el('walkSpeed').value = Math.round(speed * 100);
   el('walkSpeedValue').textContent = el('walkSpeed').value + '%';
 }
 
 async function post(path, body = {}, timeout = 10000) {
+  if (recordingView) throw Error('Use the normal dashboard to control the robot.');
   if (!token) throw Error('Dashboard is still connecting. Try again.');
   const response = await fetch(path, {method:'POST', headers:{'Content-Type':'application/json','X-Dashboard-Token':token},
     body:JSON.stringify(body), signal:AbortSignal.timeout(timeout)});
@@ -145,7 +156,7 @@ function render(state) {
   }
   if (messagesAdded) renderConsole();
   el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'course_tape', 'corridor_search'].includes(state.walking.profile)
-    ? 'Live walking perception: the actual frame and decision used by the controller.'
+    ? ''
     : 'Camera preview only; no walking starts.';
   el('walkMessage').textContent = state.walking?.message || 'ESP32 walking unavailable.';
   if (!speedBusy && document.activeElement !== el('walkSpeed')) {
@@ -185,11 +196,11 @@ function render(state) {
   el('cameraPitchStatus').textContent = !state.servo.online ? 'Controller offline.' : !pitch
     ? 'Upload the camera-pitch controller firmware to enable these controls.'
     : pitch.angle === null ? 'Camera servo released. Enable at 0° before adjusting.'
-    : current?.walking?.camera_controlled ? 'Automatic camera control: ' + pitch.angle + '°. Stop walking to adjust manually.'
+    : current?.walking?.camera_controlled ? 'Automatic camera control: ' + pitch.angle + '°.'
     : 'Commanded position: ' + pitch.angle + '°. Camera-guided walking pauses briefly after tilt changes.';
   renderIr(state.servo.online ? s : null);
   if (state.servo.online && s) {
-    renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? s.message : 'Upload the calibrated controller firmware to enable these controls.';
+    renderServos(s); el('controllerMessage').textContent = s.calibratedAngles ? visibleMessage(s.message) : 'Upload the calibrated controller firmware to enable these controls.';
     badge('servoState', s.faulted ? 'Fault' : s.externalActive ? (state.walking?.profile === 'dance' ? 'Dancing' : 'ESP32 walking') : s.running ? 'Sweep running' : s.manualActive ? 'Manual active' : 'Outputs off', !s.faulted, s.faulted);
     const live = s.imuReady && s.imuValid;
     badge('imuState', live ? 'Live' : 'Unavailable', live);
@@ -206,7 +217,7 @@ function render(state) {
   if (ready && !cameraDirty && !cameraBusy) {
     el('resolution').value = camera.resolution; el('fps').value = String(camera.targetFps); el('quality').value = String(camera.quality);
   }
-  el('cameraStats').textContent = ready ? camera.width + ' × ' + camera.height + ', target ' + camera.targetFps + ' fps. Camera send rate: ' + camera.sentFps + ' fps. Settings reset on camera restart.' : state.camera.error || camera?.error || 'Waiting for camera.';
+  el('cameraStats').textContent = ready ? camera.width + ' × ' + camera.height + ', target ' + camera.targetFps + ' fps. Camera send rate: ' + camera.sentFps + ' fps.' : state.camera.error || camera?.error || 'Waiting for camera.';
   const p = state.pipeline;
   el('videoToggle').textContent = p.enabled ? 'Stop video' : 'Start video'; el('videoToggle').disabled = cameraBusy;
   el('receiveFps').textContent = p.fresh ? p.receive_fps.toFixed(1) + ' fps' : '—';
@@ -235,6 +246,7 @@ async function poll() {
   } finally { setTimeout(poll, 500); }
 }
 async function heartbeat() {
+  if (recordingView) return;
   try {
     if (token && document.visibilityState === 'visible') await post('/api/heartbeat', {}, 1200);
   } catch (error) {
@@ -258,7 +270,7 @@ async function debugPoll() {
   } finally { setTimeout(debugPoll, 500); }
 }
 el('cameraDebug').ontoggle = async () => {
-  if (el('cameraDebug').open && token && !current?.pipeline.enabled) {
+  if (!recordingView && el('cameraDebug').open && token && !current?.pipeline.enabled) {
     try { await post('/api/video', {enabled:true}); }
     catch (error) { message(error.message, true); }
   }
@@ -311,10 +323,10 @@ el('applyCamera').onclick = async () => {
   finally { cameraBusy = false; }
 };
 function cancelMotion() {
-  if (token) post('/api/servo/stop').catch(() => {});
+  if (!recordingView && token) post('/api/servo/stop').catch(() => {});
 }
 document.addEventListener('visibilitychange', () => { renderControls(); if (document.visibilityState !== 'visible') cancelMotion(); });
 window.addEventListener('pagehide', () => {
-  if (token) fetch('/api/servo/stop', {method:'POST', headers:{'Content-Type':'application/json','X-Dashboard-Token':token}, body:'{}', keepalive:true}).catch(() => {});
+  if (!recordingView && token) fetch('/api/servo/stop', {method:'POST', headers:{'Content-Type':'application/json','X-Dashboard-Token':token}, body:'{}', keepalive:true}).catch(() => {});
 });
 renderControls(); poll(); heartbeat(); debugPoll();

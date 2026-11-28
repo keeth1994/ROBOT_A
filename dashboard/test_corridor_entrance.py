@@ -54,7 +54,41 @@ class CorridorEntranceTests(unittest.TestCase):
         nav.candidates = [endpoint([0., -.7]), endpoint([0., -1.1])]
         nav.choose_entrance()
         self.assertIsNotNone(nav.selected_pair)
-        np.testing.assert_allclose(nav.approach_goal, [.25, -.9])
+        np.testing.assert_allclose(nav.approach_goal, [.25, -1.1])
+
+    def test_pair_aims_at_the_far_edge_on_either_side_at_any_heading(self):
+        for heading in (0, 1.3, -2.5):
+            rotation = np.array([[math.cos(heading), -math.sin(heading)],
+                                 [math.sin(heading), math.cos(heading)]])
+            for side in (-1, 1):
+                for reverse in (False, True):
+                    with self.subTest(heading=heading, side=side, reverse=reverse):
+                        nav = self.navigation()
+                        nav.position = np.array([.3, -.2])
+                        nav.search_heading = heading
+                        near = endpoint(nav.position + rotation @ [0., side * .7], rotation @ [-1., 0.])
+                        far = endpoint(nav.position + rotation @ [0., side * 1.1], rotation @ [-1., 0.])
+                        nav.candidates = [far, near] if reverse else [near, far]
+                        self.assertTrue(nav.choose_entrance())
+                        self.assertIs(nav.selected, near)
+                        self.assertIs(nav.approach_end, far)
+                        np.testing.assert_allclose(nav.approach_goal, far['point'] - .25 * far['tangent'])
+
+    def test_pair_tracking_keeps_the_goal_attached_to_the_far_edge(self):
+        for track_far in (False, True):
+            with self.subTest(track_far=track_far):
+                nav = self.navigation()
+                near, far = endpoint([0., -.7]), endpoint([0., -1.1])
+                nav.candidates = [near, far]
+                nav.choose_entrance()
+                goal = nav.approach_goal.copy()
+                target = far if track_far else near
+                nav.view = {}
+                observation = (target['point'] + [.1, 0.], target['tangent'], target['normal'])
+                with patch.object(nav, 'observe_ends', return_value=[observation]):
+                    nav.track_entrance()
+                expected = goal + ([.03, 0.] if track_far else [0., 0.])
+                np.testing.assert_allclose(nav.approach_goal, expected)
 
     def test_pair_uses_both_wall_directions_when_one_estimate_is_noisy(self):
         nav = self.navigation()
@@ -126,14 +160,14 @@ class CorridorEntranceTests(unittest.TestCase):
             np.testing.assert_allclose(nav.approach_goal, old_goal)
             self.assertEqual(nav.tracked_frames, 0)
 
-    def test_ir_handover_keeps_the_center_when_both_ends_were_seen(self):
+    def test_ir_handover_keeps_the_far_edge_goal_when_both_ends_were_seen(self):
         nav = self.navigation()
         nav.candidates = [endpoint([0., -.7]), endpoint([0., -1.1])]
         nav.choose_entrance()
         nav.imu_heading = -math.pi / 2
         goal = nav.approach_goal.copy()
         nav.acquire_wall(1, .15, 3)
-        self.assertEqual(nav.stage, 'clear_end')
+        self.assertEqual(nav.stage, 'align_wall')
         np.testing.assert_allclose(nav.approach_goal, goal)
 
     def test_search_heading_is_captured_before_the_scan_and_not_replaced(self):
@@ -145,9 +179,44 @@ class CorridorEntranceTests(unittest.TestCase):
             nav.update(packet, now, (now, now, image))
         self.assertAlmostEqual(nav.search_heading, .4)
 
+    def test_empty_scan_repeats_then_approaches_a_wall_found_on_the_next_scan(self):
+        nav = self.navigation()
+        packet = status() | dict(irAgeMs=0, irMillivolts=[100, 100])
+        image = np.full((240, 320, 3), 180, dtype=np.uint8)
+        nav.turn_degrees = 360
+        nav.update(packet, 2, (1, 2, image))
+        self.assertFalse(nav.finished)
+        self.assertEqual(nav.stage, 'scan')
+        self.assertEqual(nav.turn_degrees, 0)
+        self.assertIn('Repeating', nav.reason)
+        self.assertTrue(nav.update(packet, 2.1, (2, 2.1, image)))
+        self.assertGreater(nav.estimate.heading, 0)
+        nav.candidates = [endpoint([0., -.9])]
+        nav.turn_degrees = 360
+        nav.update(packet, 2.2, (3, 2.2, image))
+        self.assertEqual(nav.stage, 'approach')
+        self.assertFalse(nav.finished)
+
+    def test_repeated_scans_still_stop_at_the_search_timeout(self):
+        nav = self.navigation()
+        packet = status() | dict(irAgeMs=0, irMillivolts=[100, 100])
+        image = np.full((240, 320, 3), 180, dtype=np.uint8)
+        for sequence, now in enumerate((2, 20, 40)):
+            nav.turn_degrees = 360
+            nav.update(packet, now, (sequence, now, image))
+            self.assertFalse(nav.finished)
+            self.assertEqual(nav.stage, 'scan')
+        nav.update(packet, 301, (4, 301, image))
+        self.assertTrue(nav.finished)
+        self.assertFalse(nav.succeeded)
+        self.assertIn('timed out', nav.reason)
+
     def test_recorded_near_wall_end_survives_pale_color_and_overlap(self):
         # Camera crop at 20 seconds in the supplied corridor search recording.
-        image = np.asarray(Image.open(Path(__file__).with_name('testdata') / 'corridor_scan_overlap.png'))
+        path = Path(__file__).with_name('testdata') / 'corridor_scan_overlap.png'
+        if not path.exists():
+            self.skipTest('Recorded corridor image is missing.')
+        image = np.asarray(Image.open(path))
         view = wall_view(image)
         ends = visible_wall_ends(view, load_corridor_settings()['camera'], 0, 0)
         self.assertTrue(any(100 < x < 120 and y > 140 for x, y in view['end_pixels']))

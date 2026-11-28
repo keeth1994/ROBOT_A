@@ -41,7 +41,7 @@ class GaitPlot {
     ctx.fillStyle = '#111';
     ctx.textAlign = 'center';
     ctx.font = '16px system-ui, sans-serif';
-    ctx.fillText('Rocker Gait Joint Targets', width / 2, 24);
+    ctx.fillText('Joint targets', width / 2, 24);
 
     const left = 70, right = width - 20, top = 43, gap = 20;
     const plotHeight = (height - top - 47 - gap) / 2;

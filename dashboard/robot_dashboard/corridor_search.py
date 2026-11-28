@@ -9,8 +9,8 @@ from scipy.ndimage import binary_opening, find_objects, grey_closing, label
 from .corridor import ir_readings
 from .navigation import CourseNavigation
 
-ENTRANCE_ADVANCE_M = .02
-RAMP_CLEARANCE_M = .10
+RAMP_CLEARANCE_M = .15
+ENTRY_WALL_DISTANCE_M = .24
 
 
 def wall_view(rgb, preferred_side=None, camera_pitch=None, fovy_deg=None):
@@ -247,7 +247,6 @@ class CorridorSearch:
         self.estimate = self.orientation.estimate
         self.camera_geometry = dict(camera_geometry or load_corridor_settings()['camera'])
         self.stage = 'scan'
-        self.center_on_entry = True
         self.clearance_heading = None
         self.approach_walk_time = 0.0
         self.speed = self.base_speed = self.last_speed = 1.0
@@ -266,6 +265,7 @@ class CorridorSearch:
         self.candidates = []
         self.selected = None
         self.selected_pair = None
+        self.approach_end = None
         self.tracked_frames = 0
         self.approach_goal = None
         self.approach_heading = None
@@ -274,17 +274,15 @@ class CorridorSearch:
         self.approach_side = None
         self.wall_side = None
         self.wall_point = None
-        self.turn_normal = None
+        self.turn_direction = 1
+        self.turn_angle = self.turn_progress = 0.0
+        self.turn_previous_heading = None
         self.advance_start = None
-        self.advance_heading = None
         self.wall_samples = deque()
         self.ir_side = None
         self.ir_since = None
         self.last_wall_seen = None
         self.both_seen_since = None
-        self.centered_since = None
-        self.center_filtered = None
-        self.center_last_update = None
         self.finished = self.succeeded = False
         self.reason = 'Waiting for camera and IMU before the full corridor scan.'
 
@@ -294,7 +292,6 @@ class CorridorSearch:
     def hold(self, reason):
         self.forward = 0.0
         self.estimate.heading = self.estimate.lateral = 0.0
-        self.centered_since = self.center_filtered = self.center_last_update = None
         self.reason = reason
         return False
 
@@ -375,8 +372,14 @@ class CorridorSearch:
         _, ends, middle, tangent = min(options, key=lambda item: item[0])
         self.selected = min(ends, key=lambda item: np.linalg.norm(item['point'] - self.position))
         self.selected_pair = ends if len(ends) == 2 else None
+        self.approach_end = self.selected
         if self.selected_pair:
-            self.approach_goal = middle - .25 * tangent
+            normal = np.array([-tangent[1], tangent[0]])
+            if (middle - self.position) @ normal < 0:
+                normal = -normal
+            # Aim across the opening at its far edge from the approach side.
+            self.approach_end = max(ends, key=lambda end: (end['point'] - self.position) @ normal)
+            self.approach_goal = self.approach_end['point'] - .25 * tangent
         else:
             normal = self.selected['normal'] / np.linalg.norm(self.selected['normal'])
             offset = self.position - self.selected['point']
@@ -412,7 +415,8 @@ class CorridorSearch:
             target['point'] = target['point'] + delta
             target['tangent'] = .8 * target['tangent'] + .2 * tangent
             target['normal'] = .8 * target['normal'] + .2 * normal
-            correction += delta / len(ends)
+            if target is self.approach_end:
+                correction += delta
             matched.append(i)
             observations = [(j, end) for j, end in observations if j != i]
         if matched:
@@ -467,21 +471,28 @@ class CorridorSearch:
         self.wall_point = self.sensor_point(side, distance)
         self.wall_samples.clear()
         self.last_wall_seen = now
-        tangent = np.array([math.cos(self.wall_heading), math.sin(self.wall_heading)])
-        # Remember which side of the wall the robot approached from.
-        self.turn_normal = np.array([-tangent[1], tangent[0]])
-        if self.turn_normal @ self.rotation()[:, 0] > 0:
-            self.turn_normal *= -1
-        self.start_advance(now)
+        # The corridor runs back alongside the ramp, opposite the scan's starting heading.
+        if self.search_heading is not None:
+            self.wall_heading = self.search_heading + math.pi
+        self.entry_heading = self.wall_heading
+        angle = angle_difference(self.wall_heading, self.imu_heading)
+        self.turn_direction = 1 if angle > 0 else -1
+        if abs(abs(angle) - math.pi) < .01:
+            self.turn_direction = 1 if side == 0 else -1
+        self.turn_angle = abs(angle)
+        self.turn_progress = 0.0
+        self.turn_previous_heading = self.imu_heading
+        self.change_stage('align_wall', now)
 
-    def start_advance(self, now):
-        self.advance_start = self.position.copy()
-        self.advance_heading = self.imu_heading
-        self.change_stage('clear_end', now)
+    def update_turn_progress(self):
+        if self.turn_previous_heading is not None:
+            self.turn_progress += self.turn_direction * angle_difference(
+                self.imu_heading, self.turn_previous_heading)
+        self.turn_previous_heading = self.imu_heading
 
     def confirm_side_wall(self, now, distances):
         # Turning and waiting do not count toward the forward walking delay.
-        if self.approach_walk_time < 10:
+        if self.approach_walk_time < 15:
             self.ir_since = None
             return False
         side = self.approach_side
@@ -500,17 +511,21 @@ class CorridorSearch:
         distance = distances[side]
         direction = 1 if side == 0 else -1
         offset = self.wall_point - self.position
-        radius = abs(self.settings['sensor_positions'][side][1]) + .12
+        radius = abs(self.settings['sensor_positions'][side][1]) + ENTRY_WALL_DISTANCE_M
         # Follow an arc around the measured wall end, with room for the feet.
         desired = math.atan2(offset[1], offset[0]) - direction * math.pi / 2
         desired += direction * (.04 + math.atan(3 * (np.linalg.norm(offset) - radius)))
         if distance <= .30:
             self.last_wall_seen = now
             # Keep correcting clearance when the side sensor can still see the wall.
-            desired += direction * float(np.clip(2 * (distance - .12), -.12, .12))
-        error = angle_difference(self.imu_heading, desired)
+            desired += direction * float(np.clip(2 * (distance - ENTRY_WALL_DISTANCE_M), -.12, .12))
+        self.update_turn_progress()
+        # Limit the arc to the corridor heading so a bad wall-point estimate cannot cause a circle.
+        desired_progress = self.turn_progress + self.turn_direction * angle_difference(desired, self.imu_heading)
+        desired_progress = float(np.clip(desired_progress, 0, self.turn_angle))
+        error = self.turn_direction * (self.turn_progress - desired_progress)
         self.estimate.heading = float(np.clip(error, -.3, .3))
-        self.forward = .5 if distance >= .08 else .2
+        self.forward = .2
         if abs(error) >= .6:
             self.forward = 0.
         self.reason = 'Turning into the corridor using the side IR distance to keep wall clearance.'
@@ -526,10 +541,14 @@ class CorridorSearch:
         self.last_update = now
         self.moving = self._update(status, now, camera_frame)
         self.speed = self.base_speed
-        if self.stage == 'approach' and self.moving and self.forward > 0 and self.ir_since is None:
-            # Walk faster across open floor; slow as soon as the chosen IR sees the wall.
-            self.speed *= 1.5
-        elif self.stage in ('clear_end', 'align_wall', 'enter', 'follow_wall'):
+        if self.stage == 'scan':
+            self.speed *= .7
+        elif self.stage == 'approach':
+            self.speed *= .5
+            if self.moving and self.forward > 0 and self.ir_since is None:
+                # Walk faster across open floor; slow as soon as the chosen IR sees the wall.
+                self.speed *= 1.5
+        elif self.stage in ('align_wall', 'enter', 'follow_wall'):
             self.speed *= 2
         self.last_speed = self.speed
         return self.moving
@@ -584,7 +603,7 @@ class CorridorSearch:
                 self.change_stage('scan', now)
                 return self.hold('Ramp clearance complete. Starting the corridor scan.')
             self.steer_to(self.clearance_heading)
-            self.reason = 'Walking 10 cm forward to clear the ramp before scanning.'
+            self.reason = 'Walking 15 cm forward to clear the ramp before scanning.'
             return True
         if self.stage == 'scan':
             if self.search_heading is None:
@@ -596,30 +615,28 @@ class CorridorSearch:
                 self.collect_candidates()
             if self.turn_degrees >= 360:
                 if not self.choose_entrance():
-                    return self.finish('Full turn completed without a clear wall end. Check the camera and lighting.')
+                    self.turn_degrees = 0.0
+                    return self.hold('No clear wall end found. Repeating the full corridor scan.')
                 self.change_stage('approach', now)
                 return self.hold('Full turn completed. Approaching the selected corridor entrance.')
             self.estimate.heading = .3
             self.reason = f'Scanning the full circle: {max(0, self.turn_degrees):.0f} / 360 degrees.'
             return True
 
-        if self.stage == 'center':
-            return self.center(now, distances)
         both = self.stage in ('enter', 'follow_wall') and self.wall_side is not None and max(distances) <= .30
         self.both_seen_since = (self.both_seen_since if self.both_seen_since is not None else now) if both else None
-        if self.both_seen_since is not None and now - self.both_seen_since >= .6:
-            if not self.center_on_entry:
+        if both:
+            if now - self.both_seen_since >= 3:
                 self.succeeded = True
-                return self.finish('Both side walls confirmed. Starting corridor navigation.')
-            self.change_stage('center', now)
-            return self.hold('Both IR sensors confirm side walls. Aligning inside the maze.')
+                return self.finish('Inside the maze: both IR sensors confirmed walls for 3 seconds. Search finished.')
+            return self.hold('Both IR sensors see walls. Stopped while confirming for 3 seconds.')
 
         if self.stage == 'approach':
             if fresh_frame:
                 self.track_entrance()
                 self.update_approach_side()
             if self.confirm_side_wall(now, distances):
-                return self.hold('Corridor-side IR confirmed the wall. Advancing slightly before the turn.')
+                return self.turn_at_wall(now, distances)
             if self.approach_heading is None and self.drive_to(self.approach_goal):
                 # Continue straight past the estimated target until IR confirms the wall.
                 self.approach_heading = self.imu_heading
@@ -628,26 +645,13 @@ class CorridorSearch:
             if (self.forward and self.view['kind'] == 'wall' and self.view['target'] is None and
                     self.view['blocked'] and self.wall_before_goal()):
                 return self.hold('The entrance target is hidden by a wall. Holding before approaching farther.')
-            wall_side = ('left', 'right')[self.approach_side] if self.approach_side is not None else 'unconfirmed'
-            self.reason = f'Approaching the wall end; checking only the {wall_side} wall side for IR handover.'
-            return True
-
-        if self.stage == 'clear_end':
-            direction = np.array([math.cos(self.advance_heading), math.sin(self.advance_heading)])
-            progress = (self.position - self.advance_start) @ direction
-            if progress >= ENTRANCE_ADVANCE_M:
-                self.change_stage('align_wall', now)
-                return self.hold('Forward clearance movement complete. Starting the entrance turn.')
-            self.steer_to(self.advance_heading, forward=.5)
-            self.reason = (f'Advancing before the turn: {max(0, progress) * 100:.1f} / '
-                           f'{ENTRANCE_ADVANCE_M * 100:.1f} cm estimated.')
+            self.reason = ''
             return True
 
         if self.stage == 'align_wall':
-            # Matching the corridor heading is not enough while still outside the wall end.
-            cleared = (self.turn_normal is None or
-                       (self.wall_point - self.position) @ self.turn_normal > .12)
-            if cleared and abs(angle_difference(self.imu_heading, self.wall_heading)) < .10:
+            self.update_turn_progress()
+            if (self.turn_progress >= self.turn_angle - .10 or
+                    abs(angle_difference(self.imu_heading, self.wall_heading)) < .10):
                 self.set_follow_side()
                 if distances[self.wall_side] <= .30:
                     self.last_wall_seen = now
@@ -693,7 +697,7 @@ class CorridorSearch:
                     innovation = angle_difference(measured, self.wall_heading)
                     if abs(innovation) < .35:
                         self.wall_heading += .2 * innovation
-            self.estimate.lateral = (1 if side == 1 else -1) * (distances[side] - .12)
+            self.estimate.lateral = (1 if side == 1 else -1) * (distances[side] - ENTRY_WALL_DISTANCE_M)
             self.estimate.heading = angle_difference(self.imu_heading, self.wall_heading)
             self.forward = 1.0
             self.reason = 'Following the inside of the near wall with IR and IMU; waiting for the opposite IR sensor.'
@@ -704,34 +708,6 @@ class CorridorSearch:
             self.reason = 'Holding the wall direction across a brief gap in the side IR reading.'
             return True
         return self.hold('Near wall lost. Holding position rather than circling away from the entrance.')
-
-    def center(self, now, distances):
-        if max(distances) > .30:
-            self.both_seen_since = None
-            self.change_stage('follow_wall', now)
-            return self.hold('Opposite wall not stable yet. Continuing to follow the near wall.')
-        self.estimate.heading = angle_difference(self.imu_heading, self.entry_heading)
-        sensor_y = sum(point[1] for point in self.settings['sensor_positions'])
-        self.estimate.lateral = float((distances[1] - distances[0] - sensor_y) / 2)
-        measurement = np.array([self.estimate.heading, self.estimate.lateral])
-        if self.center_filtered is None:
-            self.center_filtered = measurement
-        else:
-            gain = 1 - math.exp(-(now - self.center_last_update) / (.5 / self.speed))
-            self.center_filtered += gain * (measurement - self.center_filtered)
-        self.center_last_update = now
-        centered = (abs(self.center_filtered[1]) < .015 and abs(self.center_filtered[0]) < .08 and
-                    now - self.stage_started > 2 / self.speed)
-        self.centered_since = (self.centered_since if self.centered_since is not None else now) if centered else None
-        if (self.centered_since is not None and now - self.centered_since >= 1 / self.speed and
-                abs(self.estimate.heading) < .12 and abs(self.estimate.lateral) < .025):
-            self.succeeded = True
-            return self.finish('Inside the maze: both side walls confirmed and robot centered. Stopped.')
-        if now - self.stage_started > 20:
-            return self.finish('Both side walls found, but centering did not converge.')
-        self.forward = 1.0
-        self.reason = 'Both side walls confirmed. Centering with IR and IMU.'
-        return True
 
     def report(self):
         return dict(guidance='corridor_search', stage=self.stage, turn_degrees=self.turn_degrees,

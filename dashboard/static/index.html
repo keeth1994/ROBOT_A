@@ -13,7 +13,7 @@
   <button id="stop" class="danger">Stop all servos</button>
 </header>
 <main>
-  <section>
+  <section id="connectionsPanel">
     <h2>Connections</h2>
     <div class="connections">
       <label for="servoAddress">Controller ESP32</label>
@@ -25,13 +25,12 @@
     </div>
     <p><button id="connect">Save addresses</button> <small>Use the IP from Serial Monitor if .local names fail.</small></p>
   </section>
-  <p id="result" role="status" class="result">Ready. No movement starts automatically.</p>
-  <section>
+  <p id="result" role="status" class="result"></p>
+  <section id="consolePanel">
     <div class="panel-head"><h2>Console</h2><button id="clearConsole">Clear</button></div>
     <pre id="consoleLog" tabindex="0" aria-label="Dashboard message history"></pre>
-    <small>Latest 5,000 messages. Scroll up to read earlier messages.</small>
   </section>
-  <section>
+  <section id="jointPanel">
     <details id="jointPlotPanel">
       <summary>Live joint targets</summary>
       <p class="subtle">Commanded joint angles · latest 10 seconds.</p>
@@ -39,7 +38,7 @@
     </details>
   </section>
   <div class="workspace">
-    <section>
+    <section id="cameraPanel">
       <div class="panel-head"><h2>Camera</h2><button id="videoToggle">Start video</button></div>
       <div class="viewer">
         <img id="feed" hidden alt="Live robot camera">
@@ -53,7 +52,7 @@
         <button id="applyCamera">Apply</button>
       </div>
       <p id="cameraStats" class="subtle">Waiting for camera status.</p>
-      <label for="cameraPitch">Camera pitch · channel 14: <output id="cameraPitchValue">0°</output></label>
+      <label for="cameraPitch">Camera pitch: <output id="cameraPitchValue">0°</output></label>
       <input id="cameraPitch" type="range" min="-80" max="45" step="1" value="0" disabled>
       <div class="actions"><button id="cameraPitchEnable" disabled>Enable at 0°</button><button id="cameraPitchRelease" disabled>Release camera servo</button></div>
       <p id="cameraPitchStatus" class="subtle">Upload the camera-pitch controller firmware to enable these controls.</p>
@@ -62,11 +61,11 @@
         <summary>Camera debug</summary>
         <p id="debugSource" class="subtle">Camera preview only; no walking starts.</p>
         <img id="debugFeed" hidden alt="Navigation detection: annotated camera image and target mask">
-        <p class="subtle">Red: left edge. Blue: right edge. Green: accepted center. Orange: rejected candidates. The panel shows the detection result and rejection reason.</p>
+        <p class="subtle">Red: left edge. Blue: right edge. Green: accepted center. Orange: rejected candidates.</p>
       </details>
     </section>
     <div>
-      <section>
+      <section id="imuPanel">
         <div class="panel-head"><h2>BMI270</h2><span id="imuState" class="badge">No data</span></div>
         <table>
           <thead><tr><th>Reading</th><th>X / Y / Z</th></tr></thead>
@@ -75,9 +74,8 @@
             <tr><th>Gyro (°/s)</th><td id="gyro">— / — / —</td></tr>
           </tbody>
         </table>
-        <small>Acceleration includes gravity.</small>
       </section>
-      <section>
+      <section id="irPanel">
         <div class="panel-head"><h2>IR sensors</h2><span id="irState" class="badge">No data</span></div>
         <table>
           <thead><tr><th>ESP32 input</th><th>Voltage at pin</th></tr></thead>
@@ -88,11 +86,11 @@
         </table>
 
       </section>
-      <section>
+      <section id="coursePanel">
         <h2>Full course</h2>
         <button id="runCourse">Run course</button>
       </section>
-      <section>
+      <section id="servoPanel">
         <div class="panel-head"><h2>Servos</h2><span id="servoState" class="badge">Outputs off</span></div>
         <p id="controllerMessage">Waiting for controller.</p>
         <div class="actions"><button id="walk">Walk</button><button id="walkCourse">Follow ramp (camera + IMU)</button><button id="walkCourseCamera">Follow ramp (camera only)</button><button id="walkCourseTape">Follow blue tape (camera + IMU)</button><button id="walkCourseImu">Walk with IMU</button><button id="dance">Dance</button></div>
