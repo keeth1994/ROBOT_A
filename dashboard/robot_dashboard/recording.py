@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 import threading
 
-from robot_b91.paths import ROOT
+from robot.paths import ROOT
 
 
 class DashboardRecording:
@@ -45,7 +45,7 @@ class DashboardRecording:
                         while not self.stopped.is_set():
                             page.wait_for_timeout(200)
                     finally:
-                        # Closing the context finishes writing the video.
+                        # Close the context to finish saving the video.
                         context.close()
                     page.video.save_as(str(self.output / "dashboard.webm"))
                     page.video.delete()

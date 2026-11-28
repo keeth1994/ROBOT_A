@@ -5,19 +5,18 @@ from copy import copy
 
 import numpy as np
 
-from robot_b91.navigation import Navigation
-from robot_b91.paths import ROOT
-from robot_b91.camera_calibration import load_camera_scan_settings, servo_to_cradle_deg, cradle_to_servo_deg
-from robot_b91.camera_scan import RampScanNavigation
+from robot.navigation.controller import Navigation
+from robot.paths import ROOT
+from robot.navigation.camera_calibration import load_camera_scan_settings, servo_to_cradle_deg, cradle_to_servo_deg
+from robot.navigation.camera_scan import RampScanNavigation
 
 
 class CourseNavigation:
-    def __init__(self, started, use_camera=True, use_imu=True, guidance='ramp', scan_ramp=False):
+    def __init__(self, started, use_camera=True, use_imu=True, scan_ramp=False):
         config = json.loads((ROOT / 'reference/b91_navigation.json').read_text())
         config.update(json.loads((ROOT / 'dashboard/navigation.json').read_text()))
         self.camera_calibration = load_camera_scan_settings()
-        config['guidance'] = guidance
-        self.scan_ramp = scan_ramp and use_camera and guidance == 'ramp'
+        self.scan_ramp = scan_ramp and use_camera
         self.estimate = (RampScanNavigation(self.camera_calibration, use_imu=use_imu, **config)
                          if self.scan_ramp else Navigation(**config))
         self.camera_base_pitch = self.estimate.camera_pitch
@@ -29,7 +28,6 @@ class CourseNavigation:
         self.imu_heading = 0.0
         self.camera_sequence = -1
         self.reason = 'Waiting for camera and IMU.'
-        self.target = 'blue tape' if guidance == 'blue_tape' else 'ramp'
         self.downhill_since = self.flat_since = self.last_slope_sample = None
         self.downhill_seen = False
         self.corridor_requested = False
@@ -104,7 +102,7 @@ class CourseNavigation:
                     self.estimate.observe_slope(elapsed, None)
                 return self.hold('Holding steps: waiting for fresh ESP32 orientation.', now, camera_frame)
             roll, pitch, heading = map(float, attitude)
-            # Preserve visual heading corrections while following the local gyro estimate.
+            # Keep camera corrections while tracking gyro changes.
             self.estimate.heading += heading - self.imu_heading
             self.imu_heading = heading
             self.estimate.roll, self.estimate.pitch = roll, pitch
@@ -163,14 +161,14 @@ class CourseNavigation:
             self.reason = self.estimate.debug['reason'] + '.'
         elif ready:
             if self.estimate.debug and not self.estimate.debug['accepted']:
-                self.reason = f'Continuing briefly using the last valid {self.target} direction.'
+                self.reason = 'Continuing briefly using the last valid ramp direction.'
             else:
                 if self.estimate.debug.get('edge_source') in ('left', 'right'):
                     self.reason = self.estimate.debug['reason'] + '.'
                 else:
-                    self.reason = (f'Following {self.target} with camera and IMU.' if self.use_imu else
-                                   f'Following {self.target} with camera only. No tilt compensation.')
+                    self.reason = ('Following ramp with camera and IMU.' if self.use_imu else
+                                   'Following ramp with camera only. No tilt compensation.')
         else:
-            detail = self.estimate.debug['reason'] if self.estimate.debug else f'Waiting for visible {self.target}'
+            detail = self.estimate.debug['reason'] if self.estimate.debug else 'Waiting for visible ramp'
             self.reason = 'Holding steps: ' + detail + '.'
         return ready

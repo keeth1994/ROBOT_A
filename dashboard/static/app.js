@@ -16,7 +16,7 @@ let consoleLines = [];
 const consoleMessages = new Map();
 const rows = new Map();
 const walkButtons = {walk:'walk', walkCourse:'course', walkCourseCamera:'course_camera',
-  walkCourseTape:'course_tape', walkCourseImu:'course_imu', walkCorridor:'corridor',
+  walkCourseImu:'course_imu', walkCorridor:'corridor',
   searchCorridor:'corridor_search', dance:'dance', runCourse:'run_course'};
 
 function renderConsole() {
@@ -155,7 +155,7 @@ function render(state) {
     messagesAdded = true;
   }
   if (messagesAdded) renderConsole();
-  el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'course_tape', 'corridor_search'].includes(state.walking.profile)
+  el('debugSource').textContent = state.walking?.active && ['course', 'course_camera', 'corridor_search'].includes(state.walking.profile)
     ? ''
     : 'Camera preview only; no walking starts.';
   el('walkMessage').textContent = state.walking?.message || 'ESP32 walking unavailable.';
@@ -164,7 +164,7 @@ function render(state) {
   }
   const nav = state.walking?.navigation;
   el('navigationStats').textContent = nav && nav.guidance !== 'corridor_search'
-    ? 'Heading: ' + (nav.heading_rad * 180 / Math.PI).toFixed(1) + '° · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm · Camera accepted: ' + nav.accepted_frames + '/' + nav.camera_frames + (['course', 'course_camera', 'course_tape'].includes(state.walking.profile) ? (nav.guidance === 'blue_tape' ? ' · Blue tape: ' : ' · Ramp: ') + (nav.ramp_detected ? 'detected' : 'not detected') : '')
+    ? 'Heading: ' + (nav.heading_rad * 180 / Math.PI).toFixed(1) + '° · Side offset: ' + (nav.lateral_m * 100).toFixed(1) + ' cm · Camera accepted: ' + nav.accepted_frames + '/' + nav.camera_frames + (['course', 'course_camera'].includes(state.walking.profile) ? ' · Ramp: ' + (nav.ramp_detected ? 'detected' : 'not detected') : '')
     : '';
   if (nav?.guidance === 'corridor') {
     const voltage = value => value === null ? 'unavailable' : value + ' mV';

@@ -1,9 +1,4 @@
-"""Export the current STEP assembly for MuJoCo (optional cadquery-ocp dependency).
-
-Run with: python cad/export_b10_sim.py
-STEPCAF preserves occurrence names and assembly placements. OpenCascade reads
-STEP length units as millimetres; exported coordinates and inertia use metres.
-"""
+"""Export CAD for simulation. Convert millimetres to metres."""
 from pathlib import Path
 import gzip
 import hashlib
@@ -101,7 +96,7 @@ def main():
                 component=solid_name, assembly=name, body=f'solid_{solid_index}', vertices=vertices,
                 indices=indices, volume_m3=volume / 1e9,
                 com_m=[com.X()/1000, com.Y()/1000, com.Z()/1000],
-                # Inertia per unit mass about the solid COM, in m^2.
+                # Inertia per unit mass, in m².
                 unit_inertia_m2=[[inertia.Value(i, j) / volume / 1e6
                                   for j in range(1, 4)] for i in range(1, 4)],
             ))
@@ -118,7 +113,7 @@ def main():
                   source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
                   tessellation_tolerance_m=0.0001, bodies=records)
     output = ROOT / 'reference/b10_cad_meshes.json.gz'
-    # Fixed gzip timestamp makes repeat exports reproducible.
+    # Keep the gzip timestamp fixed.
     with output.open('wb') as raw:
         with gzip.GzipFile(filename='', mode='wb', fileobj=raw, mtime=0) as zipped:
             zipped.write(json.dumps(export, separators=(',', ':')).encode())

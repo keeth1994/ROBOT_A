@@ -59,7 +59,7 @@ td { font: 13px ui-monospace, monospace; }
   .connections label { grid-column: 1 / -1; }
 }
 
-/* Keep every requested panel in the recording, regardless of operator scrolling. */
+/* Show all panels in the recording. */
 .recording-view main { max-width: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-content: start; }
 .recording-view .workspace, .recording-view .workspace > div { display: contents; }
 .recording-view section { margin: 0; min-width: 0; }

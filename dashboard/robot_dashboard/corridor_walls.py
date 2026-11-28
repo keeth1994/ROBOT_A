@@ -1,5 +1,4 @@
-"""Shared corridor wall fitting from calibrated IR readings and IMU heading.
-"""
+"""Estimate corridor walls from IR and IMU readings."""
 from collections import deque
 import json
 import math
@@ -8,7 +7,7 @@ import numpy as np
 
 from dashboard.robot_dashboard.corridor import ir_readings
 from dashboard.robot_dashboard.navigation import CourseNavigation
-from robot_b91.paths import ROOT
+from robot.paths import ROOT
 
 
 def validate_wall_settings(sensor_positions, walk_speed=.04, window_s=1.5,

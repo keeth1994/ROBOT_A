@@ -1,11 +1,11 @@
 """Check current entry points and configuration paths."""
 
 import json, subprocess, sys
-from robot_b91.paths import ROOT
+from robot.paths import ROOT
 
 
 def main():
-    import robot
+    import robot.cli as robot
 
     for command in robot.COMMANDS:
         run = subprocess.run(

@@ -1,0 +1,282 @@
+"""Camera and IMU navigation. Body axes: X forward, Y left, Z up."""
+import math
+import numpy as np
+
+
+class Navigation:
+    def __init__(self, width_m=0.30, fovy_deg=42.9470936, camera_x_m=0.0626,
+                 camera_pitch_deg=15.0, dark_min=3, dark_max=25, max_chroma=.28, max_blind_s=8.0,
+                 adaptive_surface=False, ramp_offset_right_m=0.0):
+        self.width_m = width_m
+        self.ramp_offset_right_m = ramp_offset_right_m
+        self.fovy = math.radians(fovy_deg)
+        self.camera_x = camera_x_m
+        self.camera_pitch = math.radians(camera_pitch_deg)
+        self.dark_min, self.dark_max = dark_min, dark_max
+        self.max_chroma = max_chroma
+        self.blind_timeout = max_blind_s
+        self.adaptive_surface = adaptive_surface
+        if adaptive_surface:
+            from .ramp_detection import detect_ramp_edges
+            self.surface_detector = detect_ramp_edges
+        self.ramp_slopes = {}
+        self.ramp_slope_pitch = {}
+        self.ramp_mask = None
+        self.ramp_mask_pitch = None
+        self.roll = self.pitch = self.heading = self.lateral = 0.0
+        self.last_imu = None
+        self.last_seen = None
+        self.frames = self.accepted = 0
+        self.bias = np.zeros(3)
+        self.bias_samples = []
+        self.initialized = False
+        self.max_blind_s = 0.0
+        self.debug = None
+
+    def imu(self, timestamp, acceleration, angular_velocity):
+        a, g = np.asarray(acceleration), np.asarray(angular_velocity)
+        if a.shape != (3,) or g.shape != (3,) or not np.isfinite(a).all() or not np.isfinite(g).all():
+            return
+        dt = 0.0 if self.last_imu is None else timestamp - self.last_imu
+        if dt < 0:
+            return
+        self.last_imu = timestamp
+        if dt > .1:
+            dt = 0.0  # Skip the gap after missing IMU data.
+        # Measure gyro bias while the robot is still.
+        if 1.0 < timestamp < 1.9 and np.linalg.norm(g) < 0.05:
+            self.bias_samples.append(g.copy())
+            self.bias = np.mean(self.bias_samples, axis=0)
+        gx, gy, gz = g - self.bias
+        sr, cr = math.sin(self.roll), math.cos(self.roll)
+        cp = max(0.3, math.cos(self.pitch))
+        self.heading += (gy * sr + gz * cr) / cp * dt
+        self.roll += (gx + math.tan(self.pitch) * (gy * sr + gz * cr)) * dt
+        self.pitch += (gy * cr - gz * sr) * dt
+        if 8.0 < np.linalg.norm(a) < 11.5:
+            roll = math.atan2(a[1], a[2])
+            pitch = math.atan2(-a[0], math.hypot(a[1], a[2]))
+            gain = 1.0 if not self.initialized else 1 - math.exp(-dt / 1.5)
+            self.roll += gain * (roll - self.roll)
+            self.pitch += gain * (pitch - self.pitch)
+            self.initialized = True
+
+    def frame(self, timestamp, rgb, use_imu=True):
+        self.frames += 1
+        # Save this detection for the debug view.
+        self.debug = dict(timestamp=timestamp, rgb=rgb.copy(), mask=None,
+                          rows=[], inliers=[], accepted=False, surface_detected=False,
+                          edge_rows=[], edge_source='none', lateral_source='held',
+                          reason="Invalid RGB image")
+        def reject(reason):
+            self.debug["reason"] = reason
+            return False
+
+        if rgb.ndim != 3 or rgb.shape[2] != 3 or min(rgb.shape[:2]) < 32:
+            return reject("Invalid RGB image")
+        h, w = rgb.shape[:2]
+        f = h / (2 * math.tan(self.fovy / 2))
+        if self.adaptive_surface:
+            # Detect on an upright image, then restore camera coordinates.
+            rear = getattr(self, 'view_sign', 1) < 0
+            upright = rgb[::-1, ::-1] if rear else rgb
+            previous = (self.ramp_mask if self.ramp_mask_pitch is not None and
+                        abs(self.camera_pitch - self.ramp_mask_pitch) < .1 else None)
+            dark, edges = self.surface_detector(upright, self.dark_min, self.dark_max, self.max_chroma,
+                                               previous_mask=previous)
+            if edges:
+                self.ramp_mask, self.ramp_mask_pitch = dark, self.camera_pitch
+            if rear:
+                dark = dark[::-1, ::-1]
+                edges = sorted((h - 1 - y, None if right is None else w - 1 - right,
+                                None if left is None else w - 1 - left) for y, left, right in edges)
+            self.debug['mask'] = dark
+            self.debug['surface_detected'] = bool(dark.any())
+            if not dark.any():
+                return reject("No coherent ramp surface found")
+            if not edges:
+                return reject("Ramp detected; no clear side edge visible")
+        else:
+            gray = rgb.astype(float).mean(axis=2)
+            chroma = np.ptp(rgb.astype(float), axis=2) / np.maximum(gray, 1)
+            dark = (gray > self.dark_min) & (gray < self.dark_max) & (chroma < self.max_chroma)
+            self.debug['mask'] = dark.copy()
+            column = np.flatnonzero(dark[:int(h * .98), w // 2])
+            if not len(column):
+                return reject("No dark surface at image center")
+            bands = np.split(column, np.flatnonzero(np.diff(column) > 1) + 1)
+            band = max(bands, key=len)
+            if len(band) < 12:
+                return reject("Dark region too short")
+            self.debug['surface_detected'] = True
+            top, bottom = int(band[0]), int(band[-1])
+            edges = []
+            for y in range(top + 3, bottom, 2):
+                indices = np.flatnonzero(dark[y])
+                if len(indices) < 12:
+                    continue
+                runs = np.split(indices, np.flatnonzero(np.diff(indices) > 1) + 1)
+                runs = [r for r in runs if r[0] <= w / 2 <= r[-1]]
+                if not runs:
+                    continue
+                run = runs[0]
+                if len(run) < 12 or run[0] < 3 or run[-1] > w - 4:
+                    continue
+                edges.append((y, int(run[0]), int(run[-1])))
+        cr, sr = (math.cos(self.roll), math.sin(self.roll)) if use_imu else (1, 0)
+        cp, sp = (math.cos(self.pitch), math.sin(self.pitch)) if use_imu else (1, 0)
+        rotation = np.array([[cp, sp * sr, sp * cr], [0, cr, -sr], [-sp, cp * sr, cp * cr]])
+        cm, sm = math.cos(self.camera_pitch), math.sin(self.camera_pitch)
+        mount = np.array([[cm, 0, sm], [0, 1, 0], [-sm, 0, cm]])
+        rows = []
+        side_rays = [[], []]
+        side_pixels = [[], []]
+        paired_rays = [[], []]
+        self.debug['edge_rows'] = edges
+        for y, left, right in edges:
+            projected = []
+            for side, x in enumerate((left, right)):
+                ray = None
+                if x is not None:
+                    ray = rotation @ mount @ np.array([1., -(x - (w - 1) / 2) / f,
+                                                       -(y - (h - 1) / 2) / f])
+                    if ray[0] * getattr(self, 'view_sign', 1) >= .2:
+                        ray = ray / ray[0]
+                        side_rays[side].append(ray)
+                        side_pixels[side].append((y, x))
+                    else:
+                        ray = None
+                projected.append(ray)
+            if any(ray is None for ray in projected):
+                continue
+            rays = np.asarray(projected)
+            for side, ray in enumerate(projected):
+                paired_rays[side].append(ray)
+            bearings = rays[:, 1] / rays[:, 0]
+            rows.append([bearings[0] - bearings[1], np.mean(bearings)])
+            self.debug["rows"].append((y, left, right))
+        if len(rows) < 3:
+            if self.adaptive_surface:
+                return self.single_edge_frame(timestamp, side_rays, side_pixels, use_imu)
+            return reject("Too few visible edge pairs (edges may be clipped)")
+        widths, centers = np.asarray(rows).T
+        keep = np.ones(len(widths), dtype=bool)
+        # Use the gyro heading when too little ramp is visible.
+        heading = self.heading
+        depth_threshold = .01 if self.adaptive_surface else .12
+        if len(rows) >= 8 and np.ptp(widths) > depth_threshold:
+            A = np.column_stack([widths, np.ones(len(widths))])
+            for _ in range(3):
+                slope, intercept = np.linalg.lstsq(A[keep], centers[keep], rcond=None)[0]
+                residual = np.abs(centers - A @ [slope, intercept])
+                candidate = residual < max(.008, 2.5 * np.median(residual))
+                if candidate.sum() < 3:
+                    break
+                keep = candidate
+            visual_heading = -math.atan(intercept)
+            if not use_imu or self.last_seen is None or getattr(self, 'searching', False):
+                heading = visual_heading
+            elif self.adaptive_surface:
+                heading += .15 * math.atan2(math.sin(visual_heading - heading),
+                                            math.cos(visual_heading - heading))
+            elif abs(visual_heading - self.heading) < .12:
+                heading += (.2 if timestamp < 2 else .025) * (visual_heading - heading)
+        elif not use_imu:
+            if self.adaptive_surface:
+                return self.single_edge_frame(timestamp, side_rays, side_pixels, use_imu)
+            return reject("Too little edge depth to estimate heading without IMU")
+        offsets = -(centers[keep] + math.tan(heading)) / widths[keep] * self.width_m
+        self.debug["inliers"] = keep.tolist()
+        lateral = np.median(offsets) - self.camera_x * math.sin(heading)
+        if abs(lateral) > self.width_m * .4 or np.median(np.abs(offsets-np.median(offsets))) > .015:
+            if self.adaptive_surface:
+                return self.single_edge_frame(timestamp, side_rays, side_pixels, use_imu)
+            return reject("Offset out of range or inconsistent edge pairs")
+        self.heading = heading
+        self.lateral += .3 * (lateral - self.lateral)
+        self.last_seen = timestamp
+        self.accepted += 1
+        self.debug.update(accepted=True, edge_source='paired', lateral_source='paired_edges',
+                          reason="Both edges: heading and position measured")
+        if self.adaptive_surface:
+            self.remember_ramp_slope(paired_rays)
+        return True
+
+    def remember_ramp_slope(self, side_rays):
+        from .ramp_tracking import fit_edge
+        sign = getattr(self, 'view_sign', 1)
+        # Match nearby rows without crossing a crest.
+        section = slice(-32, None) if sign > 0 else slice(None, 32)
+        fits = [fit_edge(rays[section]) for rays in side_rays]
+        if any(fit is None for fit in fits):
+            return
+        left, right = fits
+        difference = left[0] - right[0]
+        if abs(difference) < .05:
+            return
+        # Use where the two edges meet to estimate ramp direction.
+        z = (right[1] - left[1]) / difference
+        if abs(z) < 1:
+            self.ramp_slopes = self.ramp_slopes | {sign: z * math.cos(self.heading)}
+            self.ramp_slope_pitch = self.ramp_slope_pitch | {sign: self.pitch}
+
+    def single_edge_frame(self, timestamp, side_rays, side_pixels, use_imu):
+        from .ramp_tracking import fit_edge
+        self.debug['inliers'] = []
+        fits = [(side, fit_edge(rays)) for side, rays in enumerate(side_rays)]
+        fits = [(side, fit) for side, fit in fits if fit is not None]
+        if not fits:
+            self.debug['reason'] = 'Too little visible edge to estimate direction'
+            return False
+        side, (slope, intercept, keep) = max(fits, key=lambda item: item[1][2].sum())
+        sign = getattr(self, 'view_sign', 1)
+        if sign in self.ramp_slopes:
+            grade = self.ramp_slopes[sign]
+            grade_source = 'paired_edges'
+            if use_imu:
+                # Adjust the slope as the body tilts.
+                grade += math.tan(self.ramp_slope_pitch[sign]) - math.tan(self.pitch)
+                grade_source = 'paired_edges_and_pitch'
+        else:
+            grade = -math.tan(self.pitch) if use_imu else 0.
+            grade_source = 'body_pitch' if use_imu else 'flat_assumption'
+        z = grade / max(.3, math.cos(self.heading))
+        visual_heading = -math.atan(slope * z + intercept)
+        error = math.atan2(math.sin(visual_heading - self.heading),
+                           math.cos(visual_heading - self.heading))
+        self.heading += .15 * error
+        self.last_seen = timestamp
+        self.accepted += 1
+        # One edge alone cannot measure the center offset.
+        label = ('left' if sign > 0 else 'right') if side == 0 else ('right' if sign > 0 else 'left')
+        self.debug.update(accepted=True, edge_source=label, lateral_source='held',
+                          single_edge_side=side, ramp_grade=grade,
+                          grade_source=grade_source,
+                          single_edge_rows=[point for point, used in zip(side_pixels[side], keep) if used],
+                          visual_heading_rad=visual_heading,
+                          reason=f'{label.capitalize()} edge: heading updated; position held; slope from {grade_source.replace("_", " ")}')
+        return True
+
+    @property
+    def lateral_error(self):
+        # Positive Y points left.
+        return self.lateral + self.ramp_offset_right_m
+
+    def ready(self, timestamp):
+        """Allow brief camera loss; stop when camera or IMU data is too old."""
+        age = timestamp - (self.last_seen if self.last_seen is not None else 0.0)
+        self.max_blind_s = max(self.max_blind_s, age)
+        return (self.last_seen is not None and age <= self.blind_timeout
+                and self.last_imu is not None and timestamp - self.last_imu <= .05)
+
+    def report(self):
+        return dict(camera_frames=self.frames, accepted_frames=self.accepted,
+                    guidance='ramp',
+                    ramp_detected=bool(self.debug and self.debug['surface_detected']),
+                    detection_reason=self.debug['reason'] if self.debug else 'Waiting for camera',
+                    last_seen_s=self.last_seen, heading_rad=self.heading,
+                    lateral_m=self.lateral, roll_rad=self.roll, pitch_rad=self.pitch,
+                    edge_source=self.debug.get('edge_source', 'none') if self.debug else 'none',
+                    lateral_source=self.debug.get('lateral_source', 'held') if self.debug else 'held',
+                    grade_source=self.debug.get('grade_source') if self.debug else None,
+                    max_blind_s=self.max_blind_s)

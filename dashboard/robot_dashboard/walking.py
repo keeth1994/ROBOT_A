@@ -7,13 +7,13 @@ from .navigation import CourseNavigation
 from .corridor_walls import IRWallNavigation, load_corridor_settings
 from .corridor_search import CorridorSearch
 from .crest import CrestSequence, CREST_WAVE_GAIT
-from robot_b91.camera_calibration import load_camera_scan_settings
-from robot_b91.gait import RAMP_SPEED_SCALE
+from robot.navigation.camera_calibration import load_camera_scan_settings
+from robot.gait import RAMP_SPEED_SCALE
 
 ROOT = Path(__file__).resolve().parents[2]
 JOINTS = tuple(f'{leg}_{axis}' for leg in ('FL', 'RL', 'FR', 'RR') for axis in ('yaw', 'pitch'))
 PROFILES = {'walk': (), 'course': ('camera', 'imu'), 'course_camera': ('camera',),
-            'course_tape': ('camera', 'imu'), 'course_imu': ('imu',),
+            'course_imu': ('imu',),
             'corridor': ('ir', 'imu'), 'corridor_search': ('camera', 'ir', 'imu'), 'dance': ()}
 WALK_ACTIONS = (*PROFILES, 'run_course')
 RAMP_PROFILES = ('course', 'course_camera')
@@ -69,7 +69,7 @@ class Walking:
     def camera_start_angle(self, profile):
         if profile == 'corridor_search':
             return self.camera_settings['corridor_servo_deg']
-        if profile in ('course', 'course_camera', 'course_tape'):
+        if profile in RAMP_PROFILES:
             return self.camera_settings['forward_servo_deg']
         return None
 
@@ -122,8 +122,8 @@ class Walking:
             settings.update(self.corridor_settings['gait'])
         if profile == 'dance':
             settings['pitch_stance'] = 0.0
-        # Guidance runs on the PC; these modes share the ESP32's existing IMU gait.
-        controller_profile = 'course' if profile in ('course_tape', 'corridor') else profile
+        # The PC calculates guidance; the ESP32 runs the gait.
+        controller_profile = 'course' if profile == 'corridor' else profile
         result = {'profile': controller_profile, **{name: settings[name] for name in names}}
         if 'rear_stride_scale' in settings:
             result['rear_stride_scale'] = settings['rear_stride_scale']
@@ -150,7 +150,6 @@ class Walking:
                                IRWallNavigation(now, **self.corridor_settings['navigation']))
         else:
             self.navigation = (CourseNavigation(now, use_camera='camera' in sensors, use_imu='imu' in sensors,
-                                                guidance='blue_tape' if profile == 'course_tape' else 'ramp',
                                                 scan_ramp=profile in ('course', 'course_camera'))
                                if sensors else None)
         self.session, self.sequence = session, 0
@@ -174,7 +173,7 @@ class Walking:
         self.last_confirmed_frame = now
         self.resume_until = now + 2
         self.crest_sequence.switched(now)
-        # Keep heading and offset across the controller's orientation reset.
+        # Keep heading and offset when orientation resets.
         self.navigation.camera_angle = None
         self.navigation.estimate.last_seen = None
         self.navigation.downhill_since = self.navigation.flat_since = None

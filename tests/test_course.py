@@ -5,10 +5,10 @@ from concurrent.futures import ProcessPoolExecutor
 import json
 from types import SimpleNamespace
 import numpy as np
-from robot_b91.paths import ROOT
-from robot_b91.run import Robot, evaluate, load_gait_parameters
-from robot_b91.progress import CourseProgress
-from robot_b91.gait import rocker_targets
+from robot.paths import ROOT
+from robot.simulation.run import Robot, evaluate, load_gait_parameters
+from robot.simulation.progress import CourseProgress
+from robot.gait import rocker_targets
 
 
 def check_scoring():

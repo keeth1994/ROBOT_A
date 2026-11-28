@@ -3,7 +3,7 @@ import math
 
 from .navigation import CourseNavigation
 
-# A low signal suggests a distant/missing wall; this is not a distance measurement.
+# Low voltage suggests a distant or missing wall.
 WEAK_SIGNAL_MV = 150
 
 
@@ -70,24 +70,24 @@ class CorridorNavigation(CourseNavigation):
             else:
                 self.last_both_seen = now
                 self.last_both_heading = self.imu_heading
-                # Higher left voltage means a nearer left wall: positive steering turns right.
+                # Positive steering turns right, away from the left wall.
                 error = math.copysign(max(0.0, abs(self.balance) - .02), self.balance)
-                # Ease off before reaching center; countersteer if crossing it quickly.
+                # Reduce steering near the center.
                 target = max(-self.max_steering, min(self.max_steering, self.balance_gain * error + self.rate_gain * self.balance_rate))
                 self.reason = 'Centering between walls using IR signal balance and IMU.'
                 if self.wall_guard and abs(raw_balance) > .12 and target * raw_balance < 0:
-                    # A filter or braking term must not keep turning toward the nearer wall.
+                    # Avoid turning toward the nearer wall.
                     target = max(-.10, min(.10, .3 * raw_balance))
                     self.reason = 'Easing out of the turn to keep clear of the nearer wall.'
         except ValueError as error:
             self.reason = 'Holding steps: ' + str(error)
             self.last_update = None
             return False
-        # Smooth the IR signal and its rate, rather than delaying the steering output.
+        # Smooth the IR readings before calculating steering.
         self.steering = target
         self.last_update = now
-        # Send a steering correction, not a fabricated distance in meters.
-        # The ESP32 gyro steadies this direction between PC updates.
+        # Use voltage to steer; it does not measure distance.
+        # The gyro holds direction between PC updates.
         self.estimate.heading = self.steering
         self.estimate.lateral = 0.0
         return True

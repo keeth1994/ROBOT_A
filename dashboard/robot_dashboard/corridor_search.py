@@ -1,4 +1,4 @@
-"""Find a corridor with camera and side IR readings, then stop centered."""
+"""Find and enter a corridor using camera and IR readings."""
 import math
 from collections import deque
 
@@ -14,14 +14,14 @@ ENTRY_WALL_DISTANCE_M = .24
 
 
 def wall_view(rgb, preferred_side=None, camera_pitch=None, fovy_deg=None):
-    """Look for substantial tan/orange walls and open floor beside them."""
+    """Find walls and nearby openings."""
     image = Image.fromarray(rgb).convert('RGB')
     image.thumbnail((320, 240))
     rgb = np.array(image)
     hsv = np.array(image.convert('HSV'))
     h, w = hsv.shape[:2]
     hue, saturation, value = hsv.transpose(2, 0, 1)
-    # Include pale plywood connected to a clearly colored wall.
+    # Include pale areas connected to a detected wall.
     mask = (hue >= 8) & (hue <= 36) & (saturation >= 25) & (value >= 65)
     mask = binary_opening(mask, structure=np.ones((3, 3)))
     regions, _ = label(mask)
@@ -50,7 +50,7 @@ def wall_view(rgb, preferred_side=None, camera_pitch=None, fovy_deg=None):
         left, right = runs[0][0], runs[-1][1]
         if max(left, w - right) >= .25 * w:
             side = 'left' if left > w - right else 'right'
-            # Aim nearer the wall end so the approach does not pass the entrance wide.
+            # Aim near the wall end.
             target = max(.15, left / w - .05) if side == 'left' else min(.85, right / w + .05)
             kind = 'edge'
         else:
@@ -61,7 +61,7 @@ def wall_view(rgb, preferred_side=None, camera_pitch=None, fovy_deg=None):
         if not np.mean((floor[:, :, 1] < 90) & (floor[:, :, 2] > 12)) >= .65:
             target, kind = None, 'wall'
     blocked = bool(mask[int(.78*h):int(.96*h), int(.38*w):int(.62*w)].mean() > .12)
-    # This is the wall side, whereas `side` above describes the open floor side.
+    # This side refers to the wall, not the opening.
     wall_side = None
     visible_columns = np.flatnonzero(mask.any(axis=0))
     if len(visible_columns):
@@ -79,7 +79,7 @@ def wall_view(rgb, preferred_side=None, camera_pitch=None, fovy_deg=None):
 
 
 def visible_wall_ends(view, camera, roll, pitch):
-    """Find wall ends using floor projection, or visible wall height as a fallback."""
+    """Find wall ends from camera geometry or wall height."""
     view['end_pixels'] = []
     mask = view['mask']
     h, w = mask.shape
@@ -87,9 +87,9 @@ def visible_wall_ends(view, camera, roll, pitch):
     angle = math.radians(camera['pitch_deg']) + pitch
     cp, sp, cr, sr = math.cos(angle), math.sin(angle), math.cos(roll), math.sin(roll)
     rotation = np.array([[cp, sp*sr, sp*cr], [0, cr, -sr], [-sp, cp*sr, cp*cr]])
-    # Thin plywood ramp edges have the same color, but are not maze walls.
+    # Ignore thin ramp edges.
     horizon = max(0, min(h - 1, int(h / 2 - f * math.tan(angle))))
-    # Walls below the lens should appear below the horizon. Prefer their height if the angle disagrees.
+    # Use wall height if the camera angle gives an unlikely position.
     if mask[:horizon].sum() > .5 * mask.sum():
         return wall_height_ends(view, camera, rotation, f)
     columns = np.flatnonzero(view['columns'] & (mask[horizon:int(.90*h)].sum(axis=0) >= .07*h))
@@ -125,7 +125,7 @@ def visible_wall_ends(view, camera, roll, pitch):
             continue
         ends = [int(np.argmin(along)), int(np.argmax(along))]
         end_index = min(ends, key=lambda i: np.linalg.norm(group[i]))
-        # A wall clipped by the image border does not reveal its actual end.
+        # Image borders do not count as wall ends.
         column = int(columns[indices[end_index]])
         if not 4 < column < w - 5:
             continue
@@ -148,7 +148,7 @@ def visible_wall_ends(view, camera, roll, pitch):
 
 
 def wall_height_ends(view, camera, rotation, f):
-    """Use visible wall height when an uncertain camera angle prevents floor projection."""
+    """Use wall height when the camera angle is uncertain."""
     mask = view['mask']
     h, w = mask.shape
     regions, _ = label(mask)
@@ -158,13 +158,13 @@ def wall_height_ends(view, camera, rotation, f):
     for region, bounds in faces:
         columns = np.arange(bounds[1].start, bounds[1].stop)
         face = regions[:, columns] == region
-        # Use the lowest colored face when another wall appears above it.
+        # Use the lower wall when walls overlap.
         rows = np.arange(h)[:, None]
         bottoms = h - 1 - face[::-1].argmax(axis=0)
         tops = np.where(~face & (rows < bottoms), rows, -1).max(axis=0) + 1
-        # Bridge the grey support feet without treating their edges as wall ends.
+        # Ignore gaps caused by grey support feet.
         bottoms = grey_closing(bottoms, size=max(3, int(.10 * w)), mode='nearest')
-        # A nearer wall can end in front of another wall of the same color.
+        # Keep wall ends visible in front of other walls.
         splits = np.flatnonzero(np.abs(np.diff(bottoms)) > .08 * h) + 1
         for part in np.split(np.arange(len(columns)), splits):
             if len(part) < 20:
@@ -344,8 +344,7 @@ class CorridorSearch:
         score = np.linalg.norm(point - self.position) + .3 / math.sqrt(samples)
         if self.search_heading is not None:
             forward = np.array([math.cos(self.search_heading), math.sin(self.search_heading)])
-            # The entrance is beside the ramp and leads back along it.
-            # These are preferences, so a rotated layout can still be selected.
+            # Prefer entrances beside the ramp, leading back along it.
             score += 1.2 * (1 + tangent @ forward)
             score += .8 * abs(point @ forward) / max(np.linalg.norm(point), .01)
         return score
@@ -377,15 +376,15 @@ class CorridorSearch:
             normal = np.array([-tangent[1], tangent[0]])
             if (middle - self.position) @ normal < 0:
                 normal = -normal
-            # Aim across the opening at its far edge from the approach side.
+            # Aim at the far edge of the opening.
             self.approach_end = max(ends, key=lambda end: (end['point'] - self.position) @ normal)
             self.approach_goal = self.approach_end['point'] - .25 * tangent
         else:
             normal = self.selected['normal'] / np.linalg.norm(self.selected['normal'])
             offset = self.position - self.selected['point']
-            # From in front, stay on the visible face. A side approach crosses the end.
+            # Stay on the visible wall face when approaching from the front.
             visible_face = abs(offset @ tangent) > abs(offset @ normal)
-            # Allow for wall thickness and walking drift before the side IR can see the wall.
+            # Leave room for wall thickness and walking drift.
             clearance = .25 * normal if visible_face else -.19 * normal
             self.approach_goal = self.selected['point'] - .18 * tangent + clearance
         self.wall_heading = math.atan2(tangent[1], tangent[0])
@@ -400,7 +399,7 @@ class CorridorSearch:
         correction = np.zeros(2)
         matched = []
         for target in ends:
-            # A close end soon leaves the image; do not replace it with the far wall.
+            # Keep tracking the same wall end as it leaves view.
             if np.linalg.norm(target['point'] - self.position) < .45:
                 continue
             matches = [(i, end) for i, end in observations
@@ -410,7 +409,7 @@ class CorridorSearch:
                 continue
             i, (point, tangent, normal) = min(matches, key=lambda item:
                                              np.linalg.norm(item[1][0] - target['point']))
-            # Correct walking drift without changing to another wall end.
+            # Correct drift without switching wall ends.
             delta = .3 * (point - target['point'])
             target['point'] = target['point'] + delta
             target['tangent'] = .8 * target['tangent'] + .2 * tangent
@@ -471,7 +470,7 @@ class CorridorSearch:
         self.wall_point = self.sensor_point(side, distance)
         self.wall_samples.clear()
         self.last_wall_seen = now
-        # The corridor runs back alongside the ramp, opposite the scan's starting heading.
+        # The corridor leads back alongside the ramp.
         if self.search_heading is not None:
             self.wall_heading = self.search_heading + math.pi
         self.entry_heading = self.wall_heading
@@ -491,7 +490,7 @@ class CorridorSearch:
         self.turn_previous_heading = self.imu_heading
 
     def confirm_side_wall(self, now, distances):
-        # Turning and waiting do not count toward the forward walking delay.
+        # Count only forward walking time.
         if self.approach_walk_time < 15:
             self.ir_since = None
             return False
@@ -512,15 +511,15 @@ class CorridorSearch:
         direction = 1 if side == 0 else -1
         offset = self.wall_point - self.position
         radius = abs(self.settings['sensor_positions'][side][1]) + ENTRY_WALL_DISTANCE_M
-        # Follow an arc around the measured wall end, with room for the feet.
+        # Turn around the wall end with room for the feet.
         desired = math.atan2(offset[1], offset[0]) - direction * math.pi / 2
         desired += direction * (.04 + math.atan(3 * (np.linalg.norm(offset) - radius)))
         if distance <= .30:
             self.last_wall_seen = now
-            # Keep correcting clearance when the side sensor can still see the wall.
+            # Use IR to keep clearance during the turn.
             desired += direction * float(np.clip(2 * (distance - ENTRY_WALL_DISTANCE_M), -.12, .12))
         self.update_turn_progress()
-        # Limit the arc to the corridor heading so a bad wall-point estimate cannot cause a circle.
+        # Stop turning at the corridor heading.
         desired_progress = self.turn_progress + self.turn_direction * angle_difference(desired, self.imu_heading)
         desired_progress = float(np.clip(desired_progress, 0, self.turn_angle))
         error = self.turn_direction * (self.turn_progress - desired_progress)
@@ -536,7 +535,7 @@ class CorridorSearch:
         if self.moving:
             if self.stage == 'approach' and self.forward > 0:
                 self.approach_walk_time += dt
-            # Integrate the previous command, before applying the new walking pace.
+            # Estimate movement using the previous speed.
             self.position += self.settings['walk_speed'] * self.last_speed * self.forward * dt * self.rotation()[:, 0]
         self.last_update = now
         self.moving = self._update(status, now, camera_frame)
@@ -546,7 +545,7 @@ class CorridorSearch:
         elif self.stage == 'approach':
             self.speed *= .5
             if self.moving and self.forward > 0 and self.ir_since is None:
-                # Walk faster across open floor; slow as soon as the chosen IR sees the wall.
+                # Slow down when the IR sensor sees the wall.
                 self.speed *= 1.5
         elif self.stage in ('align_wall', 'enter', 'follow_wall'):
             self.speed *= 2
@@ -638,7 +637,7 @@ class CorridorSearch:
             if self.confirm_side_wall(now, distances):
                 return self.turn_at_wall(now, distances)
             if self.approach_heading is None and self.drive_to(self.approach_goal):
-                # Continue straight past the estimated target until IR confirms the wall.
+                # Keep going until IR confirms the wall.
                 self.approach_heading = self.imu_heading
             if self.approach_heading is not None:
                 self.steer_to(self.approach_heading)

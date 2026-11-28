@@ -85,7 +85,7 @@ class GaitPlot {
         ctx.strokeStyle = this.colors[leg]; ctx.lineWidth = 1.7; ctx.beginPath();
         let previous = null;
         for (const sample of this.samples) {
-          // Leave gaps when no fresh controller samples were received.
+          // Leave gaps for missing samples.
           if (previous === null || sample.time_s - previous > .5) ctx.moveTo(x(sample.time_s), y(sample[axis][leg]));
           else ctx.lineTo(x(sample.time_s), y(sample[axis][leg]));
           previous = sample.time_s;

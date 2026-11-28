@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the robot dashboard on this PC: python3 dashboard/run.py."""
+"""Robot dashboard."""
 import argparse
 from pathlib import Path
 import sys

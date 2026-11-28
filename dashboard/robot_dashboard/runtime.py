@@ -10,7 +10,7 @@ import time
 
 import numpy as np
 from PIL import Image
-from robot_b91.navigation_debug import navigation_debug_image
+from robot.navigation.debug import navigation_debug_image
 
 from . import devices
 from .walking import WALK_ACTIONS, Walking
@@ -18,7 +18,7 @@ from .navigation import CourseNavigation
 
 
 def orient_camera_frame(jpeg):
-    """Use the same upright image for the dashboard and course navigation."""
+    """Rotate the camera image upright."""
     with Image.open(BytesIO(jpeg)) as source:
         upright = source.convert('RGB')
     output = BytesIO()
@@ -59,7 +59,7 @@ class CameraPipeline:
             self.error = 'Connecting to camera...' if enabled else 'Video is off.'
             conn, response = self.conn, self.response
             self.condition.notify_all()
-        # Close outside the condition; an upstream read has a bounded timeout.
+        # Release the lock before closing the stream.
         if conn:
             conn.close()
         if response:
@@ -231,7 +231,7 @@ class Dashboard:
                     if getattr(self.walking.navigation, 'corridor_requested', False):
                         self._corridor_after_ramp(url)
                         continue
-                    # Pause the gait before issuing a camera turn requested after ramp loss.
+                    # Pause walking before turning the camera.
                     self._aim_camera(url, status, self.walking.camera_target(time.monotonic()))
                     self.walking.last_confirmed_frame = time.monotonic()
                 except (devices.DeviceError, ValueError, KeyError, TypeError) as error:
@@ -246,7 +246,7 @@ class Dashboard:
                         pass
 
     def _change_ramp_gait(self, url):
-        """Stop/confirm/restart, retaining navigation; never retry a partial switch."""
+        """Stop before switching walking modes. Keep navigation state."""
         try:
             params, settings = self.walking.transition_settings()
             devices.request(url, '/stop', {}, timeout=.3)
@@ -435,7 +435,7 @@ class Dashboard:
         if any(isinstance(angles.get(name), bool) or not isinstance(angles.get(name), (int, float)) or
                not math.isfinite(angles[name]) for name in names):
             return
-        # Reverse the controller's mounting conversion to recover gait joint targets.
+        # Undo servo mounting offsets to show joint targets.
         yaw = [angles[f'{leg}_yaw'] * (-1 if leg in ('RL', 'RR') else 1)
                for leg in ('FL', 'RL', 'FR', 'RR')]
         pitch = [angles[f'{leg}_pitch'] - 45 for leg in ('FL', 'RL', 'FR', 'RR')]
@@ -470,7 +470,7 @@ class Dashboard:
         return status
 
     def navigation_debug_frame(self):
-        # Copy the actual decision under the control lock, then render outside it.
+        # Copy under the lock; draw after releasing it.
         with self.servo_lock:
             navigation = self.walking.navigation
             live = self.walking.active and navigation is not None and navigation.use_camera
@@ -483,7 +483,7 @@ class Dashboard:
                 elapsed = time.monotonic() - navigation.started
                 use_imu = navigation.use_imu
         if not live:
-            # Preview has its own estimator and never starts or alters walking.
+            # Preview does not change walking.
             with self.debug_lock:
                 now = time.monotonic()
                 with self.lock:
@@ -498,11 +498,11 @@ class Dashboard:
         return output.getvalue()
 
     def operator_heartbeat(self):
-        # Receipt in the visible browser is independent of servo/network latency.
+        # Track browser activity separately from device requests.
         with self.lock:
             self.browser_heartbeat = time.monotonic()
             if self.walking.active:
-                # Local walking has its own navigation watchdog on the MCU.
+                # The ESP32 also stops when navigation updates are lost.
                 return {'message': 'Operator heartbeat received.'}
         return self.servo_command('/heartbeat', {})
 
@@ -533,14 +533,14 @@ class Dashboard:
                 url = self.config['servo']
             result = devices.request(url, path, values, timeout=.15 if path == '/camera-pitch' else .8)
             if path == '/heartbeat':
-                # This happens ONLY in response to a browser request, never a timer.
+                # Only a browser request can start this.
                 with self.lock:
                     self.browser_heartbeat = max(self.browser_heartbeat, arrival)
             return result
 
     def configure(self, values):
         config = self._validate_config(values)
-        # Operator-requested address changes cancel current control before switching.
+        # Stop control before changing device addresses.
         with self.camera_settings_lock, self.servo_lock:
             was_walking = self.walking.active
             self.walking.stop('Device address changed. Walking stopped.')
@@ -595,7 +595,7 @@ class Dashboard:
             try:
                 self.servo_command('/stop', {})
             except devices.DeviceError:
-                pass  # MCU watchdog remains the final fallback if the PC/link is gone.
+                pass  # The ESP32 watchdog stops motion if the PC disconnects.
         self.camera.close()
         for thread in self.threads:
             thread.join(timeout=2)

@@ -1,4 +1,4 @@
-"""Small HTTP clients. No autonomous heartbeat or motion loop exists here."""
+"""HTTP connections to the ESP32s."""
 import http.client
 import json
 import re
@@ -12,7 +12,7 @@ class DeviceError(Exception):
 
 
 class DeviceConnectionError(DeviceError):
-    """A transport failure for which delivery may be retried."""
+    """A connection error that can be retried."""
 
 
 def origin(value):
@@ -41,7 +41,7 @@ def stream_origin(camera, port=81):
 
 def connection(base, timeout=0.8):
     parsed = urlsplit(base)
-    # http.client deliberately avoids proxy environment variables for LAN devices.
+    # Connect directly to the ESP32, without a proxy.
     return http.client.HTTPConnection(parsed.hostname, parsed.port or 80, timeout=timeout)
 
 
@@ -79,7 +79,7 @@ def request(base, path, values=None, timeout=0.8):
 
 
 def mjpeg_frames(response, max_frame=2_000_000):
-    """Parse bounded Content-Length multipart frames without queuing images."""
+    """Read camera frames without buffering old images."""
     buffer = bytearray()
     while True:
         part = response.read1(16384)

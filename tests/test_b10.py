@@ -7,7 +7,7 @@ import json
 import mujoco
 import numpy as np
 
-from robot_b91.paths import ROOT
+from robot.paths import ROOT
 
 
 def main():

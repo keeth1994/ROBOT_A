@@ -3,6 +3,7 @@
 .vscode/
 __pycache__/
 *.pyc
+MJMODEL.TXT
 logs/
 .pytest_cache/
 .ruff_cache/
@@ -17,5 +18,3 @@ cad/B9_8/*.json
 cad/B9_8/*.png
 cad/B9_8/*.txt
 cad/B9_8/*_candidate.*
-
-tests/

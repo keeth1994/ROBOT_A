@@ -1,10 +1,10 @@
-"""Wave gait for the selected crest, triggered by onboard observations."""
+"""Handle the selected crest using IMU readings."""
 import math
 
 MAX_SAMPLE_GAP_S = .9
 
 
-# Lift one foot at a time, with shorter rear strokes and an inward stance.
+# Lift one foot at a time.
 CREST_WAVE_GAIT = dict(duty=.8, yaw_amplitude=.55, rear_stride_scale=.30, pitch_lift=.25,
                        front_pitch_lift=math.radians(50), pitch_stance=0., yaw_bias=-.25, pattern='crest')
 
@@ -50,8 +50,8 @@ class CrestSequence:
                 self.since = None
             self.exit_candidate = candidate
             condition = candidate is not None
-            # Level pitch must persist beyond a complete slow gait cycle.
-            # This measures commanded walking time, not actual forward progress.
+            # Wait for level pitch through a full gait cycle.
+            # Count walking time, not distance.
             duration = 5.0 if candidate == 'plateau' else .6
         if not condition:
             self.since = None
